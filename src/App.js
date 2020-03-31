@@ -3,11 +3,11 @@ import { Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 
+import "./App.sass";
+
 import { setCurrentUser } from "./redux/user/user.actions";
 import { selectCurrentUser } from "./redux/user/user.selectors";
-
-import logo from "./logo.svg";
-import "./App.sass";
+import LandingPage from "./pages/landing/LandingPage";
 
 class App extends React.Component {
   componentDidMount() {
@@ -22,10 +22,7 @@ class App extends React.Component {
       <div className="App">
         <Switch>
           <Route exact path="/">
-            <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
-              <p>Project Catherine</p>
-            </header>
+            <LandingPage />
           </Route>
           {/* this route will render if all of the above routes don't */}
           <Route>404 - Not Found</Route>
