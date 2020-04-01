@@ -12,6 +12,12 @@ html {
   --bg-color: #dde6e4;
 }
 
+@media only screen and (max-width: 1600px) {
+  html {
+    font-size: 16px;
+  }
+}
+
 body {
   font-family: "Karla", sans-serif;
   -webkit-font-smoothing: antialiased;
