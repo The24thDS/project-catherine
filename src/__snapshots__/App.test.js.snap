@@ -8,7 +8,7 @@ exports[`App snapshot renders 1`] = `
     className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap landing"
   >
     <section
-      className="euiFlexItem landing--information"
+      className="euiFlexItem euiFlexItem--flexGrow4 landing--information"
     >
       <div
         className="euiText euiText--medium"
@@ -30,7 +30,7 @@ exports[`App snapshot renders 1`] = `
       </div>
     </section>
     <section
-      className="euiFlexItem landing--forms"
+      className="euiFlexItem euiFlexItem--flexGrow1 landing--forms"
     >
       login/signup
     </section>

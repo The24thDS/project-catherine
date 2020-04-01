@@ -20,7 +20,11 @@ export default function LandingPage() {
       responsive={true}
       wrap={true}
     >
-      <EuiFlexItem className="landing--information" component="section">
+      <EuiFlexItem
+        className="landing--information"
+        component="section"
+        grow={4}
+      >
         <EuiText>
           <EuiTitle textTransform="uppercase">
             <h1>Project Catherine</h1>
@@ -47,7 +51,7 @@ export default function LandingPage() {
           </article>
         </EuiText>
       </EuiFlexItem>
-      <EuiFlexItem className="landing--forms" component="section">
+      <EuiFlexItem className="landing--forms" component="section" grow={1}>
         login/signup
       </EuiFlexItem>
     </EuiFlexGroup>

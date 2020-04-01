@@ -2,7 +2,6 @@
   min-height: 100vh
   margin: 0 100px
   &>section
-    max-height: 700px
     background-color: var(--light-green)
     margin: 0
 
@@ -11,7 +10,7 @@
     margin: 0
 
 section.landing--information
-  max-width: 1120px
+  max-width: 58vw
   margin-right: 100px
   padding: 40px
   h1
@@ -24,5 +23,46 @@ section.landing--information
     font-size: 1.3rem
     margin: 0 110px
 
+@media only screen and (max-width: 1600px)
+  section.landing--information
+    h1
+      font-size: 2rem
+    .logo
+      height: 60px
+      margin: 16px 0
+    article
+      margin: 0
+      font-size: 1rem
+
+@media only screen and (max-width: 1100px)
+  .landing
+    margin: 0 50px
+  section.landing--information
+    margin-right: 50px
+    padding: 20px
+    h1
+      font-size: 1.5rem
+    .logo
+      height: 40px
+      margin: 8px 0
+    article
+      font-size: 0.9rem
+      line-height: 1rem
+
+@media only screen and (orientation: portrait)
+  .landing
+    margin: 0
+    &>section
+      min-width: 100vw
+      min-height: 50vh
+      margin: 0
+  section.landing--information
+    h1
+      font-weight: bold
+      text-transform: capitalize
+    .logo
+      margin: 20px 0
+
 section.landing--forms
-  max-width: 500px
+  min-width: 25vw
+  min-width: 300px
