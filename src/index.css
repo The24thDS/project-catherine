@@ -8,8 +8,11 @@
 
 html {
   font-size: 18px;
+  --highlight-green: #b6ffec;
   --light-green: #a1e6d4;
   --bg-color: #dde6e4;
+  --main-green: #227455;
+  scrollbar-color: var(--main-green) transparent;
 }
 
 @media only screen and (max-width: 1600px) {
@@ -32,4 +35,10 @@ h4,
 h5,
 h6 {
   font-family: "Muli", sans-serif;
+}
+
+#root {
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
 }

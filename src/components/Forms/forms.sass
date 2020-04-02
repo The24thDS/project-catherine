@@ -1,0 +1,44 @@
+.landing-form
+  padding: 20px 40px
+  label
+    font-size: 18px
+    font-family: "Karla", sans-serif
+    font-weight: normal
+    &.euiFormLabel-isFocused
+      color: var(--main-green)
+      font-weight: bold
+  input, .euiFormControlLayout
+    height: 70px
+    font-size: 24px
+    font-family: "Karla", sans-serif
+  input
+    border: 1px solid var(--main-green)
+    border-radius: 2.5px
+    background-color: #F2FFFF
+    &:focus
+      background-image: linear-gradient(to top, var(--main-green), var(--main-green) 2px, transparent 2px, transparent 100%)
+  .name-inputs
+    margin-bottom: 16px
+    .euiFlexItem:first-child
+      margin-right: 5px
+    .euiFlexItem:last-child
+      margin-left: 5px
+
+.form-button button
+  height: 70px
+  &.euiButton--primary.euiButton--fill, &.euiButton--primary.euiButton--fill:hover, &.euiButton--primary.euiButton--fill:focus
+    box-shadow: 1.5px 1.5px 3px #00000066
+    background-color: var(--main-green)
+    border: none
+  span
+    display: flex
+    justify-content: center
+    align-items: center
+.form-message
+  padding-top: 10px
+  color: #017D73
+  font-weight: 600
+  text-align: center
+
+.full-width
+  width: 100%

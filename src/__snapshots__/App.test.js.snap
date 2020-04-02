@@ -5,34 +5,359 @@ exports[`App snapshot renders 1`] = `
   className="App"
 >
   <div
-    className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap landing"
+    className="euiFlexGroup euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap landing"
   >
     <section
       className="euiFlexItem euiFlexItem--flexGrow4 landing--information"
     >
-      <div
-        className="euiText euiText--medium"
+      <h1
+        className="euiTitle euiTitle--medium euiTitle--uppercase"
       >
-        <h1
-          className="euiTitle euiTitle--medium euiTitle--uppercase"
-        >
-          Project Catherine
-        </h1>
-        <img
-          className="euiIcon euiIcon-isLoaded logo"
-          src="logo-black.svg"
-        />
-        <article>
-          <p>
-            But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that
-          </p>
-        </article>
-      </div>
+        Project Catherine
+      </h1>
+      <img
+        className="euiIcon euiIcon-isLoaded logo"
+        src="logo-black.svg"
+      />
+      <article>
+        <p>
+          But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that
+        </p>
+      </article>
     </section>
     <section
       className="euiFlexItem euiFlexItem--flexGrow1 landing--forms"
     >
-      login/signup
+      <nav
+        className="forms-nav"
+      >
+        <button
+          className="forms-nav-button  forms-nav-button--active"
+          onClick={[Function]}
+        >
+          SIGNUP
+        </button>
+        <button
+          className="forms-nav-button "
+          onClick={[Function]}
+        >
+          LOGIN
+        </button>
+      </nav>
+      <form
+        className="euiForm landing-form"
+        onSubmit={[Function]}
+      >
+        <div
+          className="euiFlexGroup euiFlexGroup--directionRow euiFlexGroup--responsive name-inputs"
+        >
+          <div
+            className="euiFlexItem"
+          >
+            <div
+              className="euiFormRow"
+              id="mxngtfx9-row"
+            >
+              <div
+                className="euiFormRow__labelWrapper"
+              >
+                <label
+                  className="euiFormLabel euiFormRow__label"
+                  htmlFor="mxngtfx9"
+                >
+                  First Name
+                </label>
+              </div>
+              <div
+                className="euiFormRow__fieldWrapper"
+              >
+                <div
+                  className="euiFormControlLayout"
+                >
+                  <div
+                    className="euiFormControlLayout__childrenWrapper"
+                  >
+                    <input
+                      className="euiFieldText"
+                      id="mxngtfx9"
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      type="text"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="euiFlexItem"
+          >
+            <div
+              className="euiFormRow"
+              id="la8020om-row"
+            >
+              <div
+                className="euiFormRow__labelWrapper"
+              >
+                <label
+                  className="euiFormLabel euiFormRow__label"
+                  htmlFor="la8020om"
+                >
+                  Last Name
+                </label>
+              </div>
+              <div
+                className="euiFormRow__fieldWrapper"
+              >
+                <div
+                  className="euiFormControlLayout"
+                >
+                  <div
+                    className="euiFormControlLayout__childrenWrapper"
+                  >
+                    <input
+                      className="euiFieldText"
+                      id="la8020om"
+                      onBlur={[Function]}
+                      onFocus={[Function]}
+                      type="text"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="euiFormRow euiFormRow--fullWidth"
+          id="mcqcro2n-row"
+          onBlur={[Function]}
+        >
+          <div
+            className="euiFormRow__labelWrapper"
+          >
+            <label
+              aria-invalid={false}
+              className="euiFormLabel euiFormRow__label"
+              htmlFor="mcqcro2n"
+            >
+              Email
+            </label>
+          </div>
+          <div
+            className="euiFormRow__fieldWrapper"
+          >
+            <div
+              className="euiFormControlLayout euiFormControlLayout--fullWidth"
+            >
+              <div
+                className="euiFormControlLayout__childrenWrapper"
+              >
+                <input
+                  className="euiFieldText euiFieldText--fullWidth"
+                  id="mcqcro2n"
+                  name="email"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  onFocus={[Function]}
+                  type="email"
+                  value=""
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="euiFormRow euiFormRow--fullWidth"
+          id="l52nkati-row"
+        >
+          <div
+            className="euiFormRow__labelWrapper"
+          >
+            <label
+              className="euiFormLabel euiFormRow__label"
+              htmlFor="l52nkati"
+            >
+              Date of Birth
+            </label>
+          </div>
+          <div
+            className="euiFormRow__fieldWrapper"
+          >
+            <span>
+              <span
+                className="euiDatePicker euiDatePicker--shadow"
+              >
+                <div
+                  className="euiFormControlLayout euiFormControlLayout--fullWidth"
+                >
+                  <div
+                    className="euiFormControlLayout__childrenWrapper"
+                  >
+                    <div
+                      className="react-datepicker-wrapper"
+                    >
+                      <div
+                        className="react-datepicker__input-container"
+                      >
+                        <input
+                          aria-label=""
+                          className="euiDatePicker euiFieldText euiFieldText--fullWidth euiFieldText--withIcon"
+                          disabled={false}
+                          id="l52nkati"
+                          onBlur={[Function]}
+                          onChange={[Function]}
+                          onClick={[Function]}
+                          onFocus={[Function]}
+                          onKeyDown={[Function]}
+                          readOnly={false}
+                          type="text"
+                          value=""
+                        />
+                      </div>
+                    </div>
+                    <div
+                      className="euiFormControlLayoutIcons"
+                    >
+                      <span
+                        className="euiFormControlLayoutCustomIcon"
+                      >
+                        <svg
+                          aria-hidden={true}
+                          className="euiIcon euiIcon--medium euiIcon-isLoading euiFormControlLayoutCustomIcon__icon"
+                          focusable="false"
+                          height={16}
+                          role="img"
+                          style={null}
+                          viewBox="0 0 16 16"
+                          width={16}
+                          xmlns="http://www.w3.org/2000/svg"
+                        />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </span>
+            </span>
+          </div>
+        </div>
+        <div
+          className="euiFormRow euiFormRow--fullWidth"
+          id="nmjn6025-row"
+          onBlur={[Function]}
+        >
+          <div
+            className="euiFormRow__labelWrapper"
+          >
+            <label
+              aria-invalid={false}
+              className="euiFormLabel euiFormRow__label"
+              htmlFor="nmjn6025"
+            >
+              Password
+            </label>
+          </div>
+          <div
+            className="euiFormRow__fieldWrapper"
+          >
+            <span
+              className="euiToolTipAnchor full-width"
+              onMouseOut={[Function]}
+              onMouseOver={[Function]}
+            >
+              <div
+                className="euiFormControlLayout euiFormControlLayout--fullWidth"
+              >
+                <div
+                  className="euiFormControlLayout__childrenWrapper"
+                >
+                  <input
+                    className="euiFieldText euiFieldText--fullWidth"
+                    minLength="10"
+                    name="password"
+                    onBlur={[Function]}
+                    onChange={[Function]}
+                    onFocus={[Function]}
+                    type="password"
+                    value=""
+                  />
+                </div>
+              </div>
+            </span>
+            <div
+              className="euiFormHelpText euiFormRow__text"
+              id="nmjn6025-help"
+            >
+              <div>
+                <div
+                  className="euiFlexGroup euiFlexGroup--alignItemsCenter euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow"
+                  style={
+                    Object {
+                      "height": "20px",
+                    }
+                  }
+                >
+                  <div
+                    className="euiFlexItem euiFlexItem--flexGrow1"
+                    style={
+                      Object {
+                        "height": "100%",
+                      }
+                    }
+                  >
+                    Strength:
+                  </div>
+                  <div
+                    className="euiFlexItem euiFlexItem--flexGrow2"
+                  >
+                    <progress
+                      aria-label="password strength"
+                      className="euiProgress euiProgress--native euiProgress--m euiProgress--danger"
+                      max={100}
+                      value={0}
+                    />
+                  </div>
+                </div>
+                <p>
+                  Must be at least 10 characters long
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="euiFormRow form-button"
+          id="7ppfhqir-row"
+        >
+          <div
+            className="euiFormRow__fieldWrapper"
+          >
+            <button
+              className="euiButton euiButton--primary euiButton--fill"
+              disabled={false}
+              id="7ppfhqir"
+              onBlur={[Function]}
+              onFocus={[Function]}
+              type="submit"
+            >
+              <span
+                className="euiButton__content"
+              >
+                <span
+                  className="euiButton__text"
+                >
+                  SIGN UP
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div
+          className="euiText euiText--medium form-message"
+        >
+          
+        </div>
+      </form>
     </section>
   </div>
 </div>
