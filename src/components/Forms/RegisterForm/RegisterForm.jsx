@@ -5,7 +5,6 @@ import {
   EuiFormRow,
   EuiFieldText,
   EuiButton,
-  EuiLink,
   EuiText,
   EuiToolTip,
   EuiProgress,
@@ -22,15 +21,18 @@ import {
 } from "../utils";
 import rightArrow from "../../../assets/arrow-right.svg";
 import "../forms.sass";
+import moment from "moment";
 
 class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
+      firstName: "",
+      lastName: "",
       usernameInvalid: false,
       email: "",
       emailInvalid: false,
+      birthDate: moment().subtract(18, "years"),
       password: "",
       passwordStrength: 0,
       passwordInvalid: false,
@@ -156,10 +158,11 @@ class RegisterForm extends React.Component {
 
   render() {
     const {
-      username,
-      usernameInvalid,
+      firstName,
+      lastName,
       email,
       emailInvalid,
+      birthDate,
       password,
       passwordStrength,
       passwordError,
@@ -222,12 +225,22 @@ class RegisterForm extends React.Component {
         <EuiFlexGroup className="name-inputs" gutterSize="none">
           <EuiFlexItem>
             <EuiFormRow label="First Name">
-              <EuiFieldText />
+              <EuiFieldText
+                name="firstName"
+                value={firstName}
+                onChange={this.onInputChange}
+                fullWidth
+              />
             </EuiFormRow>
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiFormRow label="Last Name">
-              <EuiFieldText />
+              <EuiFieldText
+                name="lastName"
+                value={lastName}
+                onChange={this.onInputChange}
+                fullWidth
+              />
             </EuiFormRow>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -247,7 +260,17 @@ class RegisterForm extends React.Component {
           />
         </EuiFormRow>
         <EuiFormRow fullWidth label="Date of Birth">
-          <EuiDatePicker fullWidth />
+          <EuiDatePicker
+            name="birthDate"
+            dateFormat="YYYY-MM-DD"
+            selected={birthDate}
+            onChange={ev =>
+              this.onInputChange({
+                target: { name: "birthDate", value: ev }
+              })
+            }
+            fullWidth
+          />
         </EuiFormRow>
         <EuiFormRow
           label="Password"

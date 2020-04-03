@@ -8,14 +8,14 @@
 
 html {
   font-size: 18px;
-  --highlight-green: #b6ffec;
-  --light-green: #a1e6d4;
+  --highlight-color: #b6ffec;
+  --secondary-color: #a1e6d4;
   --bg-color: #dde6e4;
-  --main-green: #227455;
-  scrollbar-color: var(--main-green) transparent;
+  --primary-color: #227455;
+  scrollbar-color: var(--primary-color) transparent;
 }
 
-@media only screen and (max-width: 1600px) {
+@media only screen and (max-width: 1200px) {
   html {
     font-size: 16px;
   }

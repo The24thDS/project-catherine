@@ -4,8 +4,6 @@ import {
   EuiForm,
   EuiFormRow,
   EuiFieldText,
-  EuiTitle,
-  EuiPage,
   EuiButton,
   EuiLink,
   EuiText,
@@ -22,8 +20,8 @@ class LoginForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: "",
-      userInvalid: false,
+      email: "",
+      emailInvalid: false,
       password: "",
       passwordInvalid: false,
       loading: false,
@@ -42,11 +40,11 @@ class LoginForm extends React.Component {
   validateUser = () => {
     if (this.state.user.length === 0) {
       this.setState({
-        userInvalid: true
+        emailInvalid: true
       });
     } else {
       this.setState({
-        userInvalid: false
+        emailInvalid: false
       });
     }
   };
@@ -103,8 +101,8 @@ class LoginForm extends React.Component {
 
   submitForm = async ev => {
     ev.preventDefault();
-    const { userInvalid, passwordInvalid, user, password } = this.state;
-    if (!userInvalid && !passwordInvalid && user.length && password.length) {
+    const { emailInvalid, passwordInvalid, user, password } = this.state;
+    if (!emailInvalid && !passwordInvalid && user.length && password.length) {
       await this.login();
     } else {
       this.setState({
@@ -115,8 +113,8 @@ class LoginForm extends React.Component {
 
   render() {
     const {
-      user,
-      userInvalid,
+      email,
+      emailInvalid,
       password,
       passwordInvalid,
       loading,
@@ -137,15 +135,15 @@ class LoginForm extends React.Component {
         >
           <EuiFormRow
             label="Email"
-            isInvalid={userInvalid}
+            isInvalid={emailInvalid}
             error="Can't be empty"
             onBlur={this.validateUser}
             fullWidth
           >
             <EuiFieldText
-              name="user"
-              type="text"
-              value={user}
+              name="email"
+              type="email"
+              value={email}
               onChange={this.onInputChange}
               fullWidth
             />
@@ -165,11 +163,7 @@ class LoginForm extends React.Component {
               fullWidth
             />
           </EuiFormRow>
-          <EuiFlexGroup
-            gutterSize="none"
-            justifyContent="spaceBetween"
-            style={{ fontSize: "14px", margin: "6px 0" }}
-          >
+          <EuiFormRow>
             <EuiCheckbox
               id="rememberMe"
               name="rememberMe"
@@ -181,16 +175,19 @@ class LoginForm extends React.Component {
               checked={rememberMe}
               label="Remember me"
             />
-            <EuiLink
-              style={{ marginLeft: "10px" }}
+          </EuiFormRow>
+          <EuiFormRow className="form-button" fullWidth>
+            <EuiButton fill isLoading={loading} type="submit" fullWidth>
+              Login
+            </EuiButton>
+          </EuiFormRow>
+          <EuiFormRow className="form-button" fullWidth>
+            <EuiButton
               onClick={this.toggleForgotPasswordModal}
+              type="button"
+              fullWidth
             >
               Forgot password?
-            </EuiLink>
-          </EuiFlexGroup>
-          <EuiFormRow className="form-button">
-            <EuiButton fill isLoading={loading} type="submit">
-              Log in
             </EuiButton>
           </EuiFormRow>
           <EuiText className="form-message">{formMessage}</EuiText>

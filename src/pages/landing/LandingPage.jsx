@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiText,
-  EuiTitle,
-  EuiIcon
-} from "@elastic/eui";
+import { EuiFlexGroup, EuiFlexItem, EuiTitle, EuiIcon } from "@elastic/eui";
 
 import "./landingPage.sass";
 import blackLogo from "../../assets/logo-black.svg";
@@ -22,11 +16,7 @@ export default function LandingPage() {
       responsive={true}
       wrap={true}
     >
-      <EuiFlexItem
-        className="landing--information"
-        component="section"
-        grow={4}
-      >
+      <EuiFlexItem className="landing--information" component="section">
         <EuiTitle textTransform="uppercase">
           <h1>Project Catherine</h1>
         </EuiTitle>
@@ -51,7 +41,7 @@ export default function LandingPage() {
           </p>
         </article>
       </EuiFlexItem>
-      <EuiFlexItem className="landing--forms" component="section" grow={1}>
+      <EuiFlexItem className="landing--forms" component="section">
         <nav className="forms-nav">
           <button
             className={`forms-nav-button ${
