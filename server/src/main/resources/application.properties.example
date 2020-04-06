@@ -8,8 +8,8 @@ spring.data.neo4j.password=
 #add your mail settings here
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
-spring.mail.username=calendar.universal.proiect@gmail.com
-spring.mail.password=calendaruniversal
+spring.mail.username=
+spring.mail.password=
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.connectiontimeout=5000
 spring.mail.properties.mail.smtp.timeout=5000
