@@ -26,6 +26,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <div id="modal-root"></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -44,5 +45,39 @@
       href="https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,400;0,700;1,400;1,700&display=swap"
       rel="stylesheet"
     />
+    <script type="text/javascript">
+      !(function (a, b, c, d, e, f, g, h) {
+        (a.RaygunObject = e),
+          (a[e] =
+            a[e] ||
+            function () {
+              (a[e].o = a[e].o || []).push(arguments);
+            }),
+          (f = b.createElement(c)),
+          (g = b.getElementsByTagName(c)[0]),
+          (f.async = 1),
+          (f.src = d),
+          g.parentNode.insertBefore(f, g),
+          (h = a.onerror),
+          (a.onerror = function (b, c, d, f, g) {
+            h && h(b, c, d, f, g),
+              g || (g = new Error(b)),
+              (a[e].q = a[e].q || []),
+              a[e].q.push({
+                e: g,
+              });
+          });
+      })(
+        window,
+        document,
+        "script",
+        "//cdn.raygun.io/raygun4js/raygun.min.js",
+        "rg4js"
+      );
+    </script>
+    <script type="text/javascript">
+      rg4js("apiKey", "KEVqiU2dzOMbX1g7XLagIw");
+      rg4js("enableCrashReporting", true);
+    </script>
   </body>
 </html>
