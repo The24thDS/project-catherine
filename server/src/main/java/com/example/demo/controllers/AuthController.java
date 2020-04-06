@@ -76,8 +76,8 @@ public class AuthController {
         VerificationToken verificationToken=new VerificationToken();
         String token=UUID.randomUUID().toString();
         verificationToken.setToken(token);
-       user.setVerificationToken( verificationToken);
-       userRepository.save(user);
+        user.setVerificationToken( verificationToken);
+        userRepository.save(user);
 
         MimeMessage message =javaMailSender.createMimeMessage();
         try {
