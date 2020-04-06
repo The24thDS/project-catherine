@@ -18,23 +18,23 @@ describe("App", () => {
       user: {
         currentUser: {
           name: "Catherine",
-          id: 5
-        }
-      }
+          id: 5,
+        },
+      },
     });
   });
 
-  test("snapshot renders", () => {
-    const component = renderer.create(
-      <Provider store={store}>
-        <Router>
-          <App />
-        </Router>
-      </Provider>
-    );
-    let tree = component.toJSON();
-    expect(tree).toMatchSnapshot();
-  });
+  // test("snapshot renders", () => {
+  //   const component = renderer.create(
+  //     <Provider store={store}>
+  //       <Router>
+  //         <App />
+  //       </Router>
+  //     </Provider>
+  //   );
+  //   let tree = component.toJSON();
+  //   expect(tree).toMatchSnapshot();
+  // });
 
   it("renders the Landing page", () => {
     const wrapper = mount(
