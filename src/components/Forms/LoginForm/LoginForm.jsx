@@ -1,13 +1,12 @@
 import React from "react";
-import { withRouter } from "react-router-dom";
 import {
   EuiForm,
   EuiFormRow,
   EuiFieldText,
   EuiButton,
-  EuiText,
-  EuiCheckbox
+  EuiCheckbox,
 } from "@elastic/eui";
+import * as yup from "yup";
 
 import Modal from "../../Modal";
 import ForgotPasswordForm from "../ForgotPasswordForm";
@@ -18,52 +17,77 @@ class LoginForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: "",
-      emailInvalid: false,
-      password: "",
-      passwordInvalid: false,
+      formInputs: {
+        email: "",
+        password: "",
+      },
+      formValidation: {
+        email: true,
+        password: true,
+      },
       loading: false,
       formErrors: [],
-      formMessage: "",
       rememberMe: false,
-      forgotPasswordModal: false
+      forgotPasswordModal: true,
     };
     this.serverUrl = process.env.REACT_APP_SERVER_URL;
   }
 
-  onInputChange = event => {
-    this.setState({ [event.target.name]: event.target.value, formErrors: "" });
-  };
-
-  validateUser = () => {
-    if (this.state.user.length === 0) {
-      this.setState({
-        emailInvalid: true
-      });
-    } else {
-      this.setState({
-        emailInvalid: false
-      });
-    }
-  };
-
-  validatePassword = () => {
-    if (this.state.password.length === 0) {
-      this.setState({
-        passwordInvalid: true
-      });
-    } else {
-      this.setState({
-        passwordInvalid: false
-      });
-    }
+  onInputChange = ({ target }) => {
+    this.setState((prevState) => ({
+      formInputs: {
+        ...prevState.formInputs,
+        [target.name]: target.value,
+      },
+      formValidation: {
+        email: true,
+        password: true,
+      },
+      formErrors: [],
+    }));
   };
 
   toggleForgotPasswordModal = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
-      forgotPasswordModal: !prevState.forgotPasswordModal
+      forgotPasswordModal: !prevState.forgotPasswordModal,
     }));
+  };
+
+  validateForm = async () => {
+    const loginFormSchema = yup.object({
+      email: yup.string().trim().email().required(),
+      password: yup.string().trim().required(),
+    });
+    try {
+      const castedData = await loginFormSchema.validate(this.state.formInputs, {
+        abortEarly: false,
+      });
+      this.setState({
+        formInputs: {
+          ...castedData,
+        },
+      });
+      return true;
+    } catch (error) {
+      console.log(error);
+      const formValidation = {};
+      error.inner.forEach((errObj) => {
+        formValidation[errObj.path] = false;
+      });
+      if (error.name === "ValidationError") {
+        this.setState((prevState) => ({
+          formErrors: error.errors.map(
+            (error) => error.charAt(0).toUpperCase() + error.slice(1)
+          ),
+          formValidation: {
+            ...prevState.formValidation,
+            ...formValidation,
+          },
+        }));
+      }
+      return false;
+    }
   };
 
   login = async () => {
@@ -71,12 +95,12 @@ class LoginForm extends React.Component {
     const response = await fetch(`${this.serverUrl}/auth/login`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         user: this.state.user,
-        password: this.state.password
-      })
+        password: this.state.password,
+      }),
     });
 
     const data = await response.json();
@@ -92,34 +116,31 @@ class LoginForm extends React.Component {
     } else {
       this.setState({
         loading: false,
-        formErrors: data.reason || data.message
+        formErrors: data.reason || data.message,
       });
     }
   };
 
-  submitForm = async ev => {
+  submitForm = async (ev) => {
     ev.preventDefault();
-    const { emailInvalid, passwordInvalid, user, password } = this.state;
-    if (!emailInvalid && !passwordInvalid && user.length && password.length) {
-      await this.login();
+    const valid = await this.validateForm();
+    if (valid) {
+      // await this.login();
     } else {
       this.setState({
-        formErrors: "At least one of the inputs is invalid"
+        formErrors: "At least one of the inputs is invalid",
       });
     }
   };
 
   render() {
     const {
-      email,
-      emailInvalid,
-      password,
-      passwordInvalid,
+      formInputs: { email, password },
+      formValidation,
       loading,
       formErrors,
-      formMessage,
       rememberMe,
-      forgotPasswordModal
+      forgotPasswordModal,
     } = this.state;
 
     return (
@@ -131,13 +152,7 @@ class LoginForm extends React.Component {
           onSubmit={this.submitForm}
           component="form"
         >
-          <EuiFormRow
-            label="Email"
-            isInvalid={emailInvalid}
-            error="Can't be empty"
-            onBlur={this.validateUser}
-            fullWidth
-          >
+          <EuiFormRow label="Email" isInvalid={!formValidation.email} fullWidth>
             <EuiFieldText
               name="email"
               type="email"
@@ -148,9 +163,7 @@ class LoginForm extends React.Component {
           </EuiFormRow>
           <EuiFormRow
             label="Password"
-            isInvalid={passwordInvalid}
-            error="Can't be empty"
-            onBlur={this.validatePassword}
+            isInvalid={!formValidation.password}
             fullWidth
           >
             <EuiFieldText
@@ -165,10 +178,10 @@ class LoginForm extends React.Component {
             <EuiCheckbox
               id="rememberMe"
               name="rememberMe"
-              onChange={ev =>
-                this.onInputChange({
-                  target: { name: ev.target.name, value: !rememberMe }
-                })
+              onChange={(ev) =>
+                this.setState((prevState) => ({
+                  rememberMe: !prevState.rememberMe,
+                }))
               }
               checked={rememberMe}
               label="Remember me"
@@ -188,7 +201,6 @@ class LoginForm extends React.Component {
               Forgot password?
             </EuiButton>
           </EuiFormRow>
-          <EuiText className="form-message">{formMessage}</EuiText>
         </EuiForm>
         {forgotPasswordModal && (
           <Modal>
@@ -200,4 +212,4 @@ class LoginForm extends React.Component {
   }
 }
 
-export default withRouter(LoginForm);
+export default LoginForm;

@@ -59,7 +59,7 @@ class RegisterForm extends React.Component {
         birthDate: true,
         password: true,
       },
-      formErrors: "",
+      formErrors: [],
     }));
   };
 
@@ -119,6 +119,7 @@ class RegisterForm extends React.Component {
           birthDate: prevState.formInputs.birthDate,
         },
       }));
+      return true;
     } catch (error) {
       console.log(error);
       const formValidation = {};
@@ -136,6 +137,7 @@ class RegisterForm extends React.Component {
           },
         }));
       }
+      return false;
     }
   };
 

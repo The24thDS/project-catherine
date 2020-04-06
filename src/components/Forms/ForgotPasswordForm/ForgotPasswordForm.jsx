@@ -7,34 +7,34 @@ import {
   EuiTitle,
   EuiPage,
   EuiButton,
-  EuiText
+  EuiText,
 } from "@elastic/eui";
 
 export default function ForgotPasswordForm({ closeModal }) {
   const [state, setState] = useState({
-    user: "",
+    email: "",
     loading: false,
     reset: false,
     formErrors: "",
-    formMessage: ""
+    formMessage: "",
   });
 
-  const submitForm = async event => {
+  const submitForm = async (event) => {
     event.preventDefault();
     const serverUrl = process.env.REACT_APP_SERVER_URL;
-    if (state.user.length > 0) {
+    if (state.email.length > 0) {
       setState({
         ...state,
-        loading: true
+        loading: true,
       });
       const response = await fetch(serverUrl + "/auth/reset", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user: state.user
-        })
+          email: state.email,
+        }),
       });
       const data = await response.json();
       if (data.success === true) {
@@ -46,56 +46,63 @@ export default function ForgotPasswordForm({ closeModal }) {
               <p>Check your email</p>
             </div>
           ),
-          reset: true
+          reset: true,
         });
       } else {
         setState({
           ...state,
           loading: false,
-          formErrors: "An account with this user/email doesn't exist"
+          formErrors: "An account with this user/email doesn't exist",
         });
       }
     } else {
       setState({
         ...state,
-        formErrors: "You must fill the input"
+        formErrors: "You must fill the input",
       });
     }
   };
 
   return (
-    <EuiPage className="form-container modal">
+    <EuiPage
+      className="modal"
+      style={{ width: "80vw", justifyContent: "center", maxWidth: "450px" }}
+    >
       <span
         role="img"
         aria-label="Close forgot password window"
         className="close"
         onClick={closeModal}
+        style={{ cursor: "pointer" }}
       >
         ❌
       </span>
       {state.reset === false ? (
-        <form onSubmit={submitForm}>
-          <EuiForm
-            isInvalid={state.formErrors.length > 0}
-            error={state.formErrors}
-          >
-            <EuiTitle>
-              <h2>Reset your password</h2>
-            </EuiTitle>
-            <EuiFormRow label="username or email">
-              <EuiFieldText
-                value={state.user}
-                name="user"
-                onChange={ev => setState({ ...state, user: ev.target.value })}
-              />
-            </EuiFormRow>
-            <EuiFormRow className="form-button">
-              <EuiButton isLoading={state.loading} type="submit">
-                Reset
-              </EuiButton>
-            </EuiFormRow>
-          </EuiForm>
-        </form>
+        <EuiForm
+          isInvalid={state.formErrors.length > 0}
+          error={state.formErrors}
+          onSubmit={submitForm}
+          component="form"
+          className="landing-form"
+        >
+          <EuiTitle>
+            <h2>Reset your password</h2>
+          </EuiTitle>
+          <EuiFormRow label="Email" fullWidth>
+            <EuiFieldText
+              value={state.email}
+              name="email"
+              type="email"
+              onChange={(ev) => setState({ ...state, email: ev.target.value })}
+              fullWidth
+            />
+          </EuiFormRow>
+          <EuiFormRow className="form-button" fullWidth>
+            <EuiButton fill isLoading={state.loading} type="submit" fullWidth>
+              Reset
+            </EuiButton>
+          </EuiFormRow>
+        </EuiForm>
       ) : (
         <EuiText className="form-message">
           {state.formMessage}
@@ -107,5 +114,5 @@ export default function ForgotPasswordForm({ closeModal }) {
 }
 
 ForgotPasswordForm.propTypes = {
-  closeModal: PropTypes.func.isRequired
+  closeModal: PropTypes.func.isRequired,
 };
