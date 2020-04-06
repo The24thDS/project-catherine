@@ -8,7 +8,7 @@ exports[`App snapshot renders 1`] = `
     className="euiFlexGroup euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap landing"
   >
     <section
-      className="euiFlexItem euiFlexItem--flexGrow4 landing--information"
+      className="euiFlexItem landing--information"
     >
       <h1
         className="euiTitle euiTitle--medium euiTitle--uppercase"
@@ -26,7 +26,7 @@ exports[`App snapshot renders 1`] = `
       </article>
     </section>
     <section
-      className="euiFlexItem euiFlexItem--flexGrow1 landing--forms"
+      className="euiFlexItem landing--forms"
     >
       <nav
         className="forms-nav"
@@ -55,15 +55,16 @@ exports[`App snapshot renders 1`] = `
             className="euiFlexItem"
           >
             <div
-              className="euiFormRow"
-              id="mxngtfx9-row"
+              className="euiFormRow euiFormRow--fullWidth"
+              id="9ziehufp-row"
             >
               <div
                 className="euiFormRow__labelWrapper"
               >
                 <label
+                  aria-invalid={false}
                   className="euiFormLabel euiFormRow__label"
-                  htmlFor="mxngtfx9"
+                  htmlFor="9ziehufp"
                 >
                   First Name
                 </label>
@@ -72,17 +73,20 @@ exports[`App snapshot renders 1`] = `
                 className="euiFormRow__fieldWrapper"
               >
                 <div
-                  className="euiFormControlLayout"
+                  className="euiFormControlLayout euiFormControlLayout--fullWidth"
                 >
                   <div
                     className="euiFormControlLayout__childrenWrapper"
                   >
                     <input
-                      className="euiFieldText"
-                      id="mxngtfx9"
+                      className="euiFieldText euiFieldText--fullWidth"
+                      id="9ziehufp"
+                      name="firstName"
                       onBlur={[Function]}
+                      onChange={[Function]}
                       onFocus={[Function]}
                       type="text"
+                      value=""
                     />
                   </div>
                 </div>
@@ -93,15 +97,16 @@ exports[`App snapshot renders 1`] = `
             className="euiFlexItem"
           >
             <div
-              className="euiFormRow"
-              id="la8020om-row"
+              className="euiFormRow euiFormRow--fullWidth"
+              id="lfbqxwdp-row"
             >
               <div
                 className="euiFormRow__labelWrapper"
               >
                 <label
+                  aria-invalid={false}
                   className="euiFormLabel euiFormRow__label"
-                  htmlFor="la8020om"
+                  htmlFor="lfbqxwdp"
                 >
                   Last Name
                 </label>
@@ -110,17 +115,20 @@ exports[`App snapshot renders 1`] = `
                 className="euiFormRow__fieldWrapper"
               >
                 <div
-                  className="euiFormControlLayout"
+                  className="euiFormControlLayout euiFormControlLayout--fullWidth"
                 >
                   <div
                     className="euiFormControlLayout__childrenWrapper"
                   >
                     <input
-                      className="euiFieldText"
-                      id="la8020om"
+                      className="euiFieldText euiFieldText--fullWidth"
+                      id="lfbqxwdp"
+                      name="lastName"
                       onBlur={[Function]}
+                      onChange={[Function]}
                       onFocus={[Function]}
                       type="text"
+                      value=""
                     />
                   </div>
                 </div>
@@ -130,8 +138,7 @@ exports[`App snapshot renders 1`] = `
         </div>
         <div
           className="euiFormRow euiFormRow--fullWidth"
-          id="mcqcro2n-row"
-          onBlur={[Function]}
+          id="l5dld8mr-row"
         >
           <div
             className="euiFormRow__labelWrapper"
@@ -139,7 +146,7 @@ exports[`App snapshot renders 1`] = `
             <label
               aria-invalid={false}
               className="euiFormLabel euiFormRow__label"
-              htmlFor="mcqcro2n"
+              htmlFor="l5dld8mr"
             >
               Email
             </label>
@@ -155,7 +162,7 @@ exports[`App snapshot renders 1`] = `
               >
                 <input
                   className="euiFieldText euiFieldText--fullWidth"
-                  id="mcqcro2n"
+                  id="l5dld8mr"
                   name="email"
                   onBlur={[Function]}
                   onChange={[Function]}
@@ -169,14 +176,15 @@ exports[`App snapshot renders 1`] = `
         </div>
         <div
           className="euiFormRow euiFormRow--fullWidth"
-          id="l52nkati-row"
+          id="anrx2ub5-row"
         >
           <div
             className="euiFormRow__labelWrapper"
           >
             <label
+              aria-invalid={false}
               className="euiFormLabel euiFormRow__label"
-              htmlFor="l52nkati"
+              htmlFor="anrx2ub5"
             >
               Date of Birth
             </label>
@@ -201,10 +209,11 @@ exports[`App snapshot renders 1`] = `
                         className="react-datepicker__input-container"
                       >
                         <input
-                          aria-label=""
+                          aria-label="2006-04-06"
                           className="euiDatePicker euiFieldText euiFieldText--fullWidth euiFieldText--withIcon"
                           disabled={false}
-                          id="l52nkati"
+                          id="anrx2ub5"
+                          name="birthDate"
                           onBlur={[Function]}
                           onChange={[Function]}
                           onClick={[Function]}
@@ -212,7 +221,7 @@ exports[`App snapshot renders 1`] = `
                           onKeyDown={[Function]}
                           readOnly={false}
                           type="text"
-                          value=""
+                          value="2006-04-06"
                         />
                       </div>
                     </div>
@@ -243,8 +252,7 @@ exports[`App snapshot renders 1`] = `
         </div>
         <div
           className="euiFormRow euiFormRow--fullWidth"
-          id="nmjn6025-row"
-          onBlur={[Function]}
+          id="ya02udjl-row"
         >
           <div
             className="euiFormRow__labelWrapper"
@@ -252,7 +260,7 @@ exports[`App snapshot renders 1`] = `
             <label
               aria-invalid={false}
               className="euiFormLabel euiFormRow__label"
-              htmlFor="nmjn6025"
+              htmlFor="ya02udjl"
             >
               Password
             </label>
@@ -286,7 +294,7 @@ exports[`App snapshot renders 1`] = `
             </span>
             <div
               className="euiFormHelpText euiFormRow__text"
-              id="nmjn6025-help"
+              id="ya02udjl-help"
             >
               <div>
                 <div
@@ -308,7 +316,7 @@ exports[`App snapshot renders 1`] = `
                     Strength:
                   </div>
                   <div
-                    className="euiFlexItem euiFlexItem--flexGrow2"
+                    className="euiFlexItem euiFlexItem--flexGrow3"
                   >
                     <progress
                       aria-label="password strength"
@@ -318,24 +326,20 @@ exports[`App snapshot renders 1`] = `
                     />
                   </div>
                 </div>
-                <p>
-                  Must be at least 10 characters long
-                </p>
               </div>
             </div>
           </div>
         </div>
         <div
-          className="euiFormRow form-button"
-          id="7ppfhqir-row"
+          className="euiFormRow euiFormRow--fullWidth form-button"
+          id="jq9cpo0b-row"
         >
           <div
             className="euiFormRow__fieldWrapper"
           >
             <button
-              className="euiButton euiButton--primary euiButton--fill"
-              disabled={false}
-              id="7ppfhqir"
+              className="euiButton euiButton--primary euiButton--fill euiButton--fullWidth"
+              id="jq9cpo0b"
               onBlur={[Function]}
               onFocus={[Function]}
               type="submit"
@@ -346,16 +350,14 @@ exports[`App snapshot renders 1`] = `
                 <span
                   className="euiButton__text"
                 >
-                  SIGN UP
+                  <img
+                    alt="next"
+                    src="arrow-right.svg"
+                  />
                 </span>
               </span>
             </button>
           </div>
-        </div>
-        <div
-          className="euiText euiText--medium form-message"
-        >
-          
         </div>
       </form>
     </section>

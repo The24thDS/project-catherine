@@ -5,10 +5,8 @@ import {
   EuiFormRow,
   EuiFieldText,
   EuiButton,
-  EuiLink,
   EuiText,
-  EuiCheckbox,
-  EuiFlexGroup
+  EuiCheckbox
 } from "@elastic/eui";
 
 import Modal from "../../Modal";
