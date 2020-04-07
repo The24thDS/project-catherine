@@ -50,6 +50,15 @@
       box-shadow: 1.5px 1.5px 3px #00000066
       background-color: var(--primary-color)
       border: none
+  &.euiButton:disabled
+    .euiButton__spinner
+      border-color: var(--primary-color) var(--secondary-color)
+      width: 30px
+      height: 30px
+      border-width: 3px
+      animation-duration: 1s
+      &+span
+        display: none
   &:hover
     text-decoration: none  !important
   span
