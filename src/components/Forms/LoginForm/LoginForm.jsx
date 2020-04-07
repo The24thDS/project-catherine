@@ -28,7 +28,7 @@ class LoginForm extends React.Component {
       loading: false,
       formErrors: [],
       rememberMe: false,
-      forgotPasswordModal: true,
+      forgotPasswordModal: false,
     };
     this.serverUrl = process.env.REACT_APP_SERVER_URL;
   }
