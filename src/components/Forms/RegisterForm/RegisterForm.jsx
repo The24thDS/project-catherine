@@ -44,7 +44,7 @@ class RegisterForm extends React.Component {
       },
       loading: false,
       formErrors: [],
-      success: true,
+      success: false,
     };
     this.serverUrl = process.env.REACT_APP_SERVER_URL;
   }
