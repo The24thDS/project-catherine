@@ -7,6 +7,7 @@ import com.example.demo.models.payloads.*;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailParseException;
@@ -20,9 +21,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import com.sendgrid.*;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
+
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -40,6 +44,8 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Value("${sendgrid.api.key}")
+    private String sendGridApiKey;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -48,7 +54,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseBody
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest, BindingResult bindingResult){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest, BindingResult bindingResult) throws IOException{
         if(bindingResult.hasErrors()){
             ArrayList<String>stringErrors=new ArrayList<>();
             List<FieldError> errors= bindingResult.getFieldErrors();
@@ -79,21 +85,42 @@ public class AuthController {
         user.setVerificationToken( verificationToken);
         userRepository.save(user);
 
-        MimeMessage message =javaMailSender.createMimeMessage();
+        SendGrid sg = new SendGrid(sendGridApiKey);
         try {
-            MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
-            String htmlMsg = "<body style='border:2px solid black'>"
-                    +"<h1>Your onetime password for registration is : </h1><h2>"+verificationToken.getToken()+"</h2>"
-                    + "Please use this OTP to complete your new user registration."+
-                    "OTP is confidential, do not share this  with anyone." +
-                    "</body>";
-            message.setContent(htmlMsg, "text/html");
-            helper.setTo(registerRequest.getEmail());
-            helper.setSubject("Account Registration");
-            javaMailSender.send(message);
-        } catch (MessagingException e) {
-            throw new MailParseException(e);
+            Request request = new Request();
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody("{"+
+            "\"from\": {\"email\": \"hello@project-catherine.wtf\"},"+
+            "\"personalizations\":[{"+
+                "\"to\": [{\"email\": \""+registerRequest.getEmail()+"\"}],"
+                +"\"dynamic_template_data\": {"+
+                    "\"activation_token\": \""+verificationToken.getToken()+"\""+
+                "}}],"+
+            "\"template_id\": \"d-594fb91f070e41fdab678d9a50842324\"}");
+            Response response = sg.api(request);
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+            System.out.println(response.getHeaders());
+        } catch (IOException ex) {
+            throw ex;
         }
+
+        // MimeMessage message =javaMailSender.createMimeMessage();
+        // try {
+        //     MimeMessageHelper helper = new MimeMessageHelper(message, false, "utf-8");
+        //     String htmlMsg = "<body style='border:2px solid black'>"
+        //             +"<h1>Your onetime password for registration is : </h1><h2>"+verificationToken.getToken()+"</h2>"
+        //             + "Please use this OTP to complete your new user registration."+
+        //             "OTP is confidential, do not share this  with anyone." +
+        //             "</body>";
+        //     message.setContent(htmlMsg, "text/html");
+        //     helper.setTo(registerRequest.getEmail());
+        //     helper.setSubject("Account Registration");
+        //     javaMailSender.send(message);
+        // } catch (MessagingException e) {
+        //     throw new MailParseException(e);
+        // }
         return new ResponseEntity<>(new ApiResponse("account created successfully",true), HttpStatus.CREATED);
 
     }

@@ -6,6 +6,7 @@ spring.data.neo4j.username=
 spring.data.neo4j.password=
 
 #add your mail settings here
+sendgrid.api.key=keyhere
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
 spring.mail.username=

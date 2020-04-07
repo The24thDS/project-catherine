@@ -14,9 +14,11 @@ import {
 import moment from "moment";
 import * as yup from "yup";
 
+import "../forms.sass";
+
 import { validatePassword, calculatePasswordStrength } from "../utils";
 import rightArrow from "../../../assets/arrow-right.svg";
-import "../forms.sass";
+import ServerRequest from "../../../utils/ServerRequest";
 
 class RegisterForm extends React.Component {
   constructor(props) {
@@ -42,6 +44,7 @@ class RegisterForm extends React.Component {
       },
       loading: false,
       formErrors: [],
+      success: true,
     };
     this.serverUrl = process.env.REACT_APP_SERVER_URL;
   }
@@ -154,20 +157,18 @@ class RegisterForm extends React.Component {
     this.setState({
       loading: true,
     });
-    const response = await fetch(`${this.serverUrl}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...this.state.formInputs,
-      }),
-    });
+    const req = new ServerRequest(
+      "/auth/register",
+      "POST",
+      { "Content-Type": "application/json" },
+      this.state.formInputs
+    );
+    const response = await req.send();
 
     if (response.status === 201) {
       this.setState({
         loading: false,
-        formMessage: "Account created! Redirecting to Activation page in 3s",
+        success: true,
       });
     } else if (response.status === 400) {
       this.setState((prevState) => ({
@@ -183,10 +184,10 @@ class RegisterForm extends React.Component {
 
   submitForm = async (event) => {
     event.preventDefault();
+
     const valid = await this.validateForm();
     if (valid) {
-      // submit form
-      // await register()
+      await this.register();
     } else {
       return false;
     }
@@ -199,6 +200,7 @@ class RegisterForm extends React.Component {
       passwordStrength,
       loading,
       formErrors,
+      success,
     } = this.state;
 
     const passwordHelpText = (
@@ -241,7 +243,23 @@ class RegisterForm extends React.Component {
       </EuiText>
     );
 
-    return (
+    return success ? (
+      <EuiText
+        style={{
+          textAlign: "center",
+          height: "calc(100% - 100px)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "40px",
+          fontSize: "20px",
+        }}
+      >
+        <h2>Account created</h2>
+        <p>Check your inbox or spam folder for the activation email.</p>
+      </EuiText>
+    ) : (
       <EuiForm
         className="landing-form"
         isInvalid={formErrors.length > 0}
