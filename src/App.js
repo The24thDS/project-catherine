@@ -14,7 +14,7 @@ import ServerRequest from "./utils/ServerRequest";
 
 class App extends React.Component {
   static propTypes = {
-    loggedIn: PropTypes.object.isRequired,
+    loggedIn: PropTypes.bool.isRequired,
     setLoggedIn: PropTypes.func.isRequired,
   };
 
