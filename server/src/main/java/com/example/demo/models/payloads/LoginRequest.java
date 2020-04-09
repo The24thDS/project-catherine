@@ -4,20 +4,20 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 public class LoginRequest implements Serializable {
-@NotNull
-@NotBlank
-    private String user;
+    @NotNull
+    @NotBlank
+    private String email;
 
-@NotNull
-@NotBlank
+    @NotNull
+    @NotBlank
     private String password;
 
-    public String getUser() {
-        return user;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -30,8 +30,8 @@ public class LoginRequest implements Serializable {
 
     public LoginRequest() {}
 
-    public LoginRequest(String user, String password) {
-        this.setUser(user);
+    public LoginRequest(String email, String password) {
+        this.setEmail(email);
         this.setPassword(password);
     }
 }
