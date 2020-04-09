@@ -8,6 +8,7 @@ import "./App.sass";
 import { setCurrentUser } from "./redux/user/user.actions";
 import { selectCurrentUser } from "./redux/user/user.selectors";
 import LandingPage from "./pages/landing/LandingPage";
+import Activation from "./pages/activation/Activation";
 
 class App extends React.Component {
   componentDidMount() {
@@ -21,9 +22,8 @@ class App extends React.Component {
     return (
       <div className="App">
         <Switch>
-          <Route exact path="/">
-            <LandingPage />
-          </Route>
+          <Route exact path="/" component={LandingPage} />
+          <Route exact path="/activation/:token" component={Activation} />
           {/* this route will render if all of the above routes don't */}
           <Route>404 - Not Found</Route>
         </Switch>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { EuiFlexGroup, EuiFlexItem, EuiTitle, EuiIcon } from "@elastic/eui";
 
 import "./landingPage.sass";
@@ -6,9 +7,16 @@ import blackLogo from "../../assets/logo-black.svg";
 import LoginForm from "../../components/Forms/LoginForm/";
 import RegisterForm from "../../components/Forms/RegisterForm/";
 
-export default function LandingPage() {
+function LandingPage(props) {
   document.title = "Project Catherine | Landing";
-  const [form, setForm] = useState("register");
+  let initialForm = "register";
+  if (
+    props.location.state !== undefined &&
+    props.location.state.from === "activation"
+  ) {
+    initialForm = "login";
+  }
+  const [form, setForm] = useState(initialForm);
   return (
     <EuiFlexGroup
       className="landing"
@@ -73,3 +81,11 @@ export default function LandingPage() {
     </EuiFlexGroup>
   );
 }
+
+LandingPage.propTypes = {
+  history: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  match: PropTypes.object.isRequired,
+};
+
+export default LandingPage;
