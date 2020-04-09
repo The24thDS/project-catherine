@@ -13,7 +13,12 @@ import java.util.Optional;
 public interface UserRepository extends Neo4jRepository<User,Long> {
     Optional<User> findByEmail(String email);
    boolean existsByEmail(String email);
-@Query("MATCH (j:User)-[a:`has a`]-(b:VerificationToken) " + "WHERE j.email = $email " + "return b")
-   Optional<VerificationToken> findVerificationToken(@Param("email")String email);
+
+    @Query("MATCH (j:User)-[a:`has a`]-(b:VerificationToken) " + "WHERE j.email = $email " + "return b")
+    Optional<VerificationToken> findVerificationToken(@Param("email")String email);
+
+    @Query("match (n:User)-[:`has a`]-(v:VerificationToken) where v.token=$token return n")
+    Optional<User>findByVerificationToken(@Param("token")String token);
+
 
 }
