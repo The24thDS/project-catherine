@@ -76,7 +76,11 @@ function LandingPage(props) {
             LOGIN
           </button>
         </nav>
-        {form === "login" ? <LoginForm /> : <RegisterForm />}
+        {form === "login" ? (
+          <LoginForm history={props.history} />
+        ) : (
+          <RegisterForm />
+        )}
       </EuiFlexItem>
     </EuiFlexGroup>
   );
