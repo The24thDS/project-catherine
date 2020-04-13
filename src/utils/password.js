@@ -1,29 +1,13 @@
 import sha1 from "sha-1";
 
-const serverUrl = process.env.REACT_APP_SERVER_URL;
-
-const isEmailAvailable = async email => {
-  const response = await fetch(`${serverUrl}/user/checkEmailAvailability`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      input: email
-    })
-  });
-  const data = await response.json();
-  return data.available;
-};
-
-const validatePassword = async password => {
+const validatePassword = async (password) => {
   const hashedPass = sha1(password).toUpperCase();
   const prefix = hashedPass.slice(0, 5);
   const response = await fetch(
     `https://api.pwnedpasswords.com/range/${prefix}`
   );
   const data = await response.text();
-  const hashes = data.split("\n").map(info => {
+  const hashes = data.split("\n").map((info) => {
     const suffix = info.split(":")[0];
     return prefix + suffix;
   });
@@ -34,7 +18,7 @@ const validatePassword = async password => {
   }
 };
 
-const calculatePasswordStrength = password => {
+const calculatePasswordStrength = (password) => {
   let score = 0;
   const digitsRegExp = new RegExp("([0-9])", "g");
   const lowercaseRegExp = new RegExp("([a-z])", "g");
@@ -44,7 +28,7 @@ const calculatePasswordStrength = password => {
     lowercase: false,
     uppercase: false,
     digits: false,
-    specials: false
+    specials: false,
   };
   if (password.length < 10) {
     return 0;
@@ -66,7 +50,7 @@ const calculatePasswordStrength = password => {
     used.specials = true;
   }
   if (password.length > 20) {
-    Object.values(used).forEach(type => {
+    Object.values(used).forEach((type) => {
       if (type === true) {
         score += 10;
       } else {
@@ -75,7 +59,7 @@ const calculatePasswordStrength = password => {
     });
   }
   if (password.length > 30) {
-    Object.values(used).forEach(type => {
+    Object.values(used).forEach((type) => {
       if (type === true) {
         score += 5;
       } else {
@@ -86,4 +70,4 @@ const calculatePasswordStrength = password => {
   return score;
 };
 
-export { isEmailAvailable, validatePassword, calculatePasswordStrength };
+export { validatePassword, calculatePasswordStrength };

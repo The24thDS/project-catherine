@@ -7,13 +7,22 @@ import {
   EuiCheckbox,
 } from "@elastic/eui";
 import * as yup from "yup";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
 
 import Modal from "../../Modal";
 import ForgotPasswordForm from "../ForgotPasswordForm";
 
 import "../forms.sass";
+import ServerRequest from "../../../utils/ServerRequest";
+import { setLoggedIn } from "../../../redux/user/user.actions";
 
 class LoginForm extends React.Component {
+  static propTypes = {
+    history: PropTypes.object.isRequired,
+    setLoggedIn: PropTypes.func.isRequired,
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -30,7 +39,6 @@ class LoginForm extends React.Component {
       rememberMe: false,
       forgotPasswordModal: false,
     };
-    this.serverUrl = process.env.REACT_APP_SERVER_URL;
   }
 
   onInputChange = ({ target }) => {
@@ -92,16 +100,15 @@ class LoginForm extends React.Component {
 
   login = async () => {
     this.setState({ loading: true });
-    const response = await fetch(`${this.serverUrl}/auth/login`, {
-      method: "POST",
-      headers: {
+    const req = new ServerRequest(
+      "/auth/login",
+      "POST",
+      {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        user: this.state.user,
-        password: this.state.password,
-      }),
-    });
+      this.state.formInputs
+    );
+    const response = await req.send();
 
     const data = await response.json();
 
@@ -111,8 +118,8 @@ class LoginForm extends React.Component {
       } else {
         window.sessionStorage.setItem("token", data.message);
       }
-      this.props.setLoggedIn(true, data.message);
-      this.props.history.push("/events");
+      this.props.setLoggedIn(true);
+      this.props.history.push("/feed");
     } else {
       this.setState({
         loading: false,
@@ -125,11 +132,9 @@ class LoginForm extends React.Component {
     ev.preventDefault();
     const valid = await this.validateForm();
     if (valid) {
-      // await this.login();
+      await this.login();
     } else {
-      this.setState({
-        formErrors: "At least one of the inputs is invalid",
-      });
+      return false;
     }
   };
 
@@ -212,4 +217,9 @@ class LoginForm extends React.Component {
   }
 }
 
-export default LoginForm;
+// this function will map boundActionCreators to props
+const mapDispatchToProps = (dispatch) => ({
+  setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
+});
+
+export default connect(null, mapDispatchToProps)(LoginForm);

@@ -1,5 +1,4 @@
 import React from "react";
-import renderer from "react-test-renderer";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import { mount } from "enzyme";
@@ -16,25 +15,11 @@ describe("App", () => {
   beforeEach(() => {
     store = mockStore({
       user: {
-        currentUser: {
-          name: "Catherine",
-          id: 5,
-        },
+        loggedIn: false,
+        info: null,
       },
     });
   });
-
-  // test("snapshot renders", () => {
-  //   const component = renderer.create(
-  //     <Provider store={store}>
-  //       <Router>
-  //         <App />
-  //       </Router>
-  //     </Provider>
-  //   );
-  //   let tree = component.toJSON();
-  //   expect(tree).toMatchSnapshot();
-  // });
 
   it("renders the Landing page", () => {
     const wrapper = mount(
