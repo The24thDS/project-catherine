@@ -49,16 +49,8 @@ public class AuthController {
     @PostMapping("/register")
     @ResponseBody
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest, BindingResult bindingResult) throws IOException {
-        if (bindingResult.hasErrors()) {
-            ArrayList<String> stringErrors = new ArrayList<>();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError fieldError : errors) {
-                String error = fieldError.getField();
-                if (!stringErrors.contains(error)) {
-                    stringErrors.add(error);
-                }
-            }
-
+        if(bindingResult.hasErrors()){
+            ArrayList<String>stringErrors=findErrors(bindingResult);
             throw new UserRegistrationInvalidFieldsException(stringErrors);
         }
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
@@ -141,5 +133,18 @@ public class AuthController {
             userRepository.save(user.get());
             return new ResponseEntity<>(new ApiResponse("Account activated successfully!", true), HttpStatus.OK);
         } else return new ResponseEntity<>(new ApiResponse("Error! Could not activate your account", true), HttpStatus.OK);
+    }
+    public static ArrayList<String> findErrors(BindingResult bindingResult){
+        ArrayList<String>stringErrors=new ArrayList<>();
+        List<FieldError> errors= bindingResult.getFieldErrors();
+        ArrayList<String>errorMessage=new ArrayList<>();
+        for (FieldError fieldError : errors) {
+            String error = fieldError.getField();
+            if (!stringErrors.contains(error)) {
+                stringErrors.add(error);
+                errorMessage.add(fieldError.getDefaultMessage());
+            }
+        }
+        return  errorMessage;
     }
 }
