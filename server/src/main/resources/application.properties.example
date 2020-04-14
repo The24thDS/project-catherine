@@ -1,0 +1,25 @@
+server.port=8443
+
+#add your neo4j info here
+spring.data.neo4j.uri=bolt://localhost
+spring.data.neo4j.username=
+spring.data.neo4j.password=
+
+#add your mail settings here
+sendgrid.api.key=keyhere
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=
+spring.mail.password=
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.connectiontimeout=5000
+spring.mail.properties.mail.smtp.timeout=5000
+spring.mail.properties.mail.smtp.writetimeout=5000
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+server.ssl.enabled=true
+server.ssl.key-store-type=JKS
+server.ssl.key-store=src/main/resources/keystore.jks
+server.ssl.key-store-password=strongpassword
+server.ssl.key-alias=tomcatssl
+server.compression.enabled=true
