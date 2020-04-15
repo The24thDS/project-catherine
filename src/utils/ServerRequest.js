@@ -3,7 +3,7 @@ class ServerRequest {
     this.url = process.env.REACT_APP_SERVER_URL + path;
     this.method = method;
     this.headers = headers;
-    this.body = JSON.stringify(this.formatBody(body));
+    this.body = body !== null ? JSON.stringify(this.formatBody(body)) : null;
   }
   formatBody = (body = {}) => {
     const formattedBody = {};
