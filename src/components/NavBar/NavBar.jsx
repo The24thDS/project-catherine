@@ -9,7 +9,7 @@ import friendRequests from "../../assets/friendRequests-white.svg";
 import messages from "../../assets/chat-white.svg";
 import notifications from "../../assets/notifications-white.svg";
 import styles from "./NavBar.module.sass";
-import MessageDropdown from "./DropDownMenus/MessageDropDown/MessageDropDown.jsx";
+import DropdownMenu from "./DropDownMenu/DropDownMenu.jsx";
 class NavBar extends Component {
   showFriendRequests = () => {};
   showMessages = () => {};
@@ -34,31 +34,31 @@ class NavBar extends Component {
   ];
   render() {
     return (
-      <header className={styles.navBar}>
+      <nav className={styles.navBar}>
         <div className={styles.nav}>
           <div className={styles.left}>
             <EuiIcon type={logo} size="xxl" />
             <p className={styles.logo}>Project Catherine</p>
           </div>
-          <div className={styles.search}></div>
+          <div className={styles.searchleft}></div>
           <EuiFieldSearch placeholder="Search in Project Catherine" />
-          <div className={styles.right} />
+          <div className={styles.searchright} />
           <div className={styles.rightComponents}>
-            <MessageDropdown
+            <DropdownMenu
               menuTitle="Friend Requests"
               itemType="friendRequest"
               className={styles.icons}
               icon={friendRequests}
               friendRequests={this.props.friendRequests}
             />
-            <MessageDropdown
+            <DropdownMenu
               menuTitle="Your Messages"
               itemType="message"
               className={styles.icons}
               icon={messages}
               messages={this.props.messages}
             />
-            <MessageDropdown
+            <DropdownMenu
               menuTitle="Notification center"
               itemType="notification"
               className={styles.icons}
@@ -69,7 +69,7 @@ class NavBar extends Component {
 
           <div className={styles.item}>
             <EuiIcon
-              className={styles.item1}
+              className={styles.profilePicture}
               type={this.props.profilePicture}
             />
             <div className={styles.item2}>
@@ -81,7 +81,7 @@ class NavBar extends Component {
                 placeholder="Custom status"
               />
               </div>
-              <MessageDropdown
+              <DropdownMenu
                 className={styles.item3}
                 menuTitle="Account Management"
                 itemType="profile"
@@ -89,7 +89,7 @@ class NavBar extends Component {
               />
           </div>
         </div>
-      </header>
+      </nav>
     );
   }
 }

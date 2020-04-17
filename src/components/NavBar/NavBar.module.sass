@@ -5,6 +5,9 @@
   height: 70px
   background-color: #227455
   align-items: center
+  z-index: 90
+  top: 0
+  left: 0
 .nav 
   height: 100%
   display: flex
@@ -12,20 +15,17 @@
   align-items: center
   margin-left: 60px
   margin-right: 60px
-.search
+.searchleft
   flex: 1
 .left 
-  text-align: left
   display: flex
+.searchright 
+  flex: 1
   margin-left: 0
 
-.right 
-    flex: 1
-    margin-left: 0
-
 .rightComponents
-    display: flex
-    align-items: center
+  display: flex
+  align-items: center
 
 .logo 
   font-size: 1.5rem
@@ -33,42 +33,42 @@
   padding: 10px
 
 .item
-    padding-left: 5px
-    display: flex
-    height: 80%
-    width: 220px
-    border: 0px
-    align-items: center
-    justify-content: center
-    border-radius: 5px
+  padding-left: 5px
+  display: flex
+  height: 80%
+  width: 220px
+  border: 0px
+  align-items: center
+  justify-content: center
+  border-radius: 5px
 .item:hover
   background-color: #028d68 
 .item2
-    width: 105px
-    display: flex
-    flex-direction: column
-    margin-left: 10px
+  width: 105px
+  display: flex
+  flex-direction: column
+  margin-left: 10px
 .name
-    color: white
-    white-space: nowrap
-    overflow: hidden
-    text-overflow: ellipsis
-    font-size: 0.9rem
-.item1
-    margin-left: 5px
-    border-radius: 50%
-    width: 50px
-    height: 50px
+  color: white
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  font-size: 0.9rem
+.profilePicture
+  margin-left: 5px
+  border-radius: 50%
+  width: 50px
+  height: 50px
 .status
-    background-color: #028d68
-    color: white
-    width: 80px
-    height: 15px
-    font-size: 0.7rem
-    padding: 0px
-    border: none !important
+  background-color: #028d68
+  color: white
+  width: 80px
+  height: 15px
+  font-size: 0.7rem
+  padding: 0px
+  border: none !important
     
 .status::placeholder
-    color: white
+  color: white
 .button
   width: 15px
