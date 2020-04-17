@@ -1,9 +1,5 @@
 import React, { Component } from "react";
-import {
-  EuiFieldSearch,
-  EuiIcon,
-  EuiFieldText,
-} from "@elastic/eui";
+import { EuiFieldSearch, EuiIcon, EuiFieldText } from "@elastic/eui";
 import logo from "../../assets/logo-white.svg";
 import friendRequests from "../../assets/friendRequests-white.svg";
 import messages from "../../assets/chat-white.svg";
@@ -40,46 +36,44 @@ class NavBar extends Component {
             <EuiIcon type={logo} size="xxl" />
             <p className={styles.logo}>Project Catherine</p>
           </div>
-          <div className={styles.search}></div>
           <EuiFieldSearch placeholder="Search in Project Catherine" />
-          <div className={styles.right} />
-          <div className={styles.rightComponents}>
-            <MessageDropdown
-              menuTitle="Friend Requests"
-              itemType="friendRequest"
-              className={styles.icons}
-              icon={friendRequests}
-              friendRequests={this.props.friendRequests}
-            />
-            <MessageDropdown
-              menuTitle="Your Messages"
-              itemType="message"
-              className={styles.icons}
-              icon={messages}
-              messages={this.props.messages}
-            />
-            <MessageDropdown
-              menuTitle="Notification center"
-              itemType="notification"
-              className={styles.icons}
-              icon={notifications}
-              notifications={this.props.notifications}
-            />
-          </div>
-
-          <div className={styles.item}>
-            <EuiIcon
-              className={styles.item1}
-              type={this.props.profilePicture}
-            />
-            <div className={styles.item2}>
-              <p className={styles.name}>
-                {this.props.firstName} {this.props.lastName}
-              </p>
-              <EuiFieldText
-                className={styles.status}
-                placeholder="Custom status"
+          <div className={styles.userActions}>
+            <div className={styles.rightComponents}>
+              <MessageDropdown
+                menuTitle="Friend Requests"
+                itemType="friendRequest"
+                className={styles.icons}
+                icon={friendRequests}
+                friendRequests={this.props.friendRequests}
               />
+              <MessageDropdown
+                menuTitle="Your Messages"
+                itemType="message"
+                className={styles.icons}
+                icon={messages}
+                messages={this.props.messages}
+              />
+              <MessageDropdown
+                menuTitle="Notification center"
+                itemType="notification"
+                className={styles.icons}
+                icon={notifications}
+                notifications={this.props.notifications}
+              />
+            </div>
+            <div className={styles.item}>
+              <EuiIcon
+                className={styles.item1}
+                type={this.props.profilePicture}
+              />
+              <div className={styles.item2}>
+                <p className={styles.name}>
+                  {this.props.firstName} {this.props.lastName}
+                </p>
+                <EuiFieldText
+                  className={styles.status}
+                  placeholder="Custom status"
+                />
               </div>
               <MessageDropdown
                 className={styles.item3}
@@ -87,6 +81,7 @@ class NavBar extends Component {
                 itemType="profile"
                 icon="arrowDown"
               />
+            </div>
           </div>
         </div>
       </header>
