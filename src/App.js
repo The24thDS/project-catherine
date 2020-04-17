@@ -1,38 +1,98 @@
 import React from "react";
-import NavBar from "./components/NavBar/NavBar";
-import profile from "./assets/logo-white.svg";
-import logo1 from "./assets/logo-black.svg";
+import { Switch, Route, Redirect } from "react-router-dom";
+import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
+import PropTypes from "prop-types";
 
+import "./App.sass";
+
+import { setLoggedIn } from "./redux/user/user.actions";
+import { selectLoggedIn } from "./redux/user/user.selectors";
+import LandingPage from "./pages/landing/LandingPage";
+import Activation from "./pages/activation/Activation";
+import ServerRequest from "./utils/ServerRequest";
 
 class App extends React.Component {
-  state = {
-    profilePicture: profile,
-    firstName: "Mihail",
-    lastName: "Postica",
-    messages: [{ id: 1, whoLastMessaged: true, profilePicture: logo1, read: true, time: "18:53", lastMessage: "Helloo", firstName: "Zina", lastName: "Postica" },
-    { id: 2, whoLastMessaged: true, profilePicture: logo1, read: true, time: "18:53", lastMessage: "Helloo", firstName: "David", lastName: "Sima" },
-    { id: 3, whoLastMessaged: true, profilePicture: logo1, read: true, time: "18:53", lastMessage: "Helloo", firstName: "Zina", lastName: "Postica" }],
-    notifications: [{ id: 3, profilePicture: logo1, time: "18:53", action: "Liked your picture", firstName: "Misa", lastName: "Postica" },
-    { id: 1, profilePicture: logo1, time: "18:53", action: "Liked your picture", firstName: "Zina", lastName: "Postica" },
-    { id: 2, profilePicture: logo1, time: "18:53", action: "Liked your picture", firstName: "David", lastName: "Sima" }],
-    friendRequests: [{ id: 1, profilePicture: logo1, firstName: "Zina", lastName: "Postica" },
-    { id: 2, profilePicture: logo1, firstName: "David", lastName: "Sima" },
-    { id: 3, profilePicture: logo1, firstName: "Mihail", lastName: "Postica" }]
+  static propTypes = {
+    loggedIn: PropTypes.bool.isRequired,
+    setLoggedIn: PropTypes.func.isRequired,
+  };
+
+  componentDidMount() {
+    const token =
+      window.localStorage.getItem("token") ||
+      window.sessionStorage.getItem("token");
+    const checkToken = async (token) => {
+      const req = new ServerRequest(
+        "/auth/verifyToken",
+        "POST",
+        {
+          "Content-Type": "application/json",
+        },
+        {
+          input: token,
+        }
+      );
+      const response = await req.send();
+      const data = await response.json();
+      return data.success;
+    };
+
+    if (token !== null) {
+      checkToken(token).then((valid) => {
+        if (valid) {
+          this.props.setLoggedIn(true);
+        } else {
+          window.localStorage.removeItem("token");
+          window.sessionStorage.removeItem("token");
+        }
+      });
+    }
   }
+
   render() {
-  return(
-    <header >
-      <NavBar 
-      firstName={this.state.firstName}
-      lastName={this.state.lastName}
-      profilePicture={this.state.profilePicture}
-      messages={this.state.messages}
-      notifications={this.state.notifications}
-      friendRequests={this.state.friendRequests} 
-      />
-    </header>
-  );
-}
+    return (
+      <div className="App">
+        <Switch>
+          <Route
+            exact
+            path="/"
+            component={(props) =>
+              this.props.loggedIn ? (
+                <Redirect to="/feed" />
+              ) : (
+                  <LandingPage {...props} />
+                )
+            }
+          />
+          <Route
+            exact
+            path="/activation/:token"
+            component={(props) =>
+              this.props.loggedIn ? (
+                <Redirect to="/feed" />
+              ) : (
+                  <Activation {...props} />
+                )
+            }
+          />
+          {/* this route will render if all of the above routes don't */}
+          <Route>404 - Not Found</Route>
+        </Switch>
+      </div>
+    );
+  }
 }
 
-export default App;
+// this function will select from the store and map the results to props
+// propName: selectorName
+const mapStateToProps = createStructuredSelector({
+  loggedIn: selectLoggedIn,
+});
+
+// this function will map boundActionCreators to props
+const mapDispatchToProps = (dispatch) => ({
+  setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
