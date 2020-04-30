@@ -1,38 +1,44 @@
-.item
+.friend-request-item
     display: flex
     background-color: white
-    width: 250px
-    height: 50px
-    border: 1px solid #DDDDDD
-    box-shadow: 2px 2px #DDDDDD
+    width: 15vw
+    max-width: 300px
     align-items: center
-    justify-content: center
+    justify-content: space-between
     font-size: 0.9rem
-    text-align: center
-.item2
+    padding: 10px 0
+    & + .friend-request-item
+        border-top: 1px solid hsla(120, 20, 50, 1)
+
+.user-details
     display: flex
-    flex-direction: column
-    justify-content: center
-.item1
+    flex-grow: 1
+    align-items: center
+    justify-content: flex-start
+    padding: 0 10px
+
+.accept-button
     width: 30px
     height: 30px
     border: 1px solid  #DDDDDD
     border-radius: 30%
-    box-shadow: 2px 2px #DDDDDD
-.item3
+    background-color: hsl(150, 50, 50)
+    color: white
+    cursor: pointer
+
+.refuse-button
     width: 30px 
     height: 30px
     border: 1px solid  #DDDDDD
     border-radius: 30%
-    box-shadow: 2px 2px #DDDDDD
-.item21
-    width: 30px
-    height: 30px
-    margin: 2.5px 40px 2.5px 40px
+    background-color: hsl(0, 50, 50)
+    color: white
+    cursor: pointer
+    
+.profile-picture
+    width: 25%
+    height: auto
     border-radius: 50%
-.name
-    text-align: center
-    width: 110px
-    white-space: nowrap
-    overflow: hidden
-    text-overflow: ellipsis
+    box-shadow: inset 0 1px 2px 1px hsla(0, 0, 0, .1)
+    padding: .2em
+    margin-right: 10px

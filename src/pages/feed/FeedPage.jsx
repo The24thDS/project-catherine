@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import NavBar from "../../components/NavBar/NavBar";
 
 export default class FeedPage extends Component {
   constructor(props) {
@@ -6,6 +7,10 @@ export default class FeedPage extends Component {
     document.title = "Project Catherine | Feed";
   }
   render() {
-    return <div>Welcome to the feed page</div>;
+    return (
+      <>
+        <NavBar />
+      </>
+    );
   }
 }

@@ -6,10 +6,8 @@ import "./landingPage.sass";
 import blackLogo from "../../assets/logo-black.svg";
 import LoginForm from "../../components/Forms/LoginForm/";
 import RegisterForm from "../../components/Forms/RegisterForm/";
-import NavBar from "../../components/NavBar/NavBar";
 
 function LandingPage(props) {
-
   document.title = "Project Catherine | Landing";
   let initialForm = "register";
   if (

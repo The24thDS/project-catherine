@@ -1,33 +1,59 @@
 import React, { Component } from "react";
 import { EuiFieldSearch, EuiIcon, EuiFieldText } from "@elastic/eui";
-import logo from "../../assets/logo-white.svg";
-import friendRequests from "../../assets/friendRequests-white.svg";
-import messages from "../../assets/chat-white.svg";
-import notifications from "../../assets/notifications-white.svg";
-import styles from "./NavBar.module.sass";
+
 import DropdownMenu from "./DropDownMenu/DropDownMenu.jsx";
+import MessageItem from "./DropDownMenu/MenuItems/MessageItem/";
+import FriendRequestItem from "./DropDownMenu/MenuItems/FriendRequestItem/";
+import NotificationItem from "./DropDownMenu/MenuItems/NotificationItem/";
+
+import logo from "../../assets/logo-white.svg";
+import profilePicturePlaceholder from "../../assets/logo-black.svg";
+import friendRequestsIcon from "../../assets/friendRequests-white.svg";
+import messagesIcon from "../../assets/chat-white.svg";
+import notifications from "../../assets/notifications-white.svg";
+
+import styles from "./NavBar.module.sass";
+
 class NavBar extends Component {
   showFriendRequests = () => {};
   showMessages = () => {};
   showNotifications = () => {};
-  messages = [
+  // test data
+  messagesData = [
     {
+      profilePicture: profilePicturePlaceholder,
       firstName: "Zina",
       lastName: "Postica",
-      read: false,
-      lastMessage: "Hello",
-      whoLastMessaged: false,
-      time: "12:56",
+      message: "Hello",
+      userIsMessageAuthor: true,
+      date: "12:56",
     },
     {
+      profilePicture: profilePicturePlaceholder,
       firstName: "Misa",
       lastName: "Postica",
-      read: false,
-      lastMessage: "Miau",
-      whoLastMessaged: true,
-      time: "13:08",
+      isNew: true,
+      message: "Miau",
+      userIsMessageAuthor: false,
+      date: "13:08",
     },
   ];
+  friendRequestsData = [
+    {
+      profilePicture: profilePicturePlaceholder,
+      firstName: "Zina",
+      lastName: "Postica",
+      date: "12:56",
+    },
+    {
+      profilePicture: profilePicturePlaceholder,
+      firstName: "Aurel",
+      lastName: "Mercenarul",
+      isNew: true,
+      date: "13:08",
+    },
+  ];
+  notificationsData = [{}, {}];
   render() {
     return (
       <nav className={styles.navBar}>
@@ -40,50 +66,48 @@ class NavBar extends Component {
           <div className={styles.userActions}>
             <div className={styles.rightComponents}>
               <DropdownMenu
+                MenuItemComponent={FriendRequestItem}
+                menuItemsData={this.friendRequestsData}
+                menuButtonIcon={friendRequestsIcon}
                 menuTitle="Friend Requests"
-                itemType="friendRequest"
                 className={styles.icons}
-                icon={friendRequests}
-                friendRequests={this.props.friendRequests}
               />
               <DropdownMenu
+                MenuItemComponent={MessageItem}
+                menuItemsData={this.messagesData}
+                menuButtonIcon={messagesIcon}
                 menuTitle="Your Messages"
-                itemType="message"
                 className={styles.icons}
-                icon={messages}
-                messages={this.props.messages}
               />
               <DropdownMenu
-                menuTitle="Notification center"
-                itemType="notification"
+                MenuItemComponent={NotificationItem}
+                menuItemsData={[]}
+                menuTitle="Notifications"
                 className={styles.icons}
-                icon={notifications}
-                notifications={this.props.notifications}
               />
             </div>
-          
 
-          <div className={styles.item}>
-            <EuiIcon
-              className={styles.profilePicture}
-              type={this.props.profilePicture}
-            />
-            <div className={styles.item2}>
-              <p className={styles.userName}>
-                {this.props.firstName} {this.props.lastName}
-              </p>
-              <EuiFieldText
-                className={styles.status}
-                placeholder="Custom status"
+            <div className={styles.item}>
+              <EuiIcon
+                className={styles.profilePicture}
+                type={this.props.profilePicture}
               />
+              <div className={styles.item2}>
+                <p className={styles.userName}>
+                  {this.props.firstName} {this.props.lastName}
+                </p>
+                <EuiFieldText
+                  className={styles.status}
+                  placeholder="Custom status"
+                />
+              </div>
+              {/* <DropdownMenu
+                className={styles.item3}
+                menuTitle="Account Management"
+                itemType="profile"
+                icon="arrowDown"
+              /> */}
             </div>
-            <DropdownMenu
-              className={styles.item3}
-              menuTitle="Account Management"
-              itemType="profile"
-              icon="arrowDown"
-            />
-          </div>
           </div>
         </div>
       </nav>

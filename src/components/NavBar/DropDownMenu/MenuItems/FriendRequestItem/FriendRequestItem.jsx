@@ -1,31 +1,38 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { EuiIcon } from "@elastic/eui";
-import styles from "./FriendRequestItem.module.sass";
-import add from '../../../../../assets/add.svg';
+import { EuiIcon, EuiButtonIcon } from "@elastic/eui";
+
+import add from "../../../../../assets/add.svg";
 import decline from "../../../../../assets/delete.svg";
-import { EuiButtonIcon } from "@elastic/eui";
+
+import styles from "./FriendRequestItem.module.sass";
+
 class FriendRequestItem extends Component {
+  static propTypes = {
+    profilePicture: PropTypes.string,
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    isNew: PropTypes.bool,
+    date: PropTypes.string,
+  };
 
   render() {
     return (
-      <div className={styles.item}>
-              <EuiButtonIcon iconType={add}className={styles.item1}/>
-        <div classname={styles.item2}>
-              <EuiIcon className={styles.item21} type={this.props.profilePicture}/>
-              <p className={styles.name}>{this.props.firstName} {this.props.lastName}</p>
+      <div className={styles["friend-request-item"]}>
+        <EuiButtonIcon iconType="check" className={styles["accept-button"]} />
+        <div className={styles["user-details"]}>
+          <EuiIcon
+            className={styles["profile-picture"]}
+            type={this.props.profilePicture}
+          />
+          <h2>
+            {this.props.firstName} {this.props.lastName}
+          </h2>
         </div>
-        <EuiButtonIcon iconType={decline} className={styles.item3}/>
+        <EuiButtonIcon iconType="cross" className={styles["refuse-button"]} />
       </div>
     );
   }
 }
-FriendRequestItem.propTypes = {
-  profilePicture: PropTypes.string,
-  firstName: PropTypes.string,
-  lastName: PropTypes.string,
-  read: PropTypes.bool,
-  time: PropTypes.string,
-  action: PropTypes.string
-};
+
 export default FriendRequestItem;
