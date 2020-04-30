@@ -92,8 +92,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                <LandingPage {...props} />
-              )
+                  <LandingPage {...props} />
+                )
             }
           />
           <Route
@@ -103,8 +103,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                <Activation {...props} />
-              )
+                  <Activation {...props} />
+                )
             }
           />
           <PrivateRoute isAuthenticated={this.props.loggedIn}>
