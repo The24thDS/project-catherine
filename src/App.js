@@ -61,8 +61,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                <LandingPage {...props} />
-              )
+                  <LandingPage {...props} />
+                )
             }
           />
           <Route
@@ -72,8 +72,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                <Activation {...props} />
-              )
+                  <Activation {...props} />
+                )
             }
           />
           {/* this route will render if all of the above routes don't */}
