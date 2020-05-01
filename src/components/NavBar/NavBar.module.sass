@@ -2,62 +2,51 @@
   text-align: left
   position: fixed
   width: 100%
-  height: 70px
-  background-color: #227455
+  background-color: var(--primary-color)
   align-items: center
   z-index: 90
   top: 0
   left: 0
-
-.nav 
-  height: 100%
+  padding: 10px 60px
   display: flex
-  flex-direction: row
   align-items: center
-  margin-left: 60px
-  margin-right: 60px
   justify-content: space-between
+
+
+.brand
+  display: flex
+  align-items: center
+  h1 
+    font-size: 1.5rem
+    color: white
+    padding-left: 10px
 
 .userActions
   display: flex
 
-.searchleft
-  flex: 
-
-.leftComponents 
-  display: flex
-
-.searchright 
-  flex: 1
-  margin-left: 0
-
-.rightComponents
-  display: flex
-  align-items: center
-
-.logo 
-  font-size: 1.5rem
-  color: white
-  padding: 10px
-
-.item
+.user
   padding-left: 5px
   display: flex
-  height: 80%
-  width: 220px
-  border: 0px
   align-items: center
-  justify-content: center
+  justify-content: space-around
   border-radius: 5px
+  &:hover
+    background-color: #028d68 
 
-.item:hover
-  background-color: #028d68 
+.profilePicture
+  margin-left: 5px
+  border-radius: 50%
+  width: 50px
+  height: 50px
+  box-shadow: inset 0 1px 2px 1px hsla(0, 0, 0, .1)
+  padding: 5px
+  background-color: white
 
-.item2
-  width: 105px
+.userInfo
   display: flex
   flex-direction: column
-  margin-left: 10px
+  justify-content: center
+  margin: 0 10px
 
 .userName
   color: white
@@ -66,22 +55,9 @@
   text-overflow: ellipsis
   font-size: 0.9rem
 
-.profilePicture
-  margin-left: 5px
-  border-radius: 50%
-  width: 50px
-  height: 50px
-
 .status
-  background-color: #028d68
   color: white
-  width: 80px
-  height: 15px
   font-size: 0.7rem
-  padding: 0px
-    
-.status::placeholder
-  color: white
+  padding-top: 5px
+  opacity: 0.8
   
-.button
-  width: 15px

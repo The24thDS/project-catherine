@@ -2,15 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { EuiPopover, EuiButtonIcon, EuiPopoverTitle } from "@elastic/eui";
 
-import MessageItem from "./MenuItems/MessageItem/MessageItem.jsx";
-import NotificationItem from "./MenuItems/NotificationItem/NotificationItem.jsx";
-import ProfileItem from "./MenuItems/ProfileItem/ProfileItem.jsx";
-import FriendRequestItem from "./MenuItems/FriendRequestItem/FriendRequestItem.jsx";
-
-import settingsIcon from "../../../assets/settings.svg";
-import logoutIcon from "../../../assets/logout.svg";
-import profileIcon from "../../../assets/profile.svg";
-
 import styles from "./DropDownMenu.module.sass";
 
 class DropDownMenu extends Component {
@@ -51,8 +42,8 @@ class DropDownMenu extends Component {
       />
     );
 
-    const items = menuItemsData.map((itemData) => (
-      <MenuItemComponent {...itemData} />
+    const items = menuItemsData.map((itemData, i) => (
+      <MenuItemComponent {...itemData} /> // TODO: we need a proper key here
     ));
 
     return (

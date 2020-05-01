@@ -2,9 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { EuiIcon, EuiButtonIcon } from "@elastic/eui";
 
-import add from "../../../../../assets/add.svg";
-import decline from "../../../../../assets/delete.svg";
-
 import styles from "./FriendRequestItem.module.sass";
 
 class FriendRequestItem extends Component {

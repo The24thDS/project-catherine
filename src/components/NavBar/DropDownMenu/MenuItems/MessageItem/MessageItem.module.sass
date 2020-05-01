@@ -1,8 +1,8 @@
 .message-item-container
     display: flex
     background-color: white
-    width: 15vw
-    max-width: 300px
+    width: 90vw
+    max-width: 350px
     padding: 5px 10px
     align-items: center
     justify-content: space-between
@@ -19,9 +19,13 @@
     &.new
         font-weight: 800
     .message-details
+        flex-grow: 1
         display: flex
         flex-wrap: wrap
         justify-content: space-between
-        width: 80%
         padding: 5px 0
+        h2
+            min-width: 60%
+        span
+            font-size: 0.9em
 
