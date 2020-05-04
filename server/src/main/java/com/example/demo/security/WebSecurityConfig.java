@@ -67,6 +67,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/api/v1/auth/**").permitAll()
 				.antMatchers("/api/v1/user/checkUsernameAvailability").permitAll()
 				.antMatchers("/api/v1/user/checkEmailAvailability").permitAll()
+				.antMatchers("/api/v1/photos/**").permitAll()
 						.anyRequest().fullyAuthenticated().and().
 						exceptionHandling().and().sessionManagement()
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

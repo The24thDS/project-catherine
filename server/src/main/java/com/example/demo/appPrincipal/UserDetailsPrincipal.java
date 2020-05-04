@@ -22,13 +22,13 @@ public class UserDetailsPrincipal implements UserDetails {
 
 
     public UserDetailsPrincipal(User user) {
-        this.first_name=user.getFirst_name();
-        this.last_name=user.getLast_name();
+        this.first_name=user.getFirstName();
+        this.last_name=user.getLastName();
         this.email=user.getEmail();
         this.id=user.getId();
         this.password=user.getPassword();
-        this.enabled=user.isEnabled();
-        this.birth_date=user.getBirth_date();
+        this.enabled=user.getEnabled();
+        this.birth_date=user.getBirthDate();
 
         this.authorityList= Arrays.stream(user.getRoles().split(",")).map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());

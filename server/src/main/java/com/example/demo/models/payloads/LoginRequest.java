@@ -4,8 +4,8 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 public class LoginRequest implements Serializable {
-    @NotNull
-    @NotBlank
+@NotNull
+@NotBlank
     private String email;
 
     @NotNull
