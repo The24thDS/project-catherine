@@ -1,15 +1,20 @@
 package com.example.demo.models.entities;
-
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.neo4j.ogm.annotation.*;
 import org.neo4j.ogm.annotation.typeconversion.DateString;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @NodeEntity
+@NoArgsConstructor
+@Getter
+@Setter
+
 public class  User {
     @Id
     @GeneratedValue
@@ -17,10 +22,10 @@ public class  User {
     private Long id;
 
     @NotBlank
-    private String first_name;
+    private String firstName;
 
     @NotBlank
-    private String last_name;
+    private String lastName;
 
     @NotBlank
     private String password;
@@ -33,85 +38,23 @@ public class  User {
 
     private Boolean enabled;
     @DateString("yyyy-MM-dd")
-    private Date birth_date;
+    private Date birthDate;
 
-    public Date getBirth_date() {
-        return birth_date;
-    }
+    private String profilePicture;
 
-    public void setBirth_date(Date birth_date) {
-        this.birth_date = birth_date;
-    }
-
-    @Relationship(type = "has a",direction = Relationship.OUTGOING)
+    @Relationship(type = "Has_a",direction = Relationship.OUTGOING)
     private VerificationToken verificationToken;
 
+    @Relationship(type = "Posted")
+    private Set<Post> posts=new HashSet<>();
+
+    @Relationship(type= "Friends_With")
+    private Set<User>friends=new HashSet<>();
+
+    @Relationship(type="Pending_Friend_Request",direction = Relationship.OUTGOING)
+    private Set<User>friendRequests=new HashSet<>();
 
 
-    public User() {
-    }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirst_name() {
-        return first_name;
-    }
-
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
-    }
-
-    public String getLast_name() {
-        return last_name;
-    }
-
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getRoles() {
-        return roles;
-    }
-
-    public void setRoles(String roles) {
-        this.roles = roles;
-    }
-
-    public Boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public VerificationToken getVerificationToken() {
-        return verificationToken;
-    }
-
-    public void setVerificationToken(VerificationToken verificationToken) {
-        this.verificationToken = verificationToken;
-    }
 }

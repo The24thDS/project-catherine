@@ -11,6 +11,13 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
 
 @EnableNeo4jRepositories
 @SpringBootApplication
@@ -48,7 +55,10 @@ public class DemoApplication {
 		return  connector;
 
 	}
-
+	@PostConstruct
+	void started() {
+		TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
+	}
 }
 
 

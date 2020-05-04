@@ -5,7 +5,12 @@ import com.example.demo.models.entities.User;
 import com.example.demo.models.entities.VerificationToken;
 import com.example.demo.models.payloads.*;
 import com.example.demo.repositories.UserRepository;
+import com.example.demo.repositories.VerificationTokenRepo;
 import com.example.demo.security.JwtUtil;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -15,12 +20,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import com.sendgrid.*;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -38,38 +44,42 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Value("${sendgrid.api.key}")
-    private String sendGridApiKey;
+    @Autowired
+    VerificationTokenRepo verificationTokenRepo;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${sendgrid.api.key}")
+    private String sendGridApiKey;
 
     @PostMapping("/register")
     @ResponseBody
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest, BindingResult bindingResult) throws IOException {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest, BindingResult bindingResult){
+        ApiResponse apiResponse=new ApiResponse();
         if(bindingResult.hasErrors()){
-            ArrayList<String>stringErrors=findErrors(bindingResult);
+          ArrayList<String>stringErrors=findErrors(bindingResult);
             throw new UserRegistrationInvalidFieldsException(stringErrors);
         }
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             ApiResponse userRegistrationResponse = new ApiResponse("email Already taken", false);
             return new ResponseEntity<>(userRegistrationResponse, HttpStatus.BAD_REQUEST);
         }
-        User user = new User();
+        User user=new User();
+
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEnabled(false);
         user.setRoles("ROLE_USER");
-        user.setFirst_name(registerRequest.getFirst_name());
-        user.setLast_name(registerRequest.getLast_name());
-        user.setBirth_date(registerRequest.getBirth_date());
-        VerificationToken verificationToken = new VerificationToken();
-        String token = UUID.randomUUID().toString();
+        user.setFirstName(registerRequest.getFirstName());
+        user.setLastName(registerRequest.getLastName());
+        user.setBirthDate(registerRequest.getBirthDate());
+        user.setProfilePicture("user-default.jpg");
+        VerificationToken verificationToken=new VerificationToken();
+        String token=UUID.randomUUID().toString();
         verificationToken.setToken(token);
-        user.setVerificationToken(verificationToken);
-        userRepository.save(user);
+       user.setVerificationToken( verificationToken);
+       userRepository.save(user);
 
         SendGrid sg = new SendGrid(sendGridApiKey);
         try {
@@ -85,14 +95,15 @@ public class AuthController {
                     "}}]," +
                     "\"template_id\": \"d-594fb91f070e41fdab678d9a50842324\"}");
             Response response = sg.api(request);
-            System.out.println(response.getStatusCode());
-            System.out.println(response.getBody());
-            System.out.println(response.getHeaders());
-        } catch (IOException ex) {
-            throw ex;
-        }
 
-        return new ResponseEntity<>(new ApiResponse("account created successfully", true), HttpStatus.CREATED);
+        } catch (IOException ex) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Email was not sent");
+            return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+        }
+        apiResponse.setMessage("Account created successfully");
+        apiResponse.setSuccess(true);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
 
     }
 
@@ -126,25 +137,31 @@ public class AuthController {
     }
 
     @PostMapping("/enableAccount")
+    @Transactional
     public ResponseEntity<?> enableAccount(@RequestBody EnableAccountRequest enableAccountRequest) {
         Optional<User> user = userRepository.findByVerificationToken(enableAccountRequest.getToken());
         if (user.isPresent()) {
+            verificationTokenRepo.deleteVerificationTokenByToken(enableAccountRequest.getToken());
             user.get().setEnabled(true);
             userRepository.save(user.get());
             return new ResponseEntity<>(new ApiResponse("Account activated successfully!", true), HttpStatus.OK);
         } else return new ResponseEntity<>(new ApiResponse("Error! Could not activate your account", true), HttpStatus.OK);
     }
-    public static ArrayList<String> findErrors(BindingResult bindingResult){
-        ArrayList<String>stringErrors=new ArrayList<>();
-        List<FieldError> errors= bindingResult.getFieldErrors();
-        ArrayList<String>errorMessage=new ArrayList<>();
-        for (FieldError fieldError : errors) {
-            String error = fieldError.getField();
-            if (!stringErrors.contains(error)) {
-                stringErrors.add(error);
-                errorMessage.add(fieldError.getDefaultMessage());
-            }
+
+
+
+static ArrayList<String> findErrors(BindingResult bindingResult){
+    ArrayList<String>stringErrors=new ArrayList<>();
+    List<FieldError> errors= bindingResult.getFieldErrors();
+    ArrayList<String>errorMessage=new ArrayList<>();
+    for (FieldError fieldError : errors) {
+        String error = fieldError.getField();
+        if (!stringErrors.contains(error)) {
+            stringErrors.add(error);
+            errorMessage.add(fieldError.getDefaultMessage());
         }
-        return  errorMessage;
     }
+    return  errorMessage;
+}
+
 }
