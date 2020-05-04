@@ -3,6 +3,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
+import java.util.ArrayList;
+
 @QueryResult
 @Getter
 @Setter
@@ -13,4 +15,6 @@ public class PostDetailsQueryResult {
     String date;
     Integer likes;
     Integer comments;
+    ArrayList<String> imageNames=new ArrayList<>();
+
 }

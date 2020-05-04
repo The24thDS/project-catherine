@@ -8,6 +8,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateString;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 @NoArgsConstructor
@@ -19,7 +20,7 @@ public class Post {
     @GeneratedValue
     private Long id;
     private String content;
-    private String  imageName;
+    private ArrayList<String> imageNames=new ArrayList<>();
     @DateString("yyyy-MM-dd hh:mm:ss")
     private Date date;
 

@@ -1,4 +1,4 @@
-package com.example.demo.models.payloads;
+package com.example.demo.models.payloads.requests;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -8,8 +8,8 @@ public class LoginRequest implements Serializable {
 @NotBlank
     private String email;
 
-    @NotNull
-    @NotBlank
+@NotNull
+@NotBlank
     private String password;
 
     public String getEmail() {
