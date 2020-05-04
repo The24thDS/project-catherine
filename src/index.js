@@ -4,23 +4,11 @@ import * as serviceWorker from "./serviceWorker";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
-import LogRocket from "logrocket";
-import setupLogRocketReact from "logrocket-react";
-import rg4js from "raygun4js";
 
 import { store, persistor } from "./redux/store";
 
 import "./index.css";
 import App from "./App";
-
-LogRocket.init("iisf1p/project-catherine");
-setupLogRocketReact(LogRocket);
-const getLogRocketSessionURL = () => {
-  return {
-    "LogRocket Session URL": LogRocket.sessionURL,
-  };
-};
-rg4js("withCustomData", getLogRocketSessionURL);
 
 ReactDOM.render(
   <Provider store={store}>
