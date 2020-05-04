@@ -191,7 +191,7 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = "/search",method =RequestMethod.GET)
+    @RequestMapping(value = "/search",method =RequestMethod.POST)
     ResponseEntity<?>search(@RequestBody SearchRequest searchRequest){
         System.out.println(searchRequest.getLastName()+searchRequest.getFirstName());
 
