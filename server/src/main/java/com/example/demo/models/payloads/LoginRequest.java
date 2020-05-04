@@ -8,8 +8,8 @@ public class LoginRequest implements Serializable {
 @NotBlank
     private String email;
 
-@NotNull
-@NotBlank
+    @NotNull
+    @NotBlank
     private String password;
 
     public String getEmail() {

@@ -16,13 +16,16 @@ import * as yup from "yup";
 
 import "../forms.sass";
 
-import { validatePassword, calculatePasswordStrength } from "../utils";
+import {
+  validatePassword,
+  calculatePasswordStrength,
+} from "../../../utils/password";
 import rightArrow from "../../../assets/arrow-right.svg";
 import ServerRequest from "../../../utils/ServerRequest";
 
 class RegisterForm extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       formInputs: {
         firstName: "",

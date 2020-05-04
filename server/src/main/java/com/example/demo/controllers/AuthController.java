@@ -15,9 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailParseException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,8 +49,6 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JavaMailSender javaMailSender;
 
     @Value("${sendgrid.api.key}")
     private String sendGridApiKey;
@@ -66,8 +61,8 @@ public class AuthController {
           ArrayList<String>stringErrors=findErrors(bindingResult);
             throw new UserRegistrationInvalidFieldsException(stringErrors);
         }
-        if(userRepository.existsByEmail(registerRequest.getEmail())){
-            ApiResponse userRegistrationResponse=new ApiResponse("email Already taken",false);
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+            ApiResponse userRegistrationResponse = new ApiResponse("email Already taken", false);
             return new ResponseEntity<>(userRegistrationResponse, HttpStatus.BAD_REQUEST);
         }
         User user=new User();
@@ -122,25 +117,23 @@ public class AuthController {
 
             );
 
-        }
-        catch (BadCredentialsException e) {
+        } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadCredentialsResponse("bad credentials"));
         }
         final UserDetails userDetails = myUserDetailsService.loadUserByUsername(loginRequest.getEmail());
         final String jwt = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(jwt,true));
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(jwt, true));
     }
 
 
     @PostMapping("/verifyToken")
-    public ResponseEntity<?> verifyToken(@RequestBody AvailabilityRequest availabilityRequest){
-        String jwt=availabilityRequest.getInput();
-        String username=jwtTokenUtil.extractUsername(jwt);
+    public ResponseEntity<?> verifyToken(@RequestBody AvailabilityRequest availabilityRequest) {
+        String jwt = availabilityRequest.getInput();
+        String username = jwtTokenUtil.extractUsername(jwt);
         UserDetails userDetails = this.myUserDetailsService.loadUserByUsername(username);
-        if(jwtTokenUtil.validateToken(jwt,userDetails)){
-            return new ResponseEntity<>(new ApiResponse("token is valid",true), HttpStatus.OK);
-        }
-        else return new ResponseEntity<>(new ApiResponse("token is invalid",false), HttpStatus.BAD_REQUEST);
+        if (jwtTokenUtil.validateToken(jwt, userDetails)) {
+            return new ResponseEntity<>(new ApiResponse("token is valid", true), HttpStatus.OK);
+        } else return new ResponseEntity<>(new ApiResponse("token is invalid", false), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/enableAccount")
