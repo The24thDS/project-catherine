@@ -1,4 +1,4 @@
-package com.example.demo.models.payloads;
+package com.example.demo.models.payloads.responses;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

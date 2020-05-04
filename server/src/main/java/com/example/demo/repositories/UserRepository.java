@@ -1,6 +1,5 @@
 package com.example.demo.repositories;
 import com.example.demo.models.entities.User;
-import com.example.demo.models.payloads.CustomUserResponse;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;

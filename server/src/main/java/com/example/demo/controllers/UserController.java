@@ -1,7 +1,12 @@
 package com.example.demo.controllers;
 import com.example.demo.appPrincipal.UserDetailsPrincipal;
 import com.example.demo.models.entities.User;
-import com.example.demo.models.payloads.*;
+import com.example.demo.models.payloads.requests.AvailabilityRequest;
+import com.example.demo.models.payloads.requests.SearchRequest;
+import com.example.demo.models.payloads.requests.UserUpdateRequest;
+import com.example.demo.models.payloads.responses.ApiResponse;
+import com.example.demo.models.payloads.responses.CustomUserResponse;
+import com.example.demo.models.payloads.responses.UserDetailsResponse;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

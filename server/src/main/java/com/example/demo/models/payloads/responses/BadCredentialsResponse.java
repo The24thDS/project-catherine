@@ -1,10 +1,10 @@
-package com.example.demo.models.payloads;
+package com.example.demo.models.payloads.responses;
 
 import java.io.Serializable;
 
 public class BadCredentialsResponse implements Serializable {
 
-    String reason;
+    private String reason;
     public BadCredentialsResponse( String reason) {
 
         this.reason = reason;

@@ -3,11 +3,12 @@ import com.example.demo.appPrincipal.UserDetailsPrincipal;
 import com.example.demo.models.entities.Comment;
 import com.example.demo.models.entities.Post;
 import com.example.demo.models.entities.User;
-import com.example.demo.models.payloads.ApiResponse;
-import com.example.demo.models.payloads.CommentsResponse;
-import com.example.demo.models.payloads.GetPostsResponse;
+import com.example.demo.models.payloads.responses.ApiResponse;
+import com.example.demo.models.payloads.responses.CommentsResponse;
+import com.example.demo.models.payloads.responses.GetPostsResponse;
 import com.example.demo.models.payloads.PayloadModels.CustomCommentDetails;
 import com.example.demo.models.payloads.PayloadModels.CustomUserDetails;
+import com.example.demo.models.payloads.requests.PostRequest;
 import com.example.demo.models.payloads.queryResults.PostDetailsQueryResult;
 import com.example.demo.repositories.CommentsRepository;
 import com.example.demo.repositories.PostsRepository;
@@ -19,9 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletContext;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -44,10 +43,10 @@ public class PostsController {
 
     //can post both post content (text), and image.None is compulsory, but must contain at least 1 of them.
     @PostMapping()
-    ResponseEntity<?> post(@RequestParam(value = "content", required = false) String content, @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+    ResponseEntity<?> post(@RequestBody PostRequest postRequest)  {
         ApiResponse apiResponse = new ApiResponse();
         //check request to contain either of the 2
-        if (content != null || image != null) {
+        if (postRequest.getContent() != null || postRequest.getPhotos() != null) {
             UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Optional<User> user = userRepository.findByEmail(currentUser.getUsername());
             //initialize
@@ -56,24 +55,16 @@ public class PostsController {
                 Date date = new Date();
                 post.setDate(date);
                 //in the case content is not null, save it
-                if (content != null)
-                    post.setContent(content);
-                //in the case image is not null, save the details and upload it on server
-                if (image != null) {
-                    Map<String,String> response=new HashMap<>();
-                    response=photoService.savePicture(image);
-                    if(response.containsKey("imageName")){
-                        post.setImageName(response.get("imageName"));
-                    }
-                    else if(response.containsKey("error")){
-                        apiResponse.setMessage(response.get("error"));
-                        apiResponse.setSuccess(false);
-                        return new ResponseEntity<>(apiResponse,HttpStatus.OK);
+                if (postRequest.getContent() != null)
+                    post.setContent(postRequest.getContent());
+                if(postRequest.getPhotos()!=null && postRequest.getPhotos().size()>0){
+                    for (String element:postRequest.getPhotos()) {
+                        post.getImageNames().add(element);
                     }
                 }
-                //if it got till here, it means it's all good, save the post in database
                 user.get().getPosts().add(post);
                 userRepository.save(user.get());
+
                 apiResponse.setMessage("Post added successfully");
                 apiResponse.setSuccess(true);
             }
@@ -92,7 +83,7 @@ public class PostsController {
     }
 
     @GetMapping("/user/{id}")
-        ResponseEntity<?>getPosts(@PathVariable("id") Long userId) {
+    ResponseEntity<?>getPosts(@PathVariable("id") Long userId) {
         GetPostsResponse getPostsResponse=new GetPostsResponse();
         ArrayList<PostDetailsQueryResult>postDetailsQueryResults;
         postDetailsQueryResults=postsRepository.customFindPostsByUser(userId);
@@ -105,9 +96,8 @@ public class PostsController {
             getPostsResponse.setSuccess(false);
             getPostsResponse.setPosts(postDetailsQueryResults);
         }
-      return new ResponseEntity<>(getPostsResponse,HttpStatus.OK);
+        return new ResponseEntity<>(getPostsResponse,HttpStatus.OK);
     }
-
 
 
 
@@ -130,7 +120,7 @@ public class PostsController {
         return new ResponseEntity<>(apiResponse,HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/unlike")
+    @DeleteMapping("/{id}/like")
     ResponseEntity<?>unlikePost(@PathVariable("id")Long id){
         Optional<Post>post=postsRepository.findById(id);
         ApiResponse apiResponse=new ApiResponse();
@@ -149,7 +139,7 @@ public class PostsController {
         return new ResponseEntity<>(apiResponse,HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
         ResponseEntity<?>removePost(@PathVariable("id")Long id){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
@@ -176,7 +166,7 @@ public class PostsController {
         return new ResponseEntity<>(apiResponse,HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/comment")
+    @PostMapping("/{id}/comments")
     ResponseEntity<?>comment(@PathVariable(value = "id") Long id,@RequestBody Map<String,Object> body){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
@@ -201,7 +191,7 @@ public class PostsController {
         return new ResponseEntity<>(apiResponse,HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/comment")
+    @GetMapping("/{id}/comments")
     ResponseEntity<?> getPostComments(@PathVariable("id")Long id) throws JsonProcessingException {
         List<Comment> comments = commentsRepository.findByPostId(id);
         CommentsResponse commentsResponse=new CommentsResponse();
