@@ -91,7 +91,7 @@ public class PostsController {
 
     }
 
-    @GetMapping("/getAllUserPosts/{id}")
+    @GetMapping("/user/{id}")
         ResponseEntity<?>getPosts(@PathVariable("id") Long userId) {
         GetPostsResponse getPostsResponse=new GetPostsResponse();
         ArrayList<PostDetailsQueryResult>postDetailsQueryResults;
