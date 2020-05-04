@@ -11,7 +11,8 @@ import java.util.ArrayList;
 @Repository
 public interface PostsRepository extends Neo4jRepository<Post,Long> {
 
-    @Query("match(u:User)-[l:Liked]-(p:Post),(u)-[c:commented_on]-(p) where ID(u)=$id\n" +
-        "return count(distinct l) as likes,count(distinct c) as comments,p.content as content,p.date as date,ID(p) as id")
+    @Query("MATCH (u:User)-[:Posted]->(z:Post) where ID(u)=$id\n" +
+            "RETURN z.content as content,z.imageName as imageName,z.date as date,ID(z) as id, " +
+            "SIZE( ()-[:Liked]->(z) ) as likes,SIZE( ()-[:commented_on]->(z) ) as comments")
     ArrayList<PostDetailsQueryResult> customFindPostsByUser(@Param("id")Long id);
 }
