@@ -147,7 +147,7 @@ public class UserController {
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/getAllPendingFriendRequests")
+    @GetMapping("/friendRequests")
     ResponseEntity<?>getPending(){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
@@ -170,7 +170,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/getAllFriends")
+    @GetMapping("/friends")
     ResponseEntity<?>getFriends(){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
