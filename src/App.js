@@ -61,11 +61,12 @@ class App extends React.Component {
         if (valid) {
           fetchUserDetails(token).then((userDetails) => {
             if (userDetails !== false) {
-              LogRocket.identify("123", {
+              LogRocket.identify(userDetails.id, {
                 email: userDetails.email,
-                name:
-                  userDetails["first_name"] + " " + userDetails["last_name"],
+                name: `
+                  ${userDetails["first_name"]} ${userDetails["last_name"]}`,
               });
+              delete userDetails.success;
               this.props.setUserInfo(userDetails);
               this.props.setLoggedIn(true);
             } else {
@@ -92,8 +93,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                  <LandingPage {...props} />
-                )
+                <LandingPage {...props} />
+              )
             }
           />
           <Route
@@ -103,8 +104,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                  <Activation {...props} />
-                )
+                <Activation {...props} />
+              )
             }
           />
           <PrivateRoute isAuthenticated={this.props.loggedIn}>

@@ -1,11 +1,18 @@
 import React, { Component } from "react";
-import { EuiFieldSearch, EuiIcon, EuiFieldText } from "@elastic/eui";
+import { EuiFieldSearch, EuiIcon } from "@elastic/eui";
+import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
 
 import DropdownMenu from "./DropDownMenu/DropDownMenu.jsx";
 import MessageItem from "./DropDownMenu/MenuItems/MessageItem/";
 import FriendRequestItem from "./DropDownMenu/MenuItems/FriendRequestItem/";
 import NotificationItem from "./DropDownMenu/MenuItems/NotificationItem/";
 import ProfileItem from "./DropDownMenu/MenuItems/ProfileItem/";
+import {
+  selectUserFullName,
+  selectUserID,
+  selectUserProfilePicture,
+} from "../../redux/user/user.selectors.js";
 
 import logo from "../../assets/logo-white.svg";
 import profilePicturePlaceholder from "../../assets/logo-black.svg";
@@ -123,10 +130,10 @@ class NavBar extends Component {
           <div className={styles.user}>
             <EuiIcon
               className={styles.profilePicture}
-              type={profilePicturePlaceholder}
+              type={this.props.userPFP}
             />
             <div className={styles.userInfo}>
-              <p className={styles.userName}>David Sima</p>
+              <p className={styles.userName}>{this.props.userName}</p>
               <span className={styles.status}>Custom status</span>
             </div>
             <DropdownMenu
@@ -141,4 +148,11 @@ class NavBar extends Component {
     );
   }
 }
-export default NavBar;
+
+const mapStateToProps = createStructuredSelector({
+  userName: selectUserFullName,
+  userPFP: selectUserProfilePicture,
+  userID: selectUserID,
+});
+
+export default connect(mapStateToProps, null)(NavBar);
