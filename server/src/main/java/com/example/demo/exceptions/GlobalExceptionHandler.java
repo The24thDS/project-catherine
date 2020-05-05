@@ -1,5 +1,5 @@
 package com.example.demo.exceptions;
-import com.example.demo.models.payloads.ApiResponse;
+import com.example.demo.models.payloads.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,6 +31,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ApiResponse("Account is not enabled",false), HttpStatus.BAD_REQUEST);
 
     }
+    @ExceptionHandler
+    public ResponseEntity<?> handlePhotoOfWrongFormat(InvalidPhotoException e){
+        return new ResponseEntity<>(new ApiResponse(e.getMessage(),false), HttpStatus.BAD_REQUEST);
+
+    }
+
 
 
 }

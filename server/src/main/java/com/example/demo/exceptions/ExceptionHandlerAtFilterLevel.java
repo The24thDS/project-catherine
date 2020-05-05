@@ -1,6 +1,6 @@
 package com.example.demo.exceptions;
 
-import com.example.demo.models.payloads.ApiResponse;
+import com.example.demo.models.payloads.responses.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
