@@ -11,4 +11,11 @@ const persistConfig = {
 
 const reducer = combineReducers({ user: userReducer });
 
-export default persistReducer(persistConfig, reducer);
+const root = (currentState, action) => {
+  if (action.type === "LOG_OUT") {
+    currentState = undefined;
+  }
+  return reducer(currentState, action);
+};
+
+export default persistReducer(persistConfig, root);

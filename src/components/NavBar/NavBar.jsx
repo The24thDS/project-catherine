@@ -24,15 +24,14 @@ import logoutIcon from "../../assets/logout.svg";
 import profileIcon from "../../assets/profile.svg";
 
 import styles from "./NavBar.module.sass";
-import { setLoggedIn, setUserInfo } from "../../redux/user/user.actions.js";
+import { logOut } from "../../redux/user/user.actions.js";
 
 class NavBar extends Component {
   showFriendRequests = () => {};
   showMessages = () => {};
   showNotifications = () => {};
   logout = () => {
-    this.props.setLoggedIn(false);
-    this.props.setUserInfo(null);
+    this.props.logOut();
     window.localStorage.removeItem("token");
     window.sessionStorage.removeItem("token");
   };
@@ -164,8 +163,7 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
-  setUserInfo: (info) => dispatch(setUserInfo(info)),
+  logOut: () => dispatch(logOut()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavBar);
