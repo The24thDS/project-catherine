@@ -43,7 +43,7 @@ class DropDownMenu extends Component {
     );
 
     const items = menuItemsData.map((itemData, i) => (
-      <MenuItemComponent {...itemData} /> // TODO: we need a proper key here
+      <MenuItemComponent {...itemData} key={`${menuTitle} ${i}`} /> // TODO: we need a proper key here
     ));
 
     return (

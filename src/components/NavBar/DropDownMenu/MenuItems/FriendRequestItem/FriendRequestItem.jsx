@@ -16,7 +16,11 @@ class FriendRequestItem extends Component {
   render() {
     return (
       <div className={styles["friend-request-item"]}>
-        <EuiButtonIcon iconType="check" className={styles["accept-button"]} />
+        <EuiButtonIcon
+          iconType="check"
+          className={styles["accept-button"]}
+          aria-label="Accept friend request"
+        />
         <div className={styles["user-details"]}>
           <EuiIcon
             className={styles["profile-picture"]}
@@ -26,7 +30,11 @@ class FriendRequestItem extends Component {
             {this.props.firstName} {this.props.lastName}
           </h2>
         </div>
-        <EuiButtonIcon iconType="cross" className={styles["refuse-button"]} />
+        <EuiButtonIcon
+          iconType="cross"
+          className={styles["refuse-button"]}
+          aria-label="Refuse friend request"
+        />
       </div>
     );
   }

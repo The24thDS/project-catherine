@@ -44,7 +44,6 @@ class App extends React.Component {
     const fetchUserDetails = async () => {
       const req = new ServerRequest("/user/details");
       req.useAuthorization();
-      console.log(req);
       const response = await req.send();
       if (response.status === 200) {
         return await response.json();

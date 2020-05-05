@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { EuiFieldSearch, EuiIcon } from "@elastic/eui";
+import { EuiFieldSearch, EuiIcon, EuiInputPopover } from "@elastic/eui";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 
@@ -13,6 +13,7 @@ import {
   selectUserID,
   selectUserProfilePicture,
 } from "../../redux/user/user.selectors.js";
+import ServerRequest from "../../utils/ServerRequest";
 
 import logo from "../../assets/logo-white.svg";
 import profilePicturePlaceholder from "../../assets/logo-black.svg";
@@ -27,6 +28,15 @@ import styles from "./NavBar.module.sass";
 import { logOut } from "../../redux/user/user.actions.js";
 
 class NavBar extends Component {
+  state = {
+    isSearchOpen: false,
+    searchResults: [],
+  };
+  setIsSearchOpen = (value = true) => {
+    this.setState({
+      isSearchOpen: value,
+    });
+  };
   showFriendRequests = () => {};
   showMessages = () => {};
   showNotifications = () => {};
@@ -34,6 +44,84 @@ class NavBar extends Component {
     this.props.logOut();
     window.localStorage.removeItem("token");
     window.sessionStorage.removeItem("token");
+  };
+  onSearchType = async (evt) => {
+    const text = evt.target.value;
+    const [firstName, lastName] = text.trim().split(" ");
+    const searchPath = "/user/search";
+    console.log(firstName, lastName);
+    if (firstName === "") {
+      this.setState({
+        isSearchOpen: false,
+        searchResults: [],
+      });
+      return false;
+    }
+    if (lastName === undefined) {
+      const firstNameSearch = new ServerRequest(searchPath, "POST", undefined, {
+        firstName,
+      });
+      firstNameSearch.useAuthorization().useJsonBody();
+      const lastNameSearch = new ServerRequest(searchPath, "POST", undefined, {
+        lastName: firstName,
+      });
+      lastNameSearch.useAuthorization().useJsonBody();
+      let response = await firstNameSearch.send();
+      let data = await response.json();
+      let searchResults = data.users;
+      response = await lastNameSearch.send();
+      data = await response.json();
+      searchResults = [...searchResults, ...data.users];
+      const uniqueSearchResultsIDs = new Set(
+        searchResults.map((user) => user.id)
+      );
+      const uniqueSearchResults = searchResults.filter((user) => {
+        if (uniqueSearchResultsIDs.has(user.id)) {
+          uniqueSearchResultsIDs.delete(user.id);
+          return true;
+        }
+        return false;
+      });
+      this.setState({
+        searchResults: uniqueSearchResults.length
+          ? uniqueSearchResults
+          : "No matching users",
+        isSearchOpen: true,
+      });
+    } else {
+      const firstSearch = new ServerRequest(searchPath, "POST", undefined, {
+        firstName,
+        lastName,
+      });
+      firstSearch.useAuthorization().useJsonBody();
+      const secondSearch = new ServerRequest(searchPath, "POST", undefined, {
+        firstName: lastName,
+        lastName: firstName,
+      });
+      secondSearch.useAuthorization().useJsonBody();
+      let response = await firstSearch.send();
+      let data = await response.json();
+      let searchResults = data.users;
+      response = await secondSearch.send();
+      data = await response.json();
+      searchResults = [...searchResults, ...data.users];
+      const uniqueSearchResultsIDs = new Set(
+        searchResults.map((user) => user.id)
+      );
+      const uniqueSearchResults = searchResults.filter((user) => {
+        if (uniqueSearchResultsIDs.has(user.id)) {
+          uniqueSearchResultsIDs.delete(user.id);
+          return true;
+        }
+        return false;
+      });
+      this.setState({
+        searchResults: uniqueSearchResults.length
+          ? uniqueSearchResults
+          : "No matching users",
+        isSearchOpen: true,
+      });
+    }
   };
   // test data
   messagesData = [
@@ -104,13 +192,36 @@ class NavBar extends Component {
     },
   ];
   render() {
+    const { searchResults } = this.state;
     return (
       <nav className={styles.navBar}>
         <div className={styles.brand}>
           <EuiIcon type={logo} size="xxl" />
           <h1>Project Catherine</h1>
         </div>
-        <EuiFieldSearch placeholder="Search in Project Catherine" />
+        <EuiInputPopover
+          input={
+            <EuiFieldSearch
+              onChange={this.onSearchType}
+              placeholder="Search in Project Catherine"
+            />
+          }
+          isOpen={this.state.isSearchOpen}
+          closePopover={() => this.setIsSearchOpen(false)}
+          onFocus={() => {
+            if (this.state.searchResults.length) this.setIsSearchOpen(true);
+          }}
+          style={{ width: "90vw" }}
+        >
+          {typeof searchResults === "string"
+            ? searchResults
+            : searchResults.map((user) => (
+                <div key={user.id}>
+                  {user.firstName} {user.lastName}
+                </div>
+              ))}
+        </EuiInputPopover>
+
         <div className={styles.userActions}>
           <DropdownMenu
             MenuItemComponent={FriendRequestItem}
