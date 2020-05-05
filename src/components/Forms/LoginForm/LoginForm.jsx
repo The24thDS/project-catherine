@@ -120,14 +120,8 @@ class LoginForm extends React.Component {
       } else {
         window.sessionStorage.setItem("token", token);
       }
-      const req = new ServerRequest(
-        "/user/details",
-        "GET",
-        {
-          Authorization: "Bearer " + token,
-        },
-        null
-      );
+      const req = new ServerRequest("/user/details");
+      req.useAuthorization();
       const response = await req.send();
       if (response.status === 200) {
         const userDetails = await response.json();

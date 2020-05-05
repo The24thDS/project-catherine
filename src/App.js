@@ -41,15 +41,10 @@ class App extends React.Component {
       return data.success;
     };
 
-    const fetchUserDetails = async (token) => {
-      const req = new ServerRequest(
-        "/user/details",
-        "GET",
-        {
-          Authorization: "Bearer " + token,
-        },
-        null
-      );
+    const fetchUserDetails = async () => {
+      const req = new ServerRequest("/user/details");
+      req.useAuthorization();
+      console.log(req);
       const response = await req.send();
       if (response.status === 200) {
         return await response.json();
@@ -59,7 +54,7 @@ class App extends React.Component {
     if (token !== null) {
       checkToken(token).then((valid) => {
         if (valid) {
-          fetchUserDetails(token).then((userDetails) => {
+          fetchUserDetails().then((userDetails) => {
             if (userDetails !== false) {
               LogRocket.identify(userDetails.id, {
                 email: userDetails.email,
