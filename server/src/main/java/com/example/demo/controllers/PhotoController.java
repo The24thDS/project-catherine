@@ -29,7 +29,7 @@ public class PhotoController {
     @Autowired
     PhotoService photoService;
 
-    @GetMapping("/get/{fileName:.+}")
+    @GetMapping("/{fileName:.+}")
     ResponseEntity<?> download(@PathVariable String fileName, HttpServletRequest request) throws IOException {
         final String absolutePath = context.getContextPath() + "photos/";
         Path filePath = Paths.get(absolutePath + fileName);
