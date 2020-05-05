@@ -6,7 +6,7 @@ import styles from "./ProfileItem.module.sass";
 
 const ProfileItem = (props) => {
   return (
-    <div className={styles.item}>
+    <div className={styles.item} onClick={props.onClick}>
       <EuiIcon type={props.icon} />
       <p className={styles.name}>{props.name}</p>
     </div>
@@ -15,5 +15,6 @@ const ProfileItem = (props) => {
 ProfileItem.propTypes = {
   name: PropTypes.string,
   icon: PropTypes.string,
+  onClick: PropTypes.func,
 };
 export default ProfileItem;
