@@ -3,25 +3,8 @@ class ServerRequest {
     this.url = process.env.REACT_APP_SERVER_URL + path;
     this.method = method;
     this.headers = headers;
-    this.body = body !== null ? JSON.stringify(this.formatBody(body)) : null;
+    this.body = body !== null ? JSON.stringify(body) : null;
   }
-  formatBody = (body = {}) => {
-    const formattedBody = {};
-    Object.keys(body).forEach((key) => {
-      let formattedKey = key;
-      let idx = formattedKey.search(/[A-Z]/);
-      while (idx !== -1) {
-        formattedKey =
-          formattedKey.slice(0, idx) +
-          "_" +
-          formattedKey.charAt(idx).toLowerCase() +
-          formattedKey.slice(idx + 1);
-        idx = formattedKey.search(/[A-Z]/);
-      }
-      formattedBody[formattedKey] = body[key];
-    });
-    return formattedBody;
-  };
   check = () => {
     console.log(this);
   };

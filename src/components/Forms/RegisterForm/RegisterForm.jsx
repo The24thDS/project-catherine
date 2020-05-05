@@ -73,7 +73,7 @@ class RegisterForm extends React.Component {
     const registerFormSchema = yup.object({
       firstName: yup.string().trim().required("First Name is a required field"),
       lastName: yup.string().trim().required("Last Name is a required field"),
-      email: yup.string().trim().email().required(), // TODO: Check if the email is not registered already
+      email: yup.string().trim().email().required(),
       birthDate: yup
         .date()
         .max(

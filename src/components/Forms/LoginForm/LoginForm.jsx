@@ -9,6 +9,7 @@ import {
 import * as yup from "yup";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import LogRocket from "logrocket";
 
 import Modal from "../../Modal";
 import ForgotPasswordForm from "../ForgotPasswordForm";
@@ -130,6 +131,12 @@ class LoginForm extends React.Component {
       const response = await req.send();
       if (response.status === 200) {
         const userDetails = await response.json();
+        LogRocket.identify(userDetails.id, {
+          email: userDetails.email,
+          name: `
+                  ${userDetails.firstName} ${userDetails.lastName}`,
+        });
+        delete userDetails.success;
         this.props.setUserInfo(userDetails);
         this.props.setLoggedIn(true);
         this.props.history.push("/feed");

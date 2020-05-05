@@ -64,7 +64,7 @@ class App extends React.Component {
               LogRocket.identify(userDetails.id, {
                 email: userDetails.email,
                 name: `
-                  ${userDetails["first_name"]} ${userDetails["last_name"]}`,
+                  ${userDetails.firstName} ${userDetails.lastName}`,
               });
               delete userDetails.success;
               this.props.setUserInfo(userDetails);
