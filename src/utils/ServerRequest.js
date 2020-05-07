@@ -11,6 +11,10 @@ class ServerRequest {
   check = () => {
     console.log(this);
   };
+  /** 
+    Sends the requests
+    @returns a Response object
+  */
   send = async () => {
     const response = await fetch(this.url, {
       method: this.method,
@@ -19,6 +23,10 @@ class ServerRequest {
     });
     return response;
   };
+  /** 
+    Sets "Authorization" header to "Bearer + token"
+    @returns this
+  */
   useAuthorization = () => {
     this.headers = {
       ...this.headers,
@@ -26,6 +34,10 @@ class ServerRequest {
     };
     return this;
   };
+  /** 
+    Sets "Content-Type" header to "application/json"
+    @returns this
+  */
   useJsonBody = () => {
     this.headers = {
       ...this.headers,
