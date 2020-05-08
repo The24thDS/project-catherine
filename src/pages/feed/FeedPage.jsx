@@ -7,10 +7,6 @@ export default class FeedPage extends Component {
     document.title = "Project Catherine | Feed";
   }
   render() {
-    return (
-      <>
-        <NavBar />
-      </>
-    );
+    return <></>;
   }
 }
