@@ -55,7 +55,13 @@ class DropDownMenu extends Component {
           closePopover={this.toggleIsPopoverOpen}
         >
           <EuiPopoverTitle>{menuTitle}</EuiPopoverTitle>
-          {items}
+          {items.length ? (
+            items
+          ) : (
+            <span style={{ opacity: 0.5 }}>
+              We've looked everywhere but couldn't find any
+            </span>
+          )}
         </EuiPopover>
       </div>
     );

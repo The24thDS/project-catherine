@@ -15,6 +15,7 @@ import {
 } from "../../redux/user/user.selectors.js";
 import SearchBar from "./SearchBar/SearchBar.jsx";
 import { logOut } from "../../redux/user/user.actions.js";
+import ServerRequest from "../../utils/ServerRequest.js";
 
 import logo from "../../assets/logo-white.svg";
 import profilePicturePlaceholder from "../../assets/logo-black.svg";
@@ -26,9 +27,30 @@ import logoutIcon from "../../assets/logout.svg";
 import profileIcon from "../../assets/profile.svg";
 
 import styles from "./NavBar.module.sass";
+import PictureURL from "../../utils/PictureURL.js";
 
 class NavBar extends Component {
-  showFriendRequests = () => {};
+  state = {
+    friendRequests: [],
+    messages: [],
+    notifications: [],
+  };
+
+  getFriendRequests = async () => {
+    const request = new ServerRequest("/user/friendRequests");
+    request.useAuthorization();
+    const response = await request.send();
+    if (response.status === 200) {
+      const data = await response.json();
+      const friendRequests = data.users.map((user) => ({
+        ...user,
+        profilePicture: new PictureURL(user.profilePicture).url,
+      }));
+      this.setState({
+        friendRequests,
+      });
+    }
+  };
   showMessages = () => {};
   showNotifications = () => {};
   logout = () => {
@@ -37,59 +59,11 @@ class NavBar extends Component {
     window.sessionStorage.removeItem("token");
   };
 
+  componentDidMount() {
+    this.getFriendRequests();
+  }
+
   // test data
-  messagesData = [
-    {
-      profilePicture: profilePicturePlaceholder,
-      firstName: "Zina",
-      lastName: "Postica",
-      message: "Hello",
-      userIsMessageAuthor: true,
-      date: "12:56",
-    },
-    {
-      profilePicture: profilePicturePlaceholder,
-      firstName: "Misa",
-      lastName: "Postica",
-      isNew: true,
-      message: "Miau",
-      userIsMessageAuthor: false,
-      date: "13:08",
-    },
-  ];
-  friendRequestsData = [
-    {
-      profilePicture: profilePicturePlaceholder,
-      firstName: "Zina",
-      lastName: "Postica",
-      date: "12:56",
-    },
-    {
-      profilePicture: profilePicturePlaceholder,
-      firstName: "Aurel",
-      lastName: "Mercenarul",
-      isNew: true,
-      date: "13:08",
-    },
-  ];
-  notificationsData = [
-    {
-      profilePicture: profilePicturePlaceholder,
-      firstName: "Aurel",
-      lastName: "Mercenarul",
-      isNew: true,
-      date: "13:08",
-      action: "Liked your post",
-    },
-    {
-      profilePicture: profilePicturePlaceholder,
-      firstName: "Aurel",
-      lastName: "Mercenarul",
-      isNew: false,
-      date: "15:08",
-      action: "Liked your post",
-    },
-  ];
   profileDropdownItems = [
     {
       name: "View profile",
@@ -118,21 +92,21 @@ class NavBar extends Component {
         <div className={styles.userActions}>
           <DropdownMenu
             MenuItemComponent={FriendRequestItem}
-            menuItemsData={this.friendRequestsData}
+            menuItemsData={this.state.friendRequests}
             menuButtonIcon={friendRequestsIcon}
             menuTitle="Friend Requests"
             className={styles.icons}
           />
           <DropdownMenu
             MenuItemComponent={MessageItem}
-            menuItemsData={this.messagesData}
+            menuItemsData={this.state.messages}
             menuButtonIcon={messagesIcon}
             menuTitle="Your Messages"
             className={styles.icons}
           />
           <DropdownMenu
             MenuItemComponent={NotificationItem}
-            menuItemsData={this.notificationsData}
+            menuItemsData={this.state.notifications}
             menuButtonIcon={notificationsIcon}
             menuTitle="Notifications"
             className={styles.icons}
