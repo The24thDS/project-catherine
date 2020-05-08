@@ -3,10 +3,13 @@ import { EuiInputPopover, EuiFieldSearch } from "@elastic/eui";
 
 import ServerRequest from "../../../utils/ServerRequest";
 
+import styles from "./SearchBar.module.sass";
+
 const SearchBar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
 
+  // TODO: Needs refactoring and bug fixing
   const onSearchType = async (evt) => {
     const text = evt.target.value;
     const [firstName, lastName] = text.trim().split(" ");
@@ -101,7 +104,7 @@ const SearchBar = () => {
       {typeof searchResults === "string"
         ? searchResults
         : searchResults.map((user) => (
-            <div key={user.id}>
+            <div className={styles["search-result"]} key={"user#" + user.id}>
               {user.firstName} {user.lastName}
             </div>
           ))}

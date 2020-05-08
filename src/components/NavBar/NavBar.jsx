@@ -28,15 +28,6 @@ import profileIcon from "../../assets/profile.svg";
 import styles from "./NavBar.module.sass";
 
 class NavBar extends Component {
-  state = {
-    isSearchOpen: false,
-    searchResults: [],
-  };
-  setIsSearchOpen = (value = true) => {
-    this.setState({
-      isSearchOpen: value,
-    });
-  };
   showFriendRequests = () => {};
   showMessages = () => {};
   showNotifications = () => {};
@@ -115,7 +106,6 @@ class NavBar extends Component {
     },
   ];
   render() {
-    const { searchResults } = this.state;
     return (
       <nav className={styles.navBar}>
         <div className={styles.brand}>
