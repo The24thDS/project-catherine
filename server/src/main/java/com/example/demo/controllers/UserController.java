@@ -198,11 +198,18 @@ public class UserController {
 
     @RequestMapping(value = "/search",method =RequestMethod.POST)
     ResponseEntity<?>search(@RequestBody SearchRequest searchRequest){
-        System.out.println(searchRequest.getLastName()+searchRequest.getFirstName());
-
+        UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+        ArrayList<User>list;
         if(searchRequest.getLastName()==null)searchRequest.setLastName(" ");
         if(searchRequest.getFirstName()==null)searchRequest.setFirstName(" ");
-        ArrayList<User>list=userRepository.findUserByFirstNameStartsWith(searchRequest.getFirstName(),searchRequest.getLastName());
+        if(!(searchRequest.getLastName().equals(" "))&&!(searchRequest.getFirstName().equals(" ")))
+        {
+        list=userRepository.findUserByFirstNameEqualsAndLastNameStartsWith(searchRequest.getFirstName(),searchRequest.getLastName());
+        }else {
+            list = userRepository.findUserByFirstNameStartsWith(searchRequest.getFirstName(), searchRequest.getLastName());
+        }
+        list.remove(principal.get());
         CustomUserResponse customUserResponse=new CustomUserResponse();
         if(!list.isEmpty())
         for (User user:list) customUserResponse.addUser(user.getId(),user.getFirstName(),user.getLastName(),user.getProfilePicture());

@@ -19,5 +19,7 @@ public interface UserRepository extends Neo4jRepository<User,Long> {
     @Query("match (u:User) where toLower(u.firstName) STARTS with toLower($firstName) or toLower(u.lastName) starts with toLower($lastName) return u")
     ArrayList<User> findUserByFirstNameStartsWith(@Param("firstName")String firstName, @Param("lastName")String lastName);
 
+    @Query("match (u:User) where toLower(u.firstName)=toLower($firstName) and toLower(u.lastName) starts with toLower($lastName) return u")
+    ArrayList<User> findUserByFirstNameEqualsAndLastNameStartsWith(@Param("firstName")String firstName, @Param("lastName")String lastName);
 
 }
