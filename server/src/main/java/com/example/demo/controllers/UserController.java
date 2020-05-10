@@ -1,12 +1,15 @@
 package com.example.demo.controllers;
 import com.example.demo.appPrincipal.UserDetailsPrincipal;
 import com.example.demo.models.entities.User;
+import com.example.demo.models.payloads.PayloadModels.CustomUserDetails;
 import com.example.demo.models.payloads.requests.AvailabilityRequest;
 import com.example.demo.models.payloads.requests.SearchRequest;
 import com.example.demo.models.payloads.requests.UserUpdateRequest;
 import com.example.demo.models.payloads.responses.ApiResponse;
+import com.example.demo.models.payloads.responses.CustomUserDetailsResponse;
 import com.example.demo.models.payloads.responses.CustomUserResponse;
-import com.example.demo.models.payloads.responses.UserDetailsResponse;
+import com.example.demo.models.payloads.PayloadModels.FullUserDetails;
+import com.example.demo.models.payloads.responses.FullUserDetailsResponse;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,55 +38,77 @@ public class UserController {
     @RequestMapping("/update")
     public ResponseEntity<?> updateUserDetails(@Valid @RequestBody UserUpdateRequest userUpdateRequest,
                                                BindingResult bindingResult) {
-
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<ApiResponse>(new ApiResponse(findErrors(bindingResult).toString(), false), HttpStatus.OK);
         } else {
             UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Optional<User> user = userRepository.findByEmail(currentUser.getUsername());
+            Optional<User> user = userRepository.findByEmail(currentUser.getUsername(),0);
             if (user.isPresent()) {
 
-                if (!user.get().getFirstName().equals(userUpdateRequest.getFirstName()))
+                if (!user.get().getFirstName().equals(userUpdateRequest.getFirstName())&&userUpdateRequest.getFirstName()!=null)
                     user.get().setFirstName(userUpdateRequest.getFirstName());
 
-                if (!user.get().getLastName().equals(userUpdateRequest.getLastName()))
+                if (!user.get().getLastName().equals(userUpdateRequest.getLastName())&&userUpdateRequest.getLastName()!=null)
                     user.get().setLastName(userUpdateRequest.getLastName());
 
-                if (!user.get().getEmail().equals(userUpdateRequest.getEmail()))
+                if (!user.get().getEmail().equals(userUpdateRequest.getEmail())&&userUpdateRequest.getEmail()!=null)
                     user.get().setEmail(userUpdateRequest.getEmail());
 
-                if (!user.get().getBirthDate().equals(userUpdateRequest.getBirthDate()))
+                if (!user.get().getBirthDate().equals(userUpdateRequest.getBirthDate())&&userUpdateRequest.getBirthDate()!=null)
                     user.get().setBirthDate(userUpdateRequest.getBirthDate());
-
-                if (!(passwordEncoder.matches(userUpdateRequest.getPassword(), user.get().getPassword()))) {
-                    if (passwordEncoder.matches(userUpdateRequest.getPassword2(), user.get().getPassword())) {
-                        user.get().setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
+                if(userUpdateRequest.getPassword()!=null && userUpdateRequest.getPassword2()!=null) {
+                    if (!(passwordEncoder.matches(userUpdateRequest.getPassword(), user.get().getPassword()))) {
+                        if (passwordEncoder.matches(userUpdateRequest.getPassword2(), user.get().getPassword())) {
+                            user.get().setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
+                        } else
+                            return new ResponseEntity<ApiResponse>(new ApiResponse("Old password is incorrect", false), HttpStatus.OK);
                     } else
-                        return new ResponseEntity<ApiResponse>(new ApiResponse("Old password is incorrect", false), HttpStatus.OK);
-                } else
-                    return new ResponseEntity<ApiResponse>(new ApiResponse("Can't have the same password", false), HttpStatus.OK);
+                        return new ResponseEntity<ApiResponse>(new ApiResponse("Can't have the same password", false), HttpStatus.OK);
+                }else if(userUpdateRequest.getPassword()==null&&userUpdateRequest.getPassword2()!=null) return new ResponseEntity<ApiResponse>(new ApiResponse("Should include old password too", false), HttpStatus.OK);
+                else if(userUpdateRequest.getPassword()!=null&&userUpdateRequest.getPassword2()==null) return new ResponseEntity<ApiResponse>(new ApiResponse("Should include new password too", false), HttpStatus.OK);
                 userRepository.save(user.get());
                 return new ResponseEntity<ApiResponse>(new ApiResponse("Updated Successfully", true), HttpStatus.OK);
             } else
                 return new ResponseEntity<ApiResponse>(new ApiResponse("Couldn't find a user with that email", false), HttpStatus.OK);
         }
     }
-    //gets the details of currently logged in user
+
     @GetMapping("/details")
-    public ResponseEntity<?> getUserDetails() {
+    public ResponseEntity<?> getUserDetails(@RequestParam(value = "user",required = false)Long id) {
+        FullUserDetailsResponse fullUserDetailsResponse=null;
+        CustomUserDetailsResponse customUserDetailsResponse=null;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = userRepository.findByEmail(currentUser.getUsername());
-        if (user.isPresent()) {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
-            userDetailsResponse.setSuccess(true);
-            userDetailsResponse.setEmail(user.get().getEmail());
-            userDetailsResponse.setLastName(user.get().getLastName());
-            userDetailsResponse.setFirstName(user.get().getFirstName());
-            userDetailsResponse.setBirthDate(formatter.format(user.get().getBirthDate()));
-            userDetailsResponse.setId(user.get().getId());
-            userDetailsResponse.setProfilePicture(user.get().getProfilePicture());
-            return new ResponseEntity<UserDetailsResponse>(userDetailsResponse, HttpStatus.OK);
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(), 0);
+        if (principal.isPresent()) {
+            if (id != null) {
+                Optional<User> requestedUser = userRepository.findById(id, 0);
+                if (requestedUser.isPresent()) {
+                    if (userRepository.isFriendsWith(principal.get().getId(), requestedUser.get().getId())) {
+                        User user = requestedUser.get();
+                        FullUserDetails fullUserDetails=new FullUserDetails(user.getEmail(), user.getFirstName(), user.getLastName(),
+                                formatter.format(user.getBirthDate()), user.getId(), user.getProfilePicture());
+                        fullUserDetailsResponse=new FullUserDetailsResponse(fullUserDetails);
+                        fullUserDetailsResponse.setMessage("Friend Details");
+                        fullUserDetailsResponse.setSuccess(true);
+                    } else {
+                        User user = requestedUser.get();
+                        CustomUserDetails customUserDetails=new CustomUserDetails(user.getId(),user.getFirstName(),user.getLastName(),user.getProfilePicture());
+                        customUserDetailsResponse = new CustomUserDetailsResponse(customUserDetails);
+                        customUserDetailsResponse.setMessage("User Details");
+                        customUserDetailsResponse.setSuccess(true);
+
+                    }
+                } else return new ResponseEntity<ApiResponse>(new ApiResponse("User does not exist", false),HttpStatus.OK);
+            } else {
+                User user = principal.get();
+                fullUserDetailsResponse = new FullUserDetailsResponse(new FullUserDetails(user.getEmail(), user.getFirstName(), user.getLastName(),
+                        formatter.format(user.getBirthDate()), user.getId(), user.getProfilePicture()));
+                fullUserDetailsResponse.setSuccess(true);
+                fullUserDetailsResponse.setMessage("Authenticated User details");
+
+            }if(!(fullUserDetailsResponse==null)) return new ResponseEntity<>(fullUserDetailsResponse,HttpStatus.OK);
+            else return new ResponseEntity<>(customUserDetailsResponse,HttpStatus.OK);
         } else return new ResponseEntity<>(new ApiResponse("Error. Couldn't load user", false), HttpStatus.NOT_FOUND);
     }
 
@@ -107,14 +132,14 @@ public class UserController {
     @PostMapping("/sendFriendRequest/{id}")
     ResponseEntity<?> sendFriendRequest(@PathVariable("id") Long id) {
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> senderUser = userRepository.findByEmail(currentUser.getUsername());
+        Optional<User> senderUser = userRepository.findByEmail(currentUser.getUsername(),1);
         Optional<User> recieverUser = userRepository.findById(id);
-
         if (senderUser.isPresent() && recieverUser.isPresent()) {
-            recieverUser.get().getFriendRequests().add(senderUser.get());
-            userRepository.save(recieverUser.get());
-            return new ResponseEntity<>(new ApiResponse("Friend Request Sent", true), HttpStatus.OK);
-
+            if(!recieverUser.get().getFriends().contains(senderUser.get())) {
+                recieverUser.get().getFriendRequests().add(senderUser.get());
+                userRepository.save(recieverUser.get());
+                return new ResponseEntity<>(new ApiResponse("Friend Request Sent", true), HttpStatus.OK);
+            } else return new ResponseEntity<>(new ApiResponse("User is already In your friends list", false), HttpStatus.OK);
         } else return new ResponseEntity<>(new ApiResponse("Couldn't find user with given id", false), HttpStatus.OK);
 
     }
@@ -124,7 +149,7 @@ public class UserController {
     ResponseEntity<?> acceptFriendRequest(@PathVariable("id") Long id) {
         ApiResponse apiResponse = new ApiResponse();
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),1);
         Optional<User> friendRequestUser = userRepository.findById(id);
         if (principal.isPresent() && friendRequestUser.isPresent()) {
             if (principal.get().getFriendRequests().contains(friendRequestUser.get())) {
@@ -155,7 +180,7 @@ public class UserController {
     @GetMapping("/friendRequests")
     ResponseEntity<?>getPending(){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),1);
         HashSet<CustomUserResponse> responses=new HashSet<>();
         CustomUserResponse friendsResponse = new CustomUserResponse();
         if(principal.isPresent()) {
@@ -178,7 +203,7 @@ public class UserController {
     @GetMapping("/friends")
     ResponseEntity<?>getFriends(){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),1);
         HashSet<CustomUserResponse> responses=new HashSet<>();
         CustomUserResponse friendsResponse = new CustomUserResponse();
         if(principal.isPresent()) {
@@ -199,7 +224,7 @@ public class UserController {
     @RequestMapping(value = "/search",method =RequestMethod.POST)
     ResponseEntity<?>search(@RequestBody SearchRequest searchRequest){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),0);
         ArrayList<User>list;
         if(searchRequest.getLastName()==null)searchRequest.setLastName(" ");
         if(searchRequest.getFirstName()==null)searchRequest.setFirstName(" ");
@@ -209,7 +234,7 @@ public class UserController {
         }else {
             list = userRepository.findUserByFirstNameStartsWith(searchRequest.getFirstName(), searchRequest.getLastName());
         }
-        list.remove(principal.get());
+        if(list.contains(principal.get())) list.remove(principal.get());
         CustomUserResponse customUserResponse=new CustomUserResponse();
         if(!list.isEmpty())
         for (User user:list) customUserResponse.addUser(user.getId(),user.getFirstName(),user.getLastName(),user.getProfilePicture());
