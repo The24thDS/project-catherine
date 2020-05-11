@@ -15,28 +15,20 @@ import java.util.Date;
 @NoArgsConstructor
 public class UserUpdateRequest implements Serializable {
 
-    @NotBlank(message = "Email is blank")
+
     @Email(message = "Invalid email")
     private String email;
 
-    @Size(min=10,message = "New Password is too short")
-    @NotBlank(message = "New Password is blank")
+    @Size(min = 8,message = "Password length should be greater than 8")
     private String password;
-
-    public String getPassword2() {
-        return password2;
-    }
-
-
-    @Size(min=10,message = "Old Password is too short")
-    @NotBlank(message = "Old Password is blank")
+    @Size(min = 8,message = "Password length should be greater than 8")
     private String password2;
 
 
-    @NotBlank(message = "First name is blank")
+   @Size(min = 2,message = "First Name should contain at least 2 characters")
     private String firstName;
 
-    @NotBlank(message = "Last name is blank")
+    @Size(min = 2,message = "Last name should contain at least 2 characters")
     private String lastName;
 
 

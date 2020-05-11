@@ -3,9 +3,8 @@ import com.example.demo.appPrincipal.UserDetailsPrincipal;
 import com.example.demo.models.entities.Comment;
 import com.example.demo.models.entities.Post;
 import com.example.demo.models.entities.User;
-import com.example.demo.models.payloads.responses.ApiResponse;
-import com.example.demo.models.payloads.responses.CommentsResponse;
-import com.example.demo.models.payloads.responses.GetPostsResponse;
+import com.example.demo.models.payloads.queryResults.FriendsPostDetailsQueryResult;
+import com.example.demo.models.payloads.responses.*;
 import com.example.demo.models.payloads.PayloadModels.CustomCommentDetails;
 import com.example.demo.models.payloads.PayloadModels.CustomUserDetails;
 import com.example.demo.models.payloads.requests.PostRequest;
@@ -14,8 +13,11 @@ import com.example.demo.repositories.CommentsRepository;
 import com.example.demo.repositories.PostsRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.services.PhotoService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,7 +50,7 @@ public class PostsController {
         //check request to contain either of the 2
         if (postRequest.getContent() != null || postRequest.getPhotos() != null) {
             UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Optional<User> user = userRepository.findByEmail(currentUser.getUsername());
+            Optional<User> user = userRepository.findByEmail(currentUser.getUsername(),0);
             //initialize
             if (user.isPresent()) {
                 Post post = new Post();
@@ -83,23 +85,29 @@ public class PostsController {
     }
 
     @GetMapping("/user/{id}")
-    ResponseEntity<?>getPosts(@PathVariable("id") Long userId) {
-        GetPostsResponse getPostsResponse=new GetPostsResponse();
-        ArrayList<PostDetailsQueryResult>postDetailsQueryResults;
-        postDetailsQueryResults=postsRepository.customFindPostsByUser(userId);
-        if(postDetailsQueryResults.size()>0) {
-            getPostsResponse.setMessage("Posts Fetched Successfully");
-            getPostsResponse.setSuccess(true);
-            getPostsResponse.setPosts(postDetailsQueryResults);
-        }else {
-            getPostsResponse.setMessage("User has no posts");
-            getPostsResponse.setSuccess(false);
-            getPostsResponse.setPosts(postDetailsQueryResults);
+    ResponseEntity<?>getPosts(@RequestParam("page")Integer pageNumber ,@PathVariable("id") Long userId) {
+        HttpStatus httpStatus;
+        GetPostsResponse response=new GetPostsResponse();
+        Slice<PostDetailsQueryResult> list=postsRepository.customFindPostsByUser(userId,PageRequest.of(pageNumber,25,Sort.by("date").descending()));
+        if (!list.isEmpty()) {
+            response.map(list);
+            httpStatus=HttpStatus.OK;
+        }else{
+            response.setEmpty(list.isEmpty());response.setLast(list.isLast());
+            httpStatus=HttpStatus.NOT_FOUND;
         }
-        return new ResponseEntity<>(getPostsResponse,HttpStatus.OK);
+        return new ResponseEntity<>(response,httpStatus);
     }
 
-
+    @GetMapping("/{id}/like")
+    ResponseEntity<?>getLikes(@RequestParam("page")Integer pageNumber,@PathVariable("id")Long id){
+        UserLikesResponse response=new UserLikesResponse();
+    Slice<CustomUserDetails>list=postsRepository.findUsersThatLikedPost(id,PageRequest.of(pageNumber,20,Sort.by("firstName").descending()));
+        if (!list.isEmpty()) {
+            response.map(list);
+        }else{response.setEmpty(list.isEmpty());response.setLast(list.isLast());}
+      return new ResponseEntity<>(response,HttpStatus.OK);
+    }
 
     @PostMapping("/{id}/like")
     ResponseEntity<?>likePost(@PathVariable("id")Long id){
@@ -107,7 +115,7 @@ public class PostsController {
         ApiResponse apiResponse=new ApiResponse();
         if(post.isPresent()){
             UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+            Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),0);
             post.get().getUserLikes().add(principal.get());
             postsRepository.save(post.get());
             apiResponse.setMessage("Liked successfully");
@@ -126,7 +134,7 @@ public class PostsController {
         ApiResponse apiResponse=new ApiResponse();
         if(post.isPresent()){
             UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+            Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),0);
             post.get().getUserLikes().remove(principal.get());
             postsRepository.save(post.get());
             apiResponse.setMessage("Unliked successfully");
@@ -142,7 +150,7 @@ public class PostsController {
     @DeleteMapping("/{id}")
         ResponseEntity<?>removePost(@PathVariable("id")Long id){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),1);
         Optional<Post> post=postsRepository.findById(id);
         ApiResponse apiResponse=new ApiResponse();
         if (principal.isPresent()){
@@ -169,7 +177,7 @@ public class PostsController {
     @PostMapping("/{id}/comments")
     ResponseEntity<?>comment(@PathVariable(value = "id") Long id,@RequestBody Map<String,Object> body){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername());
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),0);
         Optional<Post> post=postsRepository.findById(id);
         ApiResponse apiResponse=new ApiResponse();
         if(post.isPresent()){
@@ -192,27 +200,49 @@ public class PostsController {
     }
 
     @GetMapping("/{id}/comments")
-    ResponseEntity<?> getPostComments(@PathVariable("id")Long id) throws JsonProcessingException {
-        List<Comment> comments = commentsRepository.findByPostId(id);
-        CommentsResponse commentsResponse=new CommentsResponse();
-        if (comments.size() > 0) {
-            commentsResponse.setComments(new ArrayList<>());
+    ResponseEntity<?> getPostComments(@RequestParam("page")Integer pageNumber,@PathVariable("id")Long id){
+
+        Slice<Comment> comments = commentsRepository.findByPostId(id,PageRequest.of(pageNumber,20,Sort.by("c.date").descending()));
+       CommentsResponse commentsResponse=new CommentsResponse();
+        if (!comments.isEmpty()) {
+           commentsResponse.setComments(new ArrayList<>());
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             for (Comment comment : comments) {
-                CustomUserDetails customUserDetails=new CustomUserDetails(comment.getUser().getId(),comment.getUser().getFirstName(),comment.getUser().getLastName(),comment.getUser().getProfilePicture());
+               CustomUserDetails customUserDetails=new CustomUserDetails(comment.getUser().getId(),comment.getUser().getFirstName(),comment.getUser().getLastName(),comment.getUser().getProfilePicture());
                 CustomCommentDetails customCommentDetails=new CustomCommentDetails(formatter.format(comment.getDate()),comment.getText());
                 commentsResponse.addCommentsData(customUserDetails,customCommentDetails);
             }
-            commentsResponse.setSuccess(true);
-            commentsResponse.setMessage("Comments fetched successfully");
+            commentsResponse.setLast(comments.isLast());
+            commentsResponse.setEmpty(comments.isEmpty());
 
         }else {
-            commentsResponse.setMessage("There are no comments for this post");
-            commentsResponse.setSuccess(false);
+            commentsResponse.setEmpty(comments.isEmpty());commentsResponse.setLast(comments.isLast());
         }
 
         return new ResponseEntity<>(commentsResponse,HttpStatus.OK);
+
+
     }
+
+    @GetMapping()
+    ResponseEntity<?>friendsPosts(@RequestParam("page") Integer pageNumber){
+        UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),0);
+        PostsOfFriendsResponse response=new PostsOfFriendsResponse();
+        HttpStatus httpStatus;
+        if(principal.isPresent()) {
+            Slice<FriendsPostDetailsQueryResult> list = postsRepository.customFindFriendsPosts(principal.get().getId(), PageRequest.of(pageNumber,25,Sort.by("date").descending()));
+           if (!list.isEmpty()) {
+               response.map(list);
+           }else{response.setEmpty(list.isEmpty());response.setLast(list.isLast());}
+              httpStatus=HttpStatus.OK;
+        }else{
+            httpStatus=HttpStatus.NOT_FOUND;
+        }
+        return new ResponseEntity<>(response,httpStatus);
+    }
+
+
 
 
 
