@@ -13,10 +13,10 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 public class CommentsResponse{
-    private String message;
-    private boolean success;
-    private ArrayList<CommentDetails>comments;
 
+    private ArrayList<CommentDetails>comments;
+    private boolean last;
+    private boolean empty;
     public void addCommentsData(CustomUserDetails customUserDetails,CustomCommentDetails customCommentDetails){
         comments.add(new CommentDetails(customUserDetails,customCommentDetails));
     }
