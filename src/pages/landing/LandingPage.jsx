@@ -9,13 +9,7 @@ import RegisterForm from "../../components/Forms/RegisterForm/";
 
 function LandingPage(props) {
   document.title = "Project Catherine | Landing";
-  let initialForm = "register";
-  if (
-    props.location.state !== undefined &&
-    props.location.state.from === "activation"
-  ) {
-    initialForm = "login";
-  }
+  let initialForm = "login";
   const [form, setForm] = useState(initialForm);
   return (
     <EuiFlexGroup

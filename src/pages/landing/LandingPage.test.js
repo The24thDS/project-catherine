@@ -17,11 +17,11 @@ describe("Landing page", () => {
   });
 
   it("renders the signup form", () => {
-    expect(wrapper.find(RegisterForm).length).toEqual(1);
+    expect(wrapper.find(LoginForm).length).toEqual(1);
   });
 
   it("doesnt render the login form", () => {
-    expect(wrapper.find(LoginForm).length).toEqual(0);
+    expect(wrapper.find(RegisterForm).length).toEqual(0);
   });
 
   it("should change to the login form when you click on the login button", () => {

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import NavBar from "../../components/NavBar/NavBar";
+
+import AddPost from "../../components/AddPost/AddPost";
 
 export default class FeedPage extends Component {
   constructor(props) {
@@ -7,6 +8,18 @@ export default class FeedPage extends Component {
     document.title = "Project Catherine | Feed";
   }
   render() {
-    return <></>;
+    return (
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          paddingTop: "120px",
+        }}
+      >
+        <AddPost />
+      </div>
+    );
   }
 }

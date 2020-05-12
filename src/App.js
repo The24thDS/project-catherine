@@ -54,14 +54,14 @@ class App extends React.Component {
     if (token !== null) {
       checkToken(token).then((valid) => {
         if (valid) {
-          fetchUserDetails().then((userDetails) => {
-            if (userDetails !== false) {
+          fetchUserDetails().then((data) => {
+            if (data !== false) {
+              const userDetails = data.user;
               LogRocket.identify(userDetails.id, {
                 email: userDetails.email,
                 name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
               });
-              delete userDetails.success;
               this.props.setUserInfo(userDetails);
               this.props.setLoggedIn(true);
             } else {
