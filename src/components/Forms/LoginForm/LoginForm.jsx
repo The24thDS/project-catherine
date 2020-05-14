@@ -17,7 +17,8 @@ import ForgotPasswordForm from "../ForgotPasswordForm";
 import "../forms.sass";
 import ServerRequest from "../../../utils/ServerRequest";
 import { setLoggedIn, setUserInfo } from "../../../redux/user/user.actions";
-import { getUserDetails } from "../../../utils/user";
+import { setFriendsInfo } from "../../../redux/friends/friends.actions";
+import { getUserDetails, getUserFriends } from "../../../utils/user";
 
 class LoginForm extends React.Component {
   static propTypes = {
@@ -120,16 +121,17 @@ class LoginForm extends React.Component {
       } else {
         window.sessionStorage.setItem("token", token);
       }
-      const userData = await getUserDetails();
-      if (userData !== false) {
-        const userDetails = userData.user;
+      const userDetails = await getUserDetails();
+      if (userDetails !== false) {
         LogRocket.identify(userDetails.id, {
           email: userDetails.email,
           name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
         });
+        const userFriends = await getUserFriends();
         this.props.setUserInfo(userDetails);
         this.props.setLoggedIn(true);
+        this.props.setFriendsInfo(userFriends);
         this.props.history.push("/feed");
       }
     } else {
@@ -233,6 +235,7 @@ class LoginForm extends React.Component {
 const mapDispatchToProps = (dispatch) => ({
   setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
   setUserInfo: (userDetails) => dispatch(setUserInfo(userDetails)),
+  setFriendsInfo: (friendsArray) => dispatch(setFriendsInfo(friendsArray)),
 });
 
 export default connect(null, mapDispatchToProps)(LoginForm);

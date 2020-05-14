@@ -9,13 +9,14 @@ import "./App.sass";
 
 import { setLoggedIn, setUserInfo } from "./redux/user/user.actions";
 import { selectLoggedIn } from "./redux/user/user.selectors";
+import { setFriendsInfo } from "./redux/friends/friends.actions";
 import LandingPage from "./pages/landing";
 import Activation from "./pages/activation";
 import PrivateRoute from "./components/PrivateRoute";
 import FeedPage from "./pages/feed/FeedPage";
 import NavBar from "./components/NavBar";
-import ChatList from "./components/ChatList";
-import { getUserDetails, checkToken } from "./utils/user";
+import Chats from "./components/Chats";
+import { getUserDetails, checkToken, getUserFriends } from "./utils/user";
 
 class App extends React.Component {
   static propTypes = {
@@ -30,16 +31,18 @@ class App extends React.Component {
     if (token !== null) {
       checkToken(token).then((valid) => {
         if (valid) {
-          getUserDetails().then((data) => {
-            if (data !== false) {
-              const userDetails = data.user;
+          getUserDetails().then(async (userDetails) => {
+            if (userDetails !== false) {
               LogRocket.identify(userDetails.id, {
                 email: userDetails.email,
                 name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
               });
+              const userFriends = await getUserFriends();
+              console.log(userFriends);
               this.props.setUserInfo(userDetails);
               this.props.setLoggedIn(true);
+              this.props.setFriendsInfo(userFriends);
             } else {
               window.localStorage.removeItem("token");
               window.sessionStorage.removeItem("token");
@@ -100,7 +103,7 @@ class App extends React.Component {
             </div>
           </Route>
         </Switch>
-        {this.props.loggedIn ? <ChatList /> : null}
+        {this.props.loggedIn ? <Chats /> : null}
       </div>
     );
   }
@@ -116,6 +119,7 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = (dispatch) => ({
   setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
   setUserInfo: (userDetails) => dispatch(setUserInfo(userDetails)),
+  setFriendsInfo: (friendsArray) => dispatch(setFriendsInfo(friendsArray)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
