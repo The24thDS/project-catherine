@@ -1,126 +1,67 @@
 import React, { Component } from "react";
-import styles from "./DropDownMenu.module.sass";
+import PropTypes from "prop-types";
 import { EuiPopover, EuiButtonIcon, EuiPopoverTitle } from "@elastic/eui";
-import MessageItem from "./MenuItems/MessageItem/MessageItem.jsx";
-import NotificationItem from "./MenuItems/NotificationItem/NotificationItem.jsx";
-import ProfileItem from "./MenuItems/ProfileItem/ProfileItem.jsx";
-import FriendRequestItem from "./MenuItems/FriendRequestItem/FriendRequestItem.jsx";
-import settingsIcon from "../../../assets/settings.svg";
-import logoutIcon from "../../../assets/logout.svg";
-import profileIcon from "../../../assets/profile.svg";
+
+import styles from "./DropDownMenu.module.sass";
+
 class DropDownMenu extends Component {
+  static propTypes = {
+    MenuItemComponent: PropTypes.func.isRequired,
+    menuItemsData: PropTypes.array.isRequired,
+    menuButtonIcon: PropTypes.string.isRequired,
+    menuTitle: PropTypes.string.isRequired,
+  };
+
   state = {
     isPopoverOpen: false,
-    backGround: "#227455",
   };
-  determineColor() {
-    let color;
-    if (this.state.isPopoverOpen) {
-      color = "#227455";
-    } else {
-      color = "#028D68";
-    }
-    return color;
-  }
-  onButtonClick() {
-    this.setState({
-      isPopoverOpen: !this.state.isPopoverOpen,
-      backGround: this.determineColor(),
-    });
-  }
 
-  closePopover() {
-    this.setState({
-      isPopoverOpen: false,
-      backGround: this.determineColor(),
-    });
-  }
+  toggleIsPopoverOpen = () => {
+    this.setState((prevState) => ({
+      isPopoverOpen: !prevState.isPopoverOpen,
+    }));
+  };
 
   render() {
-    const button = (
+    const { isPopoverOpen } = this.state;
+    const {
+      MenuItemComponent,
+      menuItemsData,
+      menuButtonIcon,
+      menuTitle,
+    } = this.props;
+
+    const MenuButton = (
       <EuiButtonIcon
         className={styles.icon}
-        iconType={this.props.icon}
+        iconType={menuButtonIcon}
         iconSize="l"
-        onClick={this.onButtonClick.bind(this)}
-        style={{ backgroundColor: this.state.backGround }}
+        onClick={this.toggleIsPopoverOpen}
+        style={{ backgroundColor: isPopoverOpen ? "#028D68" : "#227455" }}
         aria-label="Next"
       />
     );
-    let item = null;
-    const setItems = () => {
-      switch (this.props.itemType) {
-        case "message":
-          item = this.props.messages.map((message, i) => {
-            return (
-              <MessageItem
-                profilePicture={message.profilePicture}
-                firstName={message.firstName}
-                lastName={message.lastName}
-                read={message.read}
-                whoLastMessaged={message.whoLastMessaged}
-                time={message.time}
-                key={message.id}
-              />
-            );
-          });
-          break;
-        case "notification":
-          item = this.props.notifications.map((notification) => {
-            return (
-              <NotificationItem
-                profilePicture={notification.profilePicture}
-                firstName={notification.firstName}
-                lastName={notification.lastName}
-                read={notification.read}
-                action={notification.action}
-                time={notification.time}
-                key={notification.id}
-              />
-            );
-          });
-          break;
-        case "profile":
-          item = (
-            <div>
-              <ProfileItem icon={profileIcon} name="View Profile"></ProfileItem>
-              <ProfileItem icon={settingsIcon} name="Settings"></ProfileItem>
-              <ProfileItem icon={logoutIcon} name="Log Out"></ProfileItem>
-            </div>
-          );
-          break;
-        case "friendRequest":
-          item = this.props.friendRequests.map((friendRequest, index) => {
-            return (
-              <FriendRequestItem
-                profilePicture={friendRequest.profilePicture}
-                firstName={friendRequest.firstName}
-                lastName={friendRequest.lastName}
-                read={friendRequest.read}
-                action={friendRequest.action}
-                time={friendRequest.time}
-                key={friendRequest.id}
-              />
-            );
-          });
-          break;
-        default:
-          item = null;
-          break;
-      }
-    };
-    setItems();
+
+    const items = menuItemsData.map((itemData, i) => (
+      <MenuItemComponent {...itemData} key={`${menuTitle} ${i}`} /> // TODO: we need a proper key here
+    ));
 
     return (
       <div>
         <EuiPopover
           className={styles.button}
-          button={button}
-          isOpen={this.state.isPopoverOpen}
-          closePopover={this.closePopover.bind(this)}
+          button={MenuButton}
+          isOpen={isPopoverOpen}
+          closePopover={this.toggleIsPopoverOpen}
         >
-          <EuiPopoverTitle>{this.props.menuTitle}</EuiPopoverTitle>
-          {item}
+          <EuiPopoverTitle>{menuTitle}</EuiPopoverTitle>
+          {items.length ? (
+            items
+          ) : (
+            <span style={{ opacity: 0.5 }}>
+              We've looked everywhere but couldn't find any
+            </span>
+          )}
         </EuiPopover>
       </div>
     );

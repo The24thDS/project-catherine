@@ -57,7 +57,6 @@ function Activation(props) {
         <Redirect
           to={{
             pathname: "/",
-            state: { from: "activation" },
           }}
         />
       ) : (

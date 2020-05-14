@@ -3,28 +3,23 @@ class ServerRequest {
     this.url = process.env.REACT_APP_SERVER_URL + path;
     this.method = method;
     this.headers = headers;
-    this.body = JSON.stringify(this.formatBody(body));
+    this.body =
+      body instanceof FormData
+        ? body
+        : Object.keys(body).length
+        ? JSON.stringify(body)
+        : null;
+    this.token =
+      window.localStorage.getItem("token") ||
+      window.sessionStorage.getItem("token");
   }
-  formatBody = (body = {}) => {
-    const formattedBody = {};
-    Object.keys(body).forEach((key) => {
-      let formattedKey = key;
-      let idx = formattedKey.search(/[A-Z]/);
-      while (idx !== -1) {
-        formattedKey =
-          formattedKey.slice(0, idx) +
-          "_" +
-          formattedKey.charAt(idx).toLowerCase() +
-          formattedKey.slice(idx + 1);
-        idx = formattedKey.search(/[A-Z]/);
-      }
-      formattedBody[formattedKey] = body[key];
-    });
-    return formattedBody;
-  };
   check = () => {
     console.log(this);
   };
+  /** 
+    Sends the requests
+    @returns a Response object
+  */
   send = async () => {
     const response = await fetch(this.url, {
       method: this.method,
@@ -32,6 +27,28 @@ class ServerRequest {
       body: this.body,
     });
     return response;
+  };
+  /** 
+    Sets "Authorization" header to "Bearer + token"
+    @returns this
+  */
+  useAuthorization = () => {
+    this.headers = {
+      ...this.headers,
+      Authorization: "Bearer " + this.token,
+    };
+    return this;
+  };
+  /** 
+    Sets "Content-Type" header to "application/json"
+    @returns this
+  */
+  useJsonBody = () => {
+    this.headers = {
+      ...this.headers,
+      "Content-Type": "application/json",
+    };
+    return this;
   };
 }
 

@@ -9,13 +9,14 @@ import {
 import * as yup from "yup";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import LogRocket from "logrocket";
 
 import Modal from "../../Modal";
 import ForgotPasswordForm from "../ForgotPasswordForm";
 
 import "../forms.sass";
 import ServerRequest from "../../../utils/ServerRequest";
-import { setLoggedIn } from "../../../redux/user/user.actions";
+import { setLoggedIn, setUserInfo } from "../../../redux/user/user.actions";
 
 class LoginForm extends React.Component {
   static propTypes = {
@@ -113,13 +114,26 @@ class LoginForm extends React.Component {
     const data = await response.json();
 
     if (data.success === true) {
+      const token = data.message;
       if (this.state.rememberMe) {
-        window.localStorage.setItem("token", data.message);
+        window.localStorage.setItem("token", token);
       } else {
-        window.sessionStorage.setItem("token", data.message);
+        window.sessionStorage.setItem("token", token);
       }
-      this.props.setLoggedIn(true);
-      this.props.history.push("/feed");
+      const req = new ServerRequest("/user/details");
+      req.useAuthorization();
+      const response = await req.send();
+      if (response.status === 200) {
+        const userDetails = (await response.json()).user;
+        LogRocket.identify(userDetails.id, {
+          email: userDetails.email,
+          name: `
+                  ${userDetails.firstName} ${userDetails.lastName}`,
+        });
+        this.props.setUserInfo(userDetails);
+        this.props.setLoggedIn(true);
+        this.props.history.push("/feed");
+      }
     } else {
       this.setState({
         loading: false,
@@ -220,6 +234,7 @@ class LoginForm extends React.Component {
 // this function will map boundActionCreators to props
 const mapDispatchToProps = (dispatch) => ({
   setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
+  setUserInfo: (userDetails) => dispatch(setUserInfo(userDetails)),
 });
 
 export default connect(null, mapDispatchToProps)(LoginForm);

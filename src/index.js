@@ -13,7 +13,24 @@ import { store, persistor } from "./redux/store";
 import "./index.css";
 import App from "./App";
 
-LogRocket.init("iisf1p/project-catherine");
+LogRocket.init("iisf1p/project-catherine", {
+  network: {
+    requestSanitizer: (request) => {
+      if (request.url.toLowerCase().indexOf("auth") !== -1) {
+        request.body = null;
+      }
+      request.headers["Authorization"] =
+        "Probably a token that you shouldn't see";
+      return request;
+    },
+    responseSanitizer: (response) => {
+      if (response.url.toLowerCase().indexOf("auth") !== -1) {
+        response.body = null;
+      }
+      return response;
+    },
+  },
+});
 setupLogRocketReact(LogRocket);
 const getLogRocketSessionURL = () => {
   return {

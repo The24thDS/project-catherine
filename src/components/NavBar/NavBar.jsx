@@ -1,93 +1,147 @@
 import React, { Component } from "react";
-import { EuiFieldSearch, EuiIcon, EuiFieldText } from "@elastic/eui";
-import logo from "../../assets/logo-white.svg";
-import friendRequests from "../../assets/friendRequests-white.svg";
-import messages from "../../assets/chat-white.svg";
-import notifications from "../../assets/notifications-white.svg";
-import styles from "./NavBar.module.sass";
+import { EuiIcon } from "@elastic/eui";
+import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
+
 import DropdownMenu from "./DropDownMenu/DropDownMenu.jsx";
+import MessageItem from "./DropDownMenu/MenuItems/MessageItem/";
+import FriendRequestItem from "./DropDownMenu/MenuItems/FriendRequestItem/";
+import NotificationItem from "./DropDownMenu/MenuItems/NotificationItem/";
+import ProfileItem from "./DropDownMenu/MenuItems/ProfileItem/";
+import {
+  selectUserFullName,
+  selectUserID,
+  selectUserProfilePicture,
+} from "../../redux/user/user.selectors.js";
+import SearchBar from "./SearchBar/SearchBar.jsx";
+import { logOut } from "../../redux/user/user.actions.js";
+import ServerRequest from "../../utils/ServerRequest.js";
+
+import logo from "../../assets/logo-white.svg";
+import profilePicturePlaceholder from "../../assets/logo-black.svg";
+import friendRequestsIcon from "../../assets/friendRequests-white.svg";
+import messagesIcon from "../../assets/chat-white.svg";
+import notificationsIcon from "../../assets/notifications-white.svg";
+import settingsIcon from "../../assets/settings.svg";
+import logoutIcon from "../../assets/logout.svg";
+import profileIcon from "../../assets/profile.svg";
+
+import styles from "./NavBar.module.sass";
+import PictureURL from "../../utils/PictureURL.js";
+
 class NavBar extends Component {
-  showFriendRequests = () => {};
+  state = {
+    friendRequests: [],
+    messages: [],
+    notifications: [],
+  };
+
+  getFriendRequests = async () => {
+    const request = new ServerRequest("/user/friendRequests");
+    request.useAuthorization();
+    const response = await request.send();
+    if (response.status === 200) {
+      const data = await response.json();
+      const friendRequests = data.users.map((user) => ({
+        ...user,
+        profilePicture: new PictureURL(user.profilePicture).url,
+      }));
+      this.setState({
+        friendRequests,
+      });
+    }
+  };
   showMessages = () => {};
   showNotifications = () => {};
-  messages = [
+  logout = () => {
+    this.props.logOut();
+    window.localStorage.removeItem("token");
+    window.sessionStorage.removeItem("token");
+  };
+
+  componentDidMount() {
+    this.getFriendRequests();
+  }
+
+  // test data
+  profileDropdownItems = [
     {
-      firstName: "Zina",
-      lastName: "Postica",
-      read: false,
-      lastMessage: "Hello",
-      whoLastMessaged: false,
-      time: "12:56",
+      name: "View profile",
+      icon: profileIcon,
     },
     {
-      firstName: "Misa",
-      lastName: "Postica",
-      read: false,
-      lastMessage: "Miau",
-      whoLastMessaged: true,
-      time: "13:08",
+      name: "Settings",
+      icon: settingsIcon,
+    },
+    {
+      name: "Logout",
+      icon: logoutIcon,
+      onClick: this.logout,
     },
   ];
   render() {
     return (
       <nav className={styles.navBar}>
-        <div className={styles.nav}>
-          <div className={styles.leftComponents}>
-            <EuiIcon type={logo} size="xxl" />
-            <p className={styles.logo}>Project Catherine</p>
-          </div>
-          <EuiFieldSearch placeholder="Search in Project Catherine" />
-          <div className={styles.userActions}>
-            <div className={styles.rightComponents}>
-              <DropdownMenu
-                menuTitle="Friend Requests"
-                itemType="friendRequest"
-                className={styles.icons}
-                icon={friendRequests}
-                friendRequests={this.props.friendRequests}
-              />
-              <DropdownMenu
-                menuTitle="Your Messages"
-                itemType="message"
-                className={styles.icons}
-                icon={messages}
-                messages={this.props.messages}
-              />
-              <DropdownMenu
-                menuTitle="Notification center"
-                itemType="notification"
-                className={styles.icons}
-                icon={notifications}
-                notifications={this.props.notifications}
-              />
-            </div>
-          
+        <div className={styles.brand}>
+          <EuiIcon type={logo} size="xxl" />
+          <h1>Project Catherine</h1>
+        </div>
 
-          <div className={styles.item}>
+        <SearchBar />
+
+        <div className={styles.userActions}>
+          <DropdownMenu
+            MenuItemComponent={FriendRequestItem}
+            menuItemsData={this.state.friendRequests}
+            menuButtonIcon={friendRequestsIcon}
+            menuTitle="Friend Requests"
+            className={styles.icons}
+          />
+          <DropdownMenu
+            MenuItemComponent={MessageItem}
+            menuItemsData={this.state.messages}
+            menuButtonIcon={messagesIcon}
+            menuTitle="Your Messages"
+            className={styles.icons}
+          />
+          <DropdownMenu
+            MenuItemComponent={NotificationItem}
+            menuItemsData={this.state.notifications}
+            menuButtonIcon={notificationsIcon}
+            menuTitle="Notifications"
+            className={styles.icons}
+          />
+
+          <div className={styles.user}>
             <EuiIcon
               className={styles.profilePicture}
-              type={this.props.profilePicture}
+              type={this.props.userPFP}
             />
-            <div className={styles.item2}>
-              <p className={styles.userName}>
-                {this.props.firstName} {this.props.lastName}
-              </p>
-              <EuiFieldText
-                className={styles.status}
-                placeholder="Custom status"
-              />
+            <div className={styles.userInfo}>
+              <p className={styles.userName}>{this.props.userName}</p>
+              <span className={styles.status}>Custom status</span>
             </div>
             <DropdownMenu
-              className={styles.item3}
+              MenuItemComponent={ProfileItem}
+              menuItemsData={this.profileDropdownItems}
+              menuButtonIcon="arrowDown"
               menuTitle="Account Management"
-              itemType="profile"
-              icon="arrowDown"
             />
-          </div>
           </div>
         </div>
       </nav>
     );
   }
 }
-export default NavBar;
+
+const mapStateToProps = createStructuredSelector({
+  userName: selectUserFullName,
+  userPFP: selectUserProfilePicture,
+  userID: selectUserID,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  logOut: () => dispatch(logOut()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(NavBar);

@@ -9,3 +9,8 @@ export const setLoggedIn = (loggedIn) => ({
   type: userActionTypes.SET_LOGGED_IN,
   payload: loggedIn,
 });
+
+export const logOut = () => ({
+  type: "LOG_OUT",
+  payload: undefined,
+});
