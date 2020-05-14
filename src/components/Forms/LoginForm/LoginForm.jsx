@@ -17,6 +17,7 @@ import ForgotPasswordForm from "../ForgotPasswordForm";
 import "../forms.sass";
 import ServerRequest from "../../../utils/ServerRequest";
 import { setLoggedIn, setUserInfo } from "../../../redux/user/user.actions";
+import { getUserDetails } from "../../../utils/user";
 
 class LoginForm extends React.Component {
   static propTypes = {
@@ -104,14 +105,13 @@ class LoginForm extends React.Component {
     const req = new ServerRequest(
       "/auth/login",
       "POST",
-      {
-        "Content-Type": "application/json",
-      },
+      undefined,
       this.state.formInputs
-    );
+    ).useJsonBody();
     const response = await req.send();
-
     const data = await response.json();
+
+    console.log(data);
 
     if (data.success === true) {
       const token = data.message;
@@ -120,11 +120,9 @@ class LoginForm extends React.Component {
       } else {
         window.sessionStorage.setItem("token", token);
       }
-      const req = new ServerRequest("/user/details");
-      req.useAuthorization();
-      const response = await req.send();
-      if (response.status === 200) {
-        const userDetails = (await response.json()).user;
+      const userData = await getUserDetails();
+      if (userData !== false) {
+        const userDetails = userData.user;
         LogRocket.identify(userDetails.id, {
           email: userDetails.email,
           name: `

@@ -9,12 +9,13 @@ import "./App.sass";
 
 import { setLoggedIn, setUserInfo } from "./redux/user/user.actions";
 import { selectLoggedIn } from "./redux/user/user.selectors";
-import LandingPage from "./pages/landing/LandingPage";
-import Activation from "./pages/activation/Activation";
-import ServerRequest from "./utils/ServerRequest";
+import LandingPage from "./pages/landing";
+import Activation from "./pages/activation";
 import PrivateRoute from "./components/PrivateRoute";
 import FeedPage from "./pages/feed/FeedPage";
-import NavBar from "./components/NavBar/NavBar";
+import NavBar from "./components/NavBar";
+import ChatList from "./components/ChatList";
+import { getUserDetails, checkToken } from "./utils/user";
 
 class App extends React.Component {
   static propTypes = {
@@ -26,35 +27,10 @@ class App extends React.Component {
     const token =
       window.localStorage.getItem("token") ||
       window.sessionStorage.getItem("token");
-    const checkToken = async (token) => {
-      const req = new ServerRequest(
-        "/auth/verifyToken",
-        "POST",
-        {
-          "Content-Type": "application/json",
-        },
-        {
-          input: token,
-        }
-      );
-      const response = await req.send();
-      const data = await response.json();
-      return data.success;
-    };
-
-    const fetchUserDetails = async () => {
-      const req = new ServerRequest("/user/details");
-      req.useAuthorization();
-      const response = await req.send();
-      if (response.status === 200) {
-        return await response.json();
-      } else return false;
-    };
-
     if (token !== null) {
       checkToken(token).then((valid) => {
         if (valid) {
-          fetchUserDetails().then((data) => {
+          getUserDetails().then((data) => {
             if (data !== false) {
               const userDetails = data.user;
               LogRocket.identify(userDetails.id, {
@@ -124,6 +100,7 @@ class App extends React.Component {
             </div>
           </Route>
         </Switch>
+        {this.props.loggedIn ? <ChatList /> : null}
       </div>
     );
   }
