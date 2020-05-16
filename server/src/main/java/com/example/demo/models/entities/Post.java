@@ -21,7 +21,7 @@ public class Post {
     private Long id;
     private String content;
     private ArrayList<String> imageNames=new ArrayList<>();
-    @DateString("yyyy-MM-dd hh:mm:ss")
+    @DateString("yyyy-MM-dd HH:mm:ss")
     private Date date;
 
     @Relationship(type="Liked",direction = Relationship.INCOMING)

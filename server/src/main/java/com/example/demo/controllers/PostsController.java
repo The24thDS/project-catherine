@@ -205,7 +205,7 @@ public class PostsController {
        CommentsResponse commentsResponse=new CommentsResponse();
         if (!comments.isEmpty()) {
            commentsResponse.setComments(new ArrayList<>());
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for (Comment comment : comments) {
                CustomUserDetails customUserDetails=new CustomUserDetails(comment.getUser().getId(),comment.getUser().getFirstName(),comment.getUser().getLastName(),comment.getUser().getProfilePicture());
                 CustomCommentDetails customCommentDetails=new CustomCommentDetails(formatter.format(comment.getDate()),comment.getText());

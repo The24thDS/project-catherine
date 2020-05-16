@@ -16,7 +16,7 @@ public class Comment {
     @GeneratedValue
     private Long relationshipId;
     private String text;
-    @DateString("yyyy-MM-dd hh:mm:ss")
+    @DateString("yyyy-MM-dd HH:mm:ss")
     private Date date;
 
     @StartNode
