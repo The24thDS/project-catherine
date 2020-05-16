@@ -5,11 +5,8 @@ import com.example.demo.models.payloads.PayloadModels.CustomUserDetails;
 import com.example.demo.models.payloads.requests.AvailabilityRequest;
 import com.example.demo.models.payloads.requests.SearchRequest;
 import com.example.demo.models.payloads.requests.UserUpdateRequest;
-import com.example.demo.models.payloads.responses.ApiResponse;
-import com.example.demo.models.payloads.responses.CustomUserDetailsResponse;
-import com.example.demo.models.payloads.responses.CustomUserResponse;
+import com.example.demo.models.payloads.responses.*;
 import com.example.demo.models.payloads.PayloadModels.FullUserDetails;
-import com.example.demo.models.payloads.responses.FullUserDetailsResponse;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -205,10 +202,10 @@ public class UserController {
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),1);
         HashSet<CustomUserResponse> responses=new HashSet<>();
-        CustomUserResponse friendsResponse = new CustomUserResponse();
+        CustomFriendsResponse friendsResponse = new CustomFriendsResponse();
         if(principal.isPresent()) {
             for (User temp : principal.get().getFriends()) {
-                friendsResponse.addUser(temp.getId(),temp.getFirstName(),temp.getLastName(),temp.getProfilePicture());
+                friendsResponse.addUser(temp.getId(),temp.getFirstName(),temp.getLastName(),temp.getProfilePicture(),temp.getEmail());
             }
             friendsResponse.setMessage("Friends Fetched Successfully");
             friendsResponse.setSuccess(true);

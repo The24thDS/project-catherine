@@ -201,7 +201,6 @@ public class PostsController {
 
     @GetMapping("/{id}/comments")
     ResponseEntity<?> getPostComments(@RequestParam("page")Integer pageNumber,@PathVariable("id")Long id){
-
         Slice<Comment> comments = commentsRepository.findByPostId(id,PageRequest.of(pageNumber,20,Sort.by("c.date").descending()));
        CommentsResponse commentsResponse=new CommentsResponse();
         if (!comments.isEmpty()) {
@@ -233,7 +232,7 @@ public class PostsController {
         if(principal.isPresent()) {
             Slice<FriendsPostDetailsQueryResult> list = postsRepository.customFindFriendsPosts(principal.get().getId(), PageRequest.of(pageNumber,25,Sort.by("date").descending()));
            if (!list.isEmpty()) {
-               response.map(list);
+               response.map(list,postsRepository,principal.get().getId());
            }else{response.setEmpty(list.isEmpty());response.setLast(list.isLast());}
               httpStatus=HttpStatus.OK;
         }else{

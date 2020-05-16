@@ -32,5 +32,8 @@ public interface PostsRepository extends Neo4jRepository<Post,Long>, PagingAndSo
     @Query(value = "match(u:User)-[l:Liked]->(p:Post) where id(p)=$id return u.firstName as firstName, u.lastName as lastName,u.profilePicture as profilePicture,id(u) as id",
             countQuery ="match(u:User)-[l:Liked]->(p:Post) where id(p)=$id return  count(u.firstName)" )
     Slice<CustomUserDetails>findUsersThatLikedPost(@Param("id") Long id, Pageable pageable);
+
+    @Query("match(u:User)-[l:Liked]-(p:Post) where id(u)=$userId and id(p)=$postId return count(l)>0")
+    boolean isLiked(@Param("userId")Long userId,@Param("postId")Long postId);
 }
 
