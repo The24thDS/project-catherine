@@ -9,13 +9,16 @@ import {
 import * as yup from "yup";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import LogRocket from "logrocket";
 
 import Modal from "../../Modal";
 import ForgotPasswordForm from "../ForgotPasswordForm";
 
 import "../forms.sass";
 import ServerRequest from "../../../utils/ServerRequest";
-import { setLoggedIn } from "../../../redux/user/user.actions";
+import { setLoggedIn, setUserInfo } from "../../../redux/user/user.actions";
+import { setFriendsInfo } from "../../../redux/friends/friends.actions";
+import { getUserDetails, getUserFriends } from "../../../utils/user";
 
 class LoginForm extends React.Component {
   static propTypes = {
@@ -103,23 +106,34 @@ class LoginForm extends React.Component {
     const req = new ServerRequest(
       "/auth/login",
       "POST",
-      {
-        "Content-Type": "application/json",
-      },
+      undefined,
       this.state.formInputs
-    );
+    ).useJsonBody();
     const response = await req.send();
-
     const data = await response.json();
 
+    console.log(data);
+
     if (data.success === true) {
+      const token = data.message;
       if (this.state.rememberMe) {
-        window.localStorage.setItem("token", data.message);
+        window.localStorage.setItem("token", token);
       } else {
-        window.sessionStorage.setItem("token", data.message);
+        window.sessionStorage.setItem("token", token);
       }
-      this.props.setLoggedIn(true);
-      this.props.history.push("/feed");
+      const userDetails = await getUserDetails();
+      if (userDetails !== false) {
+        LogRocket.identify(userDetails.id, {
+          email: userDetails.email,
+          name: `
+                  ${userDetails.firstName} ${userDetails.lastName}`,
+        });
+        const userFriends = await getUserFriends();
+        this.props.setUserInfo(userDetails);
+        this.props.setLoggedIn(true);
+        this.props.setFriendsInfo(userFriends);
+        this.props.history.push("/feed");
+      }
     } else {
       this.setState({
         loading: false,
@@ -220,6 +234,8 @@ class LoginForm extends React.Component {
 // this function will map boundActionCreators to props
 const mapDispatchToProps = (dispatch) => ({
   setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
+  setUserInfo: (userDetails) => dispatch(setUserInfo(userDetails)),
+  setFriendsInfo: (friendsArray) => dispatch(setFriendsInfo(friendsArray)),
 });
 
 export default connect(null, mapDispatchToProps)(LoginForm);

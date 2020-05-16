@@ -1,0 +1,48 @@
+.chat-window
+  width: 90vw
+  max-width: 250px
+  background: white
+  pointer-events: all
+  box-shadow: 0 1px 2px hsla(0, 0, 0, 0.5)
+  header
+    height: 40px
+    display: flex
+    align-items: center
+    box-shadow: 0 1px 2px hsla(0, 0, 0, 0.5)
+    cursor: pointer
+  .friend-avatar
+    margin: 0 10px
+    box-shadow: inset 0 1px 2px hsla(0, 0, 0, 0.2)
+  .messages-container
+    box-shadow: inset 0 -1px 2px hsla(0, 0, 0, 0.2)
+    display: flex
+    flex-direction: column
+    align-items: flex-start
+    .my-message
+      justify-self: end
+      padding: 5px
+      margin: 5px
+      border-radius: 10px
+      background-color: var(--primary-color)
+      color: white
+      align-self: flex-end
+    .friend-message
+      padding: 5px
+      margin: 5px
+      border-radius: 10px
+      background-color: var(--secondary-color)
+  .input-container
+    display: flex
+    input[type="text"]
+      width: 90%
+      padding: 0 5px
+      font-size: 12px
+    input[type="button"]
+      width: 10%
+      margin: 0
+      border: 0
+      cursor: pointer
+      background-color: var(--primary-color)
+      font-size: 18px
+      font-weight: 800
+      color: white

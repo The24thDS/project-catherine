@@ -134,6 +134,7 @@ server/target/
 !**/src/main/java/**
 !**/src/test/**
 server/src/main/resources/application.properties
+server/photos
 
 ### STS ###
 .apt_generated
