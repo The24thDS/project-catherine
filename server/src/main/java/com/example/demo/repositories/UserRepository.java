@@ -1,5 +1,7 @@
 package com.example.demo.repositories;
 import com.example.demo.models.entities.User;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.Depth;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -24,8 +26,18 @@ public interface UserRepository extends Neo4jRepository<User,Long> {
 
     @Query("match (u:User) where toLower(u.firstName)=toLower($firstName) and toLower(u.lastName) starts with toLower($lastName) return u")
     ArrayList<User> findUserByFirstNameEqualsAndLastNameStartsWith(@Param("firstName")String firstName, @Param("lastName")String lastName);
+
     @Query("match (u:User)-[f:Friends_With]->(u1:User) where id(u)=$principalId and id(u1)=$requestedUserId return CASE WHEN count(u1)=1 THEN true ELSE false END")
     boolean isFriendsWith(@Param("principalId")Long principalId,@Param("requestedUserId")Long requestedUserId);
 
+    @Query("match (u:User)-[f:Friends_With]->(u1:User) where id(u)=$id return u1.email as username, id(u) as id ")
+    ArrayList<SocketConnectedDetails> findFriends(@Param("id")Long id);
 
+    @QueryResult
+    @Getter
+    @Setter
+    public class SocketConnectedDetails{
+        String username;
+        Long id;
+    }
 }

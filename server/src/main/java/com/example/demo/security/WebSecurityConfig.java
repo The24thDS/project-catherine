@@ -63,7 +63,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		httpSecurity.cors();
 		httpSecurity.csrf().disable()
 				.authorizeRequests()
-			.antMatchers("/index.html", "/webjars/**", "/js/**","/css/**","/static/**","/ws/**","/neo4j/*").permitAll()
+			.antMatchers("/index.html", "/webjars/**", "/js/**","/css/**","/static/**","/ws/**","/neo4j/*","/nahui.html").permitAll()
 				.antMatchers("/api/v1/auth/**").permitAll()
 				.antMatchers("/api/v1/user/checkUsernameAvailability").permitAll()
 				.antMatchers("/api/v1/user/checkEmailAvailability").permitAll()
