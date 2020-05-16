@@ -3,7 +3,12 @@ class ServerRequest {
     this.url = process.env.REACT_APP_SERVER_URL + path;
     this.method = method;
     this.headers = headers;
-    this.body = Object.keys(body).length ? JSON.stringify(body) : null;
+    this.body =
+      body instanceof FormData
+        ? body
+        : Object.keys(body).length
+        ? JSON.stringify(body)
+        : null;
     this.token =
       window.localStorage.getItem("token") ||
       window.sessionStorage.getItem("token");

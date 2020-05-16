@@ -1,18 +1,26 @@
 import React, { Component } from "react";
-import NavBar from "../../components/NavBar/NavBar";
-import Posts from "../../components/Posts";
+import AddPost from "../../components/AddPost/AddPost";
 
 export default class FeedPage extends Component {
   constructor(props) {
     super(props);
     document.title = "Project Catherine | Feed";
   }
+
+
   render() {
     return (
-      <>
-        <NavBar />
-        <Posts />
-      </>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          paddingTop: "120px",
+        }}
+      >
+        <AddPost />
+      </div>
     );
   }
 }

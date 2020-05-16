@@ -91,7 +91,7 @@ public class AuthController {
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");
             request.setBody("{" +
-                    "\"from\": {\"email\": \"hello@project-catherine.wtf\"}," +
+                    "\"from\": {\"email\": \"hello@project-catherine.wtf\", \"name\": \"Project Catherine\"}," +
                     "\"personalizations\":[{" +
                     "\"to\": [{\"email\": \"" + registerRequest.getEmail() + "\"}],"
                     + "\"dynamic_template_data\": {" +

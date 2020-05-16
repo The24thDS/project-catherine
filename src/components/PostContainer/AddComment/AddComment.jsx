@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import styles from "./AddComment.module.sass";
 import { EuiFlexGroup } from "@elastic/eui";
 import { EuiFlexItem } from "@elastic/eui";
@@ -17,6 +17,10 @@ const AddComment = (props) => {
       </EuiFlexItem>
       <EuiFlexItem className={styles.text_field_container}>
         <EuiFieldText
+          value={props.value}
+          onChange={(e) => props.onChangeCommentHandler(e)}
+          isLoading={props.isCommentLoading}
+          onKeyDown={(e) => props.addCommentHandler(e)}
           className={styles.comment_text_field}
           placeholder="Add a comment"
           fullWidth={true}

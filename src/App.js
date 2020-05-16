@@ -14,7 +14,8 @@ import Activation from "./pages/activation/Activation";
 import ServerRequest from "./utils/ServerRequest";
 import PrivateRoute from "./components/PrivateRoute";
 import FeedPage from "./pages/feed/FeedPage";
-
+import NavBar from "./components/NavBar/NavBar";
+import ProfilePage from "./pages/profile";
 class App extends React.Component {
   static propTypes = {
     loggedIn: PropTypes.bool.isRequired,
@@ -53,14 +54,14 @@ class App extends React.Component {
     if (token !== null) {
       checkToken(token).then((valid) => {
         if (valid) {
-          fetchUserDetails().then((userDetails) => {
-            if (userDetails !== false) {
+          fetchUserDetails().then((data) => {
+            if (data !== false) {
+              const userDetails = data.user;
               LogRocket.identify(userDetails.id, {
                 email: userDetails.email,
                 name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
               });
-              delete userDetails.success;
               this.props.setUserInfo(userDetails);
               this.props.setLoggedIn(true);
             } else {
@@ -79,6 +80,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
+        {this.props.loggedIn ? <NavBar /> : null}
         <Switch>
           <Route
             exact
@@ -87,8 +89,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                <LandingPage {...props} />
-              )
+                  <LandingPage {...props} />
+                )
             }
           />
           <Route
@@ -98,15 +100,36 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                <Activation {...props} />
-              )
+                  <Activation {...props} />
+                )
             }
           />
-          <PrivateRoute isAuthenticated={this.props.loggedIn}>
+          <PrivateRoute
+            exact
+            path="/feed"
+            isAuthenticated={this.props.loggedIn}
+          >
             <FeedPage />
           </PrivateRoute>
+          <PrivateRoute
+            exact
+            path="/profilePage"
+            isAuthenticated={this.props.loggedIn}
+          >
+            <ProfilePage profilePicture="https://localhost:8443/api/v1/photos/user-default.jpg" userName="David Sima" userID="2" />
+          </PrivateRoute>
           {/* this route will render if all of the above routes don't */}
-          <Route>404 - Not Found</Route>
+          <Route>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                height: "50vh",
+              }}
+            >
+              404 - Not Found
+            </div>
+          </Route>
         </Switch>
       </div>
     );

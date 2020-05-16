@@ -124,13 +124,12 @@ class LoginForm extends React.Component {
       req.useAuthorization();
       const response = await req.send();
       if (response.status === 200) {
-        const userDetails = await response.json();
+        const userDetails = (await response.json()).user;
         LogRocket.identify(userDetails.id, {
           email: userDetails.email,
           name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
         });
-        delete userDetails.success;
         this.props.setUserInfo(userDetails);
         this.props.setLoggedIn(true);
         this.props.history.push("/feed");
