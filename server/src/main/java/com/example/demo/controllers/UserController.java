@@ -11,6 +11,8 @@ import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.user.SimpUser;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -30,7 +32,8 @@ public class UserController {
     UserRepository userRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
-
+    @Autowired
+    SimpUserRegistry simpUserRegistry;
     //updates user's details
     @RequestMapping("/update")
     public ResponseEntity<?> updateUserDetails(@Valid @RequestBody UserUpdateRequest userUpdateRequest,
@@ -205,7 +208,9 @@ public class UserController {
         CustomFriendsResponse friendsResponse = new CustomFriendsResponse();
         if(principal.isPresent()) {
             for (User temp : principal.get().getFriends()) {
-                friendsResponse.addUser(temp.getId(),temp.getFirstName(),temp.getLastName(),temp.getProfilePicture(),temp.getEmail());
+                SimpUser simpUser= simpUserRegistry.getUser(temp.getEmail());
+                     boolean online= simpUser != null;
+                friendsResponse.addUser(temp.getId(),temp.getFirstName(),temp.getLastName(),temp.getProfilePicture(),temp.getEmail(),online);
             }
             friendsResponse.setMessage("Friends Fetched Successfully");
             friendsResponse.setSuccess(true);
