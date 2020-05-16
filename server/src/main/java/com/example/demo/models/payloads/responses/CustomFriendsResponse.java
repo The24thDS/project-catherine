@@ -14,15 +14,16 @@ import java.util.HashSet;
 public class CustomFriendsResponse extends ApiResponse implements Serializable{
     private HashSet<FriendDetails> users=new HashSet<>();
 
-    public void addUser(Long id,String first_name,String last_name,String profilePicture,String email){
+    public void addUser(Long id,String first_name,String last_name,String profilePicture,String email,boolean online){
         FriendDetails friendDetails=new FriendDetails();
         friendDetails.setEmail(email);
         friendDetails.setFirstName(first_name);
         friendDetails.setLastName(last_name);
         friendDetails.setId(id);
         friendDetails.setProfilePicture(profilePicture);
+        friendDetails.setOnline(online);
         users.add(friendDetails);
-        System.out.println(users.size());
+
     }
 
 @Getter
@@ -31,7 +32,7 @@ public class CustomFriendsResponse extends ApiResponse implements Serializable{
 @AllArgsConstructor
 private class FriendDetails extends CustomUserDetails{
        private String email;
-
+       private boolean online;
 }
 
 }
