@@ -38,8 +38,10 @@ class App extends React.Component {
                 name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
               });
-              const userFriends = await getUserFriends();
-              console.log(userFriends);
+              const userFriends = (await getUserFriends()).reduce(
+                (acc, value) => ({ [value.id]: { ...value }, ...acc }),
+                {}
+              );
               this.props.setUserInfo(userDetails);
               this.props.setLoggedIn(true);
               this.props.setFriendsInfo(userFriends);

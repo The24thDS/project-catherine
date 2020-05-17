@@ -112,8 +112,6 @@ class LoginForm extends React.Component {
     const response = await req.send();
     const data = await response.json();
 
-    console.log(data);
-
     if (data.success === true) {
       const token = data.message;
       if (this.state.rememberMe) {
@@ -128,7 +126,10 @@ class LoginForm extends React.Component {
           name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
         });
-        const userFriends = await getUserFriends();
+        const userFriends = (await getUserFriends()).reduce(
+          (acc, value) => ({ [value.id]: { ...value }, ...acc }),
+          {}
+        );
         this.props.setUserInfo(userDetails);
         this.props.setLoggedIn(true);
         this.props.setFriendsInfo(userFriends);

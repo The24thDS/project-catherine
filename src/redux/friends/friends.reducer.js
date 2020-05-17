@@ -1,6 +1,6 @@
 import { friendsActionTypes } from "./friends.types";
 
-const INITIAL_STATE = [];
+const INITIAL_STATE = {};
 
 const friendsReducer = (currentState = INITIAL_STATE, action) => {
   switch (action.type) {
