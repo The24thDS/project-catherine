@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+
 import AddPost from "../../components/AddPost/AddPost";
 
 export default class FeedPage extends Component {
@@ -6,8 +7,6 @@ export default class FeedPage extends Component {
     super(props);
     document.title = "Project Catherine | Feed";
   }
-
-
   render() {
     return (
       <div

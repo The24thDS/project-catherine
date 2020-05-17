@@ -37,15 +37,7 @@ class DropDownMenu extends Component {
         iconType={menuButtonIcon}
         iconSize="l"
         onClick={this.toggleIsPopoverOpen}
-        style={{
-          backgroundColor: this.props.isPostItem
-            ? isPopoverOpen
-              ? "#dde6e4"
-              : "white"
-            : isPopoverOpen
-            ? "#028D68"
-            : "#227455",
-        }}
+        style={{ backgroundColor: isPopoverOpen ? "#028D68" : "#227455" }}
         aria-label="Next"
       />
     );

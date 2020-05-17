@@ -201,12 +201,11 @@ public class PostsController {
 
     @GetMapping("/{id}/comments")
     ResponseEntity<?> getPostComments(@RequestParam("page")Integer pageNumber,@PathVariable("id")Long id){
-
         Slice<Comment> comments = commentsRepository.findByPostId(id,PageRequest.of(pageNumber,20,Sort.by("c.date").descending()));
        CommentsResponse commentsResponse=new CommentsResponse();
         if (!comments.isEmpty()) {
            commentsResponse.setComments(new ArrayList<>());
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for (Comment comment : comments) {
                CustomUserDetails customUserDetails=new CustomUserDetails(comment.getUser().getId(),comment.getUser().getFirstName(),comment.getUser().getLastName(),comment.getUser().getProfilePicture());
                 CustomCommentDetails customCommentDetails=new CustomCommentDetails(formatter.format(comment.getDate()),comment.getText());
@@ -233,7 +232,7 @@ public class PostsController {
         if(principal.isPresent()) {
             Slice<FriendsPostDetailsQueryResult> list = postsRepository.customFindFriendsPosts(principal.get().getId(), PageRequest.of(pageNumber,25,Sort.by("date").descending()));
            if (!list.isEmpty()) {
-               response.map(list);
+               response.map(list,postsRepository,principal.get().getId());
            }else{response.setEmpty(list.isEmpty());response.setLast(list.isLast());}
               httpStatus=HttpStatus.OK;
         }else{

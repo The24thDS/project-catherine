@@ -5,15 +5,14 @@ import com.example.demo.models.payloads.PayloadModels.CustomUserDetails;
 import com.example.demo.models.payloads.requests.AvailabilityRequest;
 import com.example.demo.models.payloads.requests.SearchRequest;
 import com.example.demo.models.payloads.requests.UserUpdateRequest;
-import com.example.demo.models.payloads.responses.ApiResponse;
-import com.example.demo.models.payloads.responses.CustomUserDetailsResponse;
-import com.example.demo.models.payloads.responses.CustomUserResponse;
+import com.example.demo.models.payloads.responses.*;
 import com.example.demo.models.payloads.PayloadModels.FullUserDetails;
-import com.example.demo.models.payloads.responses.FullUserDetailsResponse;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.user.SimpUser;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -33,7 +32,8 @@ public class UserController {
     UserRepository userRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
-
+    @Autowired
+    SimpUserRegistry simpUserRegistry;
     //updates user's details
     @RequestMapping("/update")
     public ResponseEntity<?> updateUserDetails(@Valid @RequestBody UserUpdateRequest userUpdateRequest,
@@ -205,10 +205,12 @@ public class UserController {
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),1);
         HashSet<CustomUserResponse> responses=new HashSet<>();
-        CustomUserResponse friendsResponse = new CustomUserResponse();
+        CustomFriendsResponse friendsResponse = new CustomFriendsResponse();
         if(principal.isPresent()) {
             for (User temp : principal.get().getFriends()) {
-                friendsResponse.addUser(temp.getId(),temp.getFirstName(),temp.getLastName(),temp.getProfilePicture());
+                SimpUser simpUser= simpUserRegistry.getUser(temp.getEmail());
+                     boolean online= simpUser != null;
+                friendsResponse.addUser(temp.getId(),temp.getFirstName(),temp.getLastName(),temp.getProfilePicture(),temp.getEmail(),online);
             }
             friendsResponse.setMessage("Friends Fetched Successfully");
             friendsResponse.setSuccess(true);
