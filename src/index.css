@@ -42,3 +42,8 @@ h6 {
   align-items: center;
   min-height: 100vh;
 }
+
+.euiAvatar {
+  background-size: cover;
+  background-position: center;
+}

@@ -6,15 +6,7 @@ spring.data.neo4j.username=
 spring.data.neo4j.password=
 spring.jackson.time-zone=UTC
 #add your mail settings here
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=
-spring.mail.password=
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.connectiontimeout=5000
-spring.mail.properties.mail.smtp.timeout=5000
-spring.mail.properties.mail.smtp.writetimeout=5000
-spring.mail.properties.mail.smtp.starttls.enable=true
+sendgrid.api.key=
 
 #ssl
 server.ssl.enabled=true

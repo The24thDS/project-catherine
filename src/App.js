@@ -9,12 +9,15 @@ import "./App.sass";
 
 import { setLoggedIn, setUserInfo } from "./redux/user/user.actions";
 import { selectLoggedIn } from "./redux/user/user.selectors";
-import LandingPage from "./pages/landing/LandingPage";
-import Activation from "./pages/activation/Activation";
-import ServerRequest from "./utils/ServerRequest";
+import { setFriendsInfo } from "./redux/friends/friends.actions";
+import LandingPage from "./pages/landing";
+import Activation from "./pages/activation";
 import PrivateRoute from "./components/PrivateRoute";
 import FeedPage from "./pages/feed/FeedPage";
-import NavBar from "./components/NavBar/NavBar";
+import NavBar from "./components/NavBar";
+import Chats from "./components/Chats";
+import { getUserDetails, checkToken, getUserFriends } from "./utils/user";
+
 import ProfilePage from "./pages/profile";
 class App extends React.Component {
   static propTypes = {
@@ -26,44 +29,23 @@ class App extends React.Component {
     const token =
       window.localStorage.getItem("token") ||
       window.sessionStorage.getItem("token");
-    const checkToken = async (token) => {
-      const req = new ServerRequest(
-        "/auth/verifyToken",
-        "POST",
-        {
-          "Content-Type": "application/json",
-        },
-        {
-          input: token,
-        }
-      );
-      const response = await req.send();
-      const data = await response.json();
-      return data.success;
-    };
-
-    const fetchUserDetails = async () => {
-      const req = new ServerRequest("/user/details");
-      req.useAuthorization();
-      const response = await req.send();
-      if (response.status === 200) {
-        return await response.json();
-      } else return false;
-    };
-
     if (token !== null) {
       checkToken(token).then((valid) => {
         if (valid) {
-          fetchUserDetails().then((data) => {
-            if (data !== false) {
-              const userDetails = data.user;
+          getUserDetails().then(async (userDetails) => {
+            if (userDetails !== false) {
               LogRocket.identify(userDetails.id, {
                 email: userDetails.email,
                 name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
               });
+              const userFriends = (await getUserFriends()).reduce(
+                (acc, value) => ({ [value.id]: { ...value }, ...acc }),
+                {}
+              );
               this.props.setUserInfo(userDetails);
               this.props.setLoggedIn(true);
+              this.props.setFriendsInfo(userFriends);
             } else {
               window.localStorage.removeItem("token");
               window.sessionStorage.removeItem("token");
@@ -89,8 +71,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                  <LandingPage {...props} />
-                )
+                <LandingPage {...props} />
+              )
             }
           />
           <Route
@@ -100,8 +82,8 @@ class App extends React.Component {
               this.props.loggedIn ? (
                 <Redirect to="/feed" />
               ) : (
-                  <Activation {...props} />
-                )
+                <Activation {...props} />
+              )
             }
           />
           <PrivateRoute
@@ -131,6 +113,7 @@ class App extends React.Component {
             </div>
           </Route>
         </Switch>
+        {this.props.loggedIn ? <Chats /> : null}
       </div>
     );
   }
@@ -146,6 +129,7 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = (dispatch) => ({
   setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
   setUserInfo: (userDetails) => dispatch(setUserInfo(userDetails)),
+  setFriendsInfo: (friendsArray) => dispatch(setFriendsInfo(friendsArray)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
