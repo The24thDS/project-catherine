@@ -2,7 +2,7 @@ import { createSelector } from "reselect";
 
 import PictureURL from "../../utils/PictureURL";
 
-export const selectFriendsRaw = (state) => state.friends;
+export const selectFriendsRaw = (state) => Object.values(state.friends);
 
 export const selectFriendsFormatted = createSelector(
   [selectFriendsRaw],
