@@ -1,74 +1,65 @@
-import React, { Component } from "react";
+import React from "react";
+import PropTypes from "prop-types";
+import { EuiAvatar, EuiHorizontalRule } from "@elastic/eui";
+import moment from "moment";
+
+import PictureURL from "../../../utils/PictureURL";
+
 import styles from "./Post.module.sass";
-import { EuiFlexGroup } from "@elastic/eui";
-import { EuiFlexItem } from "@elastic/eui";
-import PostContent from "../PostContent";
-import ServerRequest from "../../../utils/ServerRequest";
-class Post extends Component {
-  state = {
-    postID: this.props.postID,
-    likes: this.props.likes,
-    shares : this.props.shares,
-    isLikedBySignedInUser: this.props.isLikedBySignedInUser
+import ImageGrid from "../../ImageGrid/ImageGrid";
 
-}
- 
+const Post = (props) => {
+  const authorName = props.author.firstName + " " + props.author.lastName;
+  const authorPFP = new PictureURL(props.author.profilePicture).url;
 
-ShareClickHandler(){
-  
-}
-likeClickHandler= async() =>{
-  const req = new ServerRequest("/posts/"+this.state.postID+"/like", "POST");
-    req.useAuthorization().useJsonBody();
-  const response = await req.send();
+  const localDate = moment.utc(props.postData.date).local();
+  const formatedDate = localDate.fromNow();
 
-  if (response.status === 200 && this.state.isLikedBySignedInUser === false) {
-    this.setState(
-      (prevState) => (
-        {
-          likes: prevState.likes+1,
-          isLikedBySignedInUser: true,
-        }
-      ), console.log("liked")
-    );
-
-  }
-}
-
-  render(){
-
-    let likeBackground = "white";
-    if(this.state.isLikedBySignedInUser){
-      likeBackground="#dde6e4"
-      console.log("likes:"+this.state.likes)
-    }
-    console.log("render");
-   
-  return (
-    <EuiFlexGroup className={styles.post_container}>
-      <EuiFlexItem className={styles.profile_details}>
-        <PostContent
-          className={styles.post_content}
-          profilePicture={this.props.profilePicture}
-          name={this.props.name}
-          timePosted={this.props.timePosted}
-          textContent={this.props.textContent}
-          image={this.props.image}
-        />
-      </EuiFlexItem>
-      <div className={styles.button_top_numbers_container}>
-        <div  className={styles.button_top_numbers}>{this.state.likes}</div>
-        <div className={styles.button_top_numbers}>{this.props.comments}</div>
-        <div className={styles.button_top_numbers}>{this.state.shares}</div>
-      </div>
-      <div className={styles.buttton_container}>
-        <button  style={{backgroundColor: likeBackground}} className={styles.buttons} onClick={this.likeClickHandler}>Like</button>
-        <button style={{backgroundColor: this.props.commBackGround}} className={styles.buttons} onClick={this.props.commentClickHandler}>Comm</button>
-        <button className={styles.buttons} onClick={this.ShareClickHandler}>Share</button>
-      </div>
-    </EuiFlexGroup>
+  const images = props.postData.imageNames.map(
+    (imageName) => new PictureURL(imageName).url
   );
-  }
- 
-}
+
+  return (
+    <>
+      <header className={styles["post-header"]}>
+        <EuiAvatar
+          name={authorName}
+          imageUrl={authorPFP}
+          className={styles["author-pfp"]}
+        />
+        <div className={styles["post-info"]}>
+          <span>{authorName}</span>
+          <time
+            title={localDate.format("YYYY-MM-DD HH:mm")}
+            dateTime={localDate.format("YYYY-MM-DD HH:mm")}
+          >
+            {formatedDate}
+          </time>
+        </div>
+      </header>
+      <EuiHorizontalRule margin="s" />
+      <article className={styles["post-content"]}>
+        {props.postData.content.split("\n").map((el, idx) => (
+          <p key={"p" + idx}>{el}</p>
+        ))}
+        {images.length ? <ImageGrid images={images} /> : null}
+      </article>
+    </>
+  );
+};
+
+Post.propTypes = {
+  author: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    profilePicture: PropTypes.string.isRequired,
+  }).isRequired,
+  postData: PropTypes.shape({
+    content: PropTypes.string,
+    date: PropTypes.string.isRequired,
+    imageNames: PropTypes.arrayOf(PropTypes.string),
+  }).isRequired,
+};
+
 export default Post;

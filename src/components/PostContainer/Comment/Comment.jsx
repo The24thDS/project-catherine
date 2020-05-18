@@ -1,22 +1,24 @@
 import React from "react";
-import PostContent from "../PostContent";
+
+import Post from "../Post";
+
 import styles from "./Comment.module.sass";
-import { EuiFlexGroup } from "@elastic/eui";
-import { EuiFlexItem } from "@elastic/eui";
-const Comment = (props) => {
+
+const Comment = ({ user, commentData }) => {
   return (
-    <EuiFlexGroup className={styles.content}>
-      <EuiFlexItem>
-        <PostContent
-          className={styles.postContent}
-          profilePicture={props.profilePicture}
-          name={props.name}
-          timePosted={props.timePosted}
-          textContent={props.textContent}
-          image={[]}
-        />
-      </EuiFlexItem>
-    </EuiFlexGroup>
+    <div className={styles.comment}>
+      <Post
+        className={styles.postContent}
+        author={{
+          ...user,
+        }}
+        postData={{
+          date: commentData.date,
+          content: commentData.text,
+          imageNames: [],
+        }}
+      />
+    </div>
   );
 };
 

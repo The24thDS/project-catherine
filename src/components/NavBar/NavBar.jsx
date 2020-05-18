@@ -18,7 +18,6 @@ import { logOut } from "../../redux/user/user.actions.js";
 import ServerRequest from "../../utils/ServerRequest.js";
 
 import logo from "../../assets/logo-white.svg";
-import profilePicturePlaceholder from "../../assets/logo-black.svg";
 import friendRequestsIcon from "../../assets/friendRequests-white.svg";
 import messagesIcon from "../../assets/chat-white.svg";
 import notificationsIcon from "../../assets/notifications-white.svg";

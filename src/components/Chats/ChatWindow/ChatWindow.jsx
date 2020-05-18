@@ -24,7 +24,7 @@ function ChatWindow(props) {
 
   useEffect(() => {
     if (props.receivedMessage) {
-      setMessages((m) => [
+      setMessages((messages) => [
         ...messages,
         {
           you: false,

@@ -1,32 +1,44 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import styles from "./AddComment.module.sass";
-import { EuiFlexGroup } from "@elastic/eui";
-import { EuiFlexItem } from "@elastic/eui";
-import { EuiFieldText } from "@elastic/eui";
-import { EuiIcon } from "@elastic/eui";
+import { EuiFieldText, EuiAvatar } from "@elastic/eui";
+import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
+
+import {
+  selectUserFullName,
+  selectUserProfilePicture,
+} from "../../../redux/user/user.selectors";
 
 const AddComment = (props) => {
+  const [value, setValue] = useState("");
+
   return (
-    <EuiFlexGroup className={styles.container}>
-      <EuiFlexItem className={styles.profile_picture_container}>
-        <EuiIcon
-          className={styles.profile_picture}
-          type={props.profilePicture}
-          size="l"
-        />
-      </EuiFlexItem>
-      <EuiFlexItem className={styles.text_field_container}>
-        <EuiFieldText
-          value={props.value}
-          onChange={(e) => props.onChangeCommentHandler(e)}
-          isLoading={props.isCommentLoading}
-          onKeyDown={(e) => props.addCommentHandler(e)}
-          className={styles.comment_text_field}
-          placeholder="Add a comment"
-          fullWidth={true}
-        />
-      </EuiFlexItem>
-    </EuiFlexGroup>
+    <div className={styles.container}>
+      <EuiAvatar
+        className={styles.profile_picture}
+        imageUrl={props.currentUserPFP}
+        name={props.currentUserName}
+      />
+      <EuiFieldText
+        value={value}
+        isLoading={props.isCommentLoading}
+        onKeyDown={async (e) => {
+          if (await props.addCommentHandler(e)) {
+            setValue("");
+          }
+        }}
+        className={styles.comment_text_field}
+        placeholder="Add a comment"
+        fullWidth={true}
+        onChange={(ev) => setValue(ev.target.value)}
+      />
+    </div>
   );
 };
-export default AddComment;
+
+const mapStateToProps = createStructuredSelector({
+  currentUserName: selectUserFullName,
+  currentUserPFP: selectUserProfilePicture,
+});
+
+export default connect(mapStateToProps)(AddComment);

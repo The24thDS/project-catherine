@@ -25,7 +25,7 @@ class FriendRequestItem extends Component {
     const request = new ServerRequest(path, "POST").useAuthorization();
     const response = await request.send();
     if (response.status === 200) {
-      const data = await response.json();
+      await response.json();
       this.setState({
         message: `You're now friends with ${this.props.firstName} ${this.props.lastName}`,
         accepted: true,

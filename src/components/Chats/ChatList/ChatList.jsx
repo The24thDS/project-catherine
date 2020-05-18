@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import { createStructuredSelector } from "reselect";
 import { EuiAvatar } from "@elastic/eui";
-import { connect } from "react-redux";
-
-import { selectFriendsFormatted } from "../../../redux/friends/friends.selectors";
 
 import styles from "./ChatList.module.sass";
 

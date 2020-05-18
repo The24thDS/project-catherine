@@ -1,153 +1,167 @@
 import React, { useState } from "react";
-import styles from "./PostContainer.module.sass";
-import { EuiFlexGroup } from "@elastic/eui";
-import { EuiFlexItem } from "@elastic/eui";
+import { EuiHorizontalRule, EuiIcon } from "@elastic/eui";
+import moment from "moment";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
+
 import AddComment from "./AddComment";
 import Post from "./Post";
 import Comment from "./Comment";
 import ServerRequest from "../../utils/ServerRequest";
-import PictureURL from "../../utils/PictureURL";
-import moment from "moment";
-import moreIcon from "../../assets/more.svg";
-import deleteIcon from "../../assets/delete.svg";
-import ProfileItem from "../NavBar/DropDownMenu/MenuItems/ProfileItem";
-import DropdownMenu from "../NavBar/DropDownMenu/DropDownMenu.jsx";
+import { selectUserInfo } from "../../redux/user/user.selectors";
+
+import styles from "./PostContainer.module.sass";
+
 const PostContainer = (props) => {
   const [state, setState] = useState({
-    isCommentLoading: false,
-    areCommentsLoaded: false,
-    comments: [],
-    commentNr: props.comments,
-    commentPageNr: 0,
-    islastPage: false,
-    value: "",
+    isCommentPosting: false,
+    areCommentsOpen: false,
+    commentsData: [],
+    commentsNumber: props.postInfo.comments,
+    commentsPage: 0,
+    isLastCommentsPage: false,
+    isLikedByCurrentUser: props.postInfo.isLiked,
+    likesNumber: props.postInfo.likes,
   });
 
-  const postDropdownItems = [
-    {
-      name: "Delete Post",
-      icon: deleteIcon,
-      onClick: () => props.deletePost(props.postID),
-    },
-  ];
-
   const fetchComments = async () => {
-    if (!state.islastPage && state.commentNr > 0) {
+    if (!state.isLastCommentsPage && state.commentsNumber > 0) {
       const req = new ServerRequest(
-        "/posts/" + props.postID + "/comments?page=" + state.commentPageNr
-      );
-      req.useAuthorization().useJsonBody();
+        "/posts/" +
+          props.postInfo.postId +
+          "/comments?page=" +
+          state.commentsPage
+      )
+        .useAuthorization()
+        .useJsonBody();
       const response = await req.send();
-
       if (response.status === 200) {
-        let data = await response.json();
-        if (data.comments.length > 0) {
-          data.comments.map((comment) => {
-            comment.user.profilePicture = new PictureURL(
-              comment.user.profilePicture
-            ).url;
-          });
+        const data = await response.json();
+        if (data.comments !== null) {
           setState({
             ...state,
-            areCommentsLoaded: true,
-            comments: [...state.comments, ...data.comments],
-            commentPageNr: state.commentPageNr + 1,
-            islastPage: data.last,
+            areCommentsOpen: true,
+            commentsData: [...state.commentsData, ...data.comments],
+            commentsPage: state.commentsPage + 1,
+            isLastCommentsPage: data.last,
           });
         }
       }
     }
   };
-  const commentClickHandler = () => {
-    if (state.commentNr > 0) {
+
+  const likeClickHandler = async () => {
+    const config = {
+      method: state.isLikedByCurrentUser ? "DELETE" : "POST",
+      amount: state.isLikedByCurrentUser ? -1 : 1,
+    };
+    const req = new ServerRequest(
+      "/posts/" + props.postInfo.postId + "/like",
+      config.method
+    );
+    req.useAuthorization().useJsonBody();
+    const response = await req.send();
+
+    if (response.status === 200) {
       setState({
         ...state,
-        areCommentsLoaded: !state.areCommentsLoaded,
+        likesNumber: state.likesNumber + config.amount,
+        isLikedByCurrentUser: !state.isLikedByCurrentUser,
       });
     }
-    if (state.commentPageNr === 0) {
-      fetchComments();
+  };
+
+  const commentClickHandler = () => {
+    if (state.commentsNumber > 0) {
+      if (state.areCommentsOpen !== true && state.commentsData.length === 0) {
+        fetchComments();
+      }
+      setState({
+        ...state,
+        areCommentsOpen: !state.areCommentsOpen,
+      });
     }
   };
-  const onChangeCommentHandler = (e) => {
-    setState({ ...state, value: e.target.value });
-  };
+
   const addCommentHandler = async (e) => {
-    if (e.key == "Enter") {
+    if (e.key === "Enter") {
       const text = e.target.value;
-      setState({ ...state, isCommentLoading: true });
+      setState({
+        ...state,
+        isCommentPosting: true,
+      });
       const req = new ServerRequest(
-        "/posts/" + props.postID + "/comments",
+        "/posts/" + props.postInfo.postId + "/comments",
         "POST",
         undefined,
-        { text: text }
+        { text }
       );
       req.useAuthorization().useJsonBody();
       const response = await req.send();
       if (response.status === 200) {
         setState({
           ...state,
-          commentNr: state.commentNr + 1,
-          isCommentLoading: false,
-          value: "",
+          commentsNumber: state.commentsNumber + 1,
+          isCommentPosting: false,
         });
-        if (state.areCommentsLoaded) {
-          let now = new moment();
-          const timeZoneOffset = now.utcOffset();
-          now = now.subtract(timeZoneOffset, "minutes");
+        if (state.areCommentsOpen) {
+          const UTCnow = moment.utc().format("YYYY-MM-DD HH:mm:ss");
           setState({
             ...state,
-            comments: [
+            commentsData: [
               {
                 user: {
-                  profilePicture: props.reduxuserPFP,
-                  firstName: props.reduxuserName,
-                  lastName: "",
+                  profilePicture: props.currentUser.profilePicture,
+                  firstName: props.currentUser.firstName,
+                  lastName: props.currentUser.lastName,
+                  id: props.currentUser.id,
                 },
                 comment: {
-                  date: now,
-                  text: text,
+                  date: UTCnow,
+                  text,
                 },
               },
-              ...state.comments,
+              ...state.commentsData,
             ],
           });
         }
+        return true;
       }
-    } else {
-      setState({ ...state, value: e.target.value });
     }
+    return false;
   };
-  let comments = [];
-  let commBackGround = "white";
-  if (state.areCommentsLoaded) {
-    commBackGround = "#dde6e4";
-    console.log(state.comments);
-    comments = (
-      <div className={styles.commentContainer}>
-        {state.comments.map((comment, index) => {
+
+  let commentsContainer = [];
+  if (state.areCommentsOpen) {
+    commentsContainer = (
+      <div className={styles.commentsContainer}>
+        {state.commentsData.map((el, index) => {
           return (
             <Comment
               key={index}
               className={styles.comment}
-              profilePicture={comment.user.profilePicture}
-              name={comment.user.firstName + " " + comment.user.lastName}
-              timePosted={comment.comment.date}
-              textContent={comment.comment.text}
+              user={{
+                ...el.user,
+              }}
+              commentData={{
+                ...el.comment,
+              }}
             />
           );
         })}
       </div>
     );
   }
+
   const showSeeMoreButton = () => {
-    if (!state.islastPage && state.areCommentsLoaded) {
+    if (!state.isLastCommentsPage && state.areCommentsOpen) {
       return (
         <button onClick={fetchComments} className={styles.seeMoreButton}>
           See More
         </button>
       );
-    } else if (state.islastPage && state.areCommentsLoaded) {
+    } else if (state.isLastCommentsPage && state.areCommentsOpen) {
       return (
         <button onClick={commentClickHandler} className={styles.seeMoreButton}>
           See Less
@@ -157,48 +171,83 @@ const PostContainer = (props) => {
       return null;
     }
   };
+
   return (
-    <EuiFlexGroup className={styles.postContainer}>
-      <div className={styles.moreButton}>
-        <DropdownMenu
-          className={styles.moreButton}
-          MenuItemComponent={ProfileItem}
-          menuItemsData={postDropdownItems}
-          menuButtonIcon={moreIcon}
-          menuTitle="Post Settings"
-          isPostItem={true}
-        />
+    <section className={styles.postContainer}>
+      <Post
+        author={props.author}
+        postData={{
+          content: props.postInfo.content,
+          date: props.postInfo.date,
+          imageNames: props.postInfo.imageNames,
+        }}
+      />
+      <EuiHorizontalRule margin="xxl" />
+      <div className={styles.postActions}>
+        <div
+          title="Like"
+          className={
+            styles.button +
+            " " +
+            (state.isLikedByCurrentUser ? styles.active : null)
+          }
+          onClick={likeClickHandler}
+        >
+          <EuiIcon
+            type="https://upload.wikimedia.org/wikipedia/commons/8/87/Symbol_thumbs_up.svg"
+            size="l"
+            style={{
+              transform: "rotateY(180deg)",
+            }}
+          />
+          <div className={styles.counter}>{state.likesNumber}</div>
+        </div>
+        <div
+          title="Comment"
+          className={
+            styles.button + " " + (state.areCommentsOpen ? styles.active : null)
+          }
+          onClick={commentClickHandler}
+        >
+          <EuiIcon type="editorComment" size="l" />
+          <div className={styles.counter}>{state.commentsNumber}</div>
+        </div>
+        <div title="Share" className={styles.button + " " + styles.disabled}>
+          <div className={styles.counter}>0</div>
+        </div>
       </div>
-      <EuiFlexItem className={styles.post}>
-        <Post
-          profilePicture={props.profilePicture}
-          name={props.name}
-          timePosted={props.timePosted}
-          textContent={props.textContent}
-          image={props.image}
-          likes={props.likes}
-          shares={props.shares}
-          postID={props.postID}
-          comments={state.commentNr}
-          isLikedBySignedInUser={props.isLikedBySignedInUser}
-          commentClickHandler={commentClickHandler}
-          commBackGround={commBackGround}
-        />
-      </EuiFlexItem>
-      <EuiFlexItem className={styles.add_comment_container}>
-        <AddComment
-          value={state.value}
-          onChangeCommentHandler={onChangeCommentHandler}
-          isCommentLoading={state.isCommentLoading}
-          className={styles.add_comment}
-          profilePicture={props.reduxuserPFP}
-          addCommentHandler={addCommentHandler}
-        />
-      </EuiFlexItem>
-      <EuiFlexItem>{comments}</EuiFlexItem>
+      <AddComment
+        isCommentLoading={state.isCommentPosting}
+        className={styles.add_comment}
+        addCommentHandler={addCommentHandler}
+      />
+      {state.areCommentsOpen ? <EuiHorizontalRule margin="s" /> : null}
+      {commentsContainer}
       {showSeeMoreButton()}
-    </EuiFlexGroup>
+    </section>
   );
 };
 
-export default PostContainer;
+PostContainer.propTypes = {
+  postInfo: PropTypes.shape({
+    postId: PropTypes.number.isRequired,
+    content: PropTypes.string,
+    date: PropTypes.string.isRequired,
+    likes: PropTypes.number.isRequired,
+    comments: PropTypes.number.isRequired,
+    imageNames: PropTypes.arrayOf(PropTypes.string),
+    isLiked: PropTypes.bool.isRequired,
+  }).isRequired,
+  author: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    profilePicture: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectUserInfo,
+});
+
+export default connect(mapStateToProps)(PostContainer);
