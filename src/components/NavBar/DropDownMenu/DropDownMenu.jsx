@@ -43,7 +43,14 @@ class DropDownMenu extends Component {
     );
 
     const items = menuItemsData.map((itemData, i) => (
-      <MenuItemComponent {...itemData} key={`${menuTitle} ${i}`} /> // TODO: we need a proper key here
+      <MenuItemComponent
+        {...itemData}
+        onClick={() => {
+          this.toggleIsPopoverOpen();
+          itemData.onClick();
+        }}
+        key={`${menuTitle} ${i}`}
+      />
     ));
 
     return (

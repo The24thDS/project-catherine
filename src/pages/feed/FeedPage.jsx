@@ -10,22 +10,52 @@ class FeedPage extends Component {
     document.title = "Project Catherine | Feed";
     this.state = {
       posts: [],
+      postsPage: 0,
+      isPostsLastPage: false,
     };
   }
 
   fetchPosts = async () => {
-    const req = new ServerRequest("/posts?page=0").useAuthorization();
+    const req = new ServerRequest(
+      "/posts?page=" + this.state.postsPage
+    ).useAuthorization();
     const response = await req.send();
     const data = await response.json();
     return data;
+  };
+
+  scrollListener = () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+      if (!this.state.isPostsLastPage) {
+        this.setState(
+          (prevState) => ({
+            postsPage: prevState.postsPage + 1,
+          }),
+          () => {
+            this.fetchPosts().then((data) => {
+              this.setState((prevState) => ({
+                posts: [...prevState.posts, ...data.posts],
+                isPostsLastPage: data.last,
+              }));
+            });
+          }
+        );
+      }
+    }
   };
 
   componentDidMount() {
     this.fetchPosts().then((data) => {
       this.setState({
         posts: data.posts,
+        isPostsLastPage: data.last,
       });
     });
+    window.addEventListener("scroll", this.scrollListener);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.scrollListener);
   }
 
   render() {

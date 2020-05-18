@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { EuiAvatar, EuiHorizontalRule } from "@elastic/eui";
 import moment from "moment";
+import { useHistory } from "react-router-dom";
 
 import PictureURL from "../../../utils/PictureURL";
 
@@ -19,6 +20,8 @@ const Post = (props) => {
     (imageName) => new PictureURL(imageName).url
   );
 
+  const history = useHistory();
+
   return (
     <>
       <header className={styles["post-header"]}>
@@ -26,6 +29,7 @@ const Post = (props) => {
           name={authorName}
           imageUrl={authorPFP}
           className={styles["author-pfp"]}
+          onClick={() => history.push("/user/" + props.author.id)}
         />
         <div className={styles["post-info"]}>
           <span>{authorName}</span>

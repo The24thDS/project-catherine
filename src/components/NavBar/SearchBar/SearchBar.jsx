@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { EuiInputPopover, EuiFieldSearch } from "@elastic/eui";
+import { useHistory } from "react-router-dom";
 
 import ServerRequest from "../../../utils/ServerRequest";
 
@@ -8,18 +9,17 @@ import styles from "./SearchBar.module.sass";
 const SearchBar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [value, setValue] = useState("");
+  let history = useHistory();
 
   // TODO: Needs refactoring and bug fixing
-  const onSearchType = async (evt) => {
-    const text = evt.target.value;
-    const [firstName, lastName] = text.trim().split(" ");
+  const search = async (value) => {
+    const [firstName, lastName] = value.trim().split(" ");
     const searchPath = "/user/search";
-
-    console.log(firstName, lastName);
 
     if (firstName === "") {
       setIsSearchOpen(false);
-      setSearchResults([]);
+      setSearchResults("");
       return false;
     }
 
@@ -90,11 +90,15 @@ const SearchBar = () => {
     <EuiInputPopover
       input={
         <EuiFieldSearch
-          onChange={onSearchType}
+          value={value}
+          onChange={(ev) => {
+            setValue(ev.target.value);
+            search(ev.target.value);
+          }}
           placeholder="Search in Project Catherine"
         />
       }
-      isOpen={isSearchOpen}
+      isOpen={isSearchOpen && value !== ""}
       closePopover={() => setIsSearchOpen(false)}
       onFocus={() => {
         if (searchResults.length) setIsSearchOpen(true);
@@ -104,7 +108,16 @@ const SearchBar = () => {
       {typeof searchResults === "string"
         ? searchResults
         : searchResults.map((user) => (
-            <div className={styles["search-result"]} key={"user#" + user.id}>
+            <div
+              className={styles["search-result"]}
+              key={"user#" + user.id}
+              onClick={() => {
+                setIsSearchOpen(false);
+                setSearchResults("");
+                setValue("");
+                history.push("/user/" + user.id);
+              }}
+            >
               {user.firstName} {user.lastName}
             </div>
           ))}

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { EuiIcon } from "@elastic/eui";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import { withRouter } from "react-router-dom";
 
 import DropdownMenu from "./DropDownMenu/DropDownMenu.jsx";
 import MessageItem from "./DropDownMenu/MenuItems/MessageItem/";
@@ -62,26 +63,36 @@ class NavBar extends Component {
     this.getFriendRequests();
   }
 
-  // test data
   profileDropdownItems = [
     {
       name: "View profile",
       icon: profileIcon,
+      onClick: () => {
+        this.props.history.push("/user/" + this.props.userID);
+      },
+      style: { cursor: "pointer" },
     },
     {
       name: "Settings",
       icon: settingsIcon,
+      style: { cursor: "pointer" },
     },
     {
       name: "Logout",
       icon: logoutIcon,
       onClick: this.logout,
+      style: { cursor: "pointer" },
     },
   ];
   render() {
     return (
       <nav className={styles.navBar}>
-        <div className={styles.brand}>
+        <div
+          className={styles.brand}
+          onClick={() => {
+            this.props.history.push("/feed");
+          }}
+        >
           <EuiIcon type={logo} size="xxl" />
           <h1>Project Catherine</h1>
         </div>
@@ -143,4 +154,4 @@ const mapDispatchToProps = (dispatch) => ({
   logOut: () => dispatch(logOut()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(NavBar);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(NavBar));

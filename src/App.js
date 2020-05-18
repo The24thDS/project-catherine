@@ -95,18 +95,21 @@ class App extends React.Component {
           </PrivateRoute>
           <PrivateRoute
             exact
-            path="/profilePage"
+            path="/user/:userID"
             isAuthenticated={this.props.loggedIn}
-          >
-            <ProfilePage profilePicture="https://localhost:8443/api/v1/photos/user-default.jpg" userName="David Sima" userID="2" />
-          </PrivateRoute>
+            component={(props) => (
+              <ProfilePage key={props.location.key} {...props} />
+            )}
+          ></PrivateRoute>
           {/* this route will render if all of the above routes don't */}
           <Route>
             <div
               style={{
                 display: "flex",
                 justifyContent: "center",
+                alignItems: "center",
                 height: "50vh",
+                width: "100%",
               }}
             >
               404 - Not Found

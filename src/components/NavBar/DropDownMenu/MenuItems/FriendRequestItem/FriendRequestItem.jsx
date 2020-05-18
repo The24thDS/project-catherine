@@ -48,12 +48,6 @@ class FriendRequestItem extends Component {
           this.state.message
         ) : (
           <>
-            <EuiButtonIcon
-              iconType="check"
-              className={styles["accept-button"]}
-              aria-label="Accept friend request"
-              onClick={this.acceptButtonClick}
-            />
             <div className={styles["user-details"]}>
               <EuiIcon
                 className={styles["profile-picture"]}
@@ -63,6 +57,12 @@ class FriendRequestItem extends Component {
                 {this.props.firstName} {this.props.lastName}
               </h2>
             </div>
+            <EuiButtonIcon
+              iconType="check"
+              className={styles["accept-button"]}
+              aria-label="Accept friend request"
+              onClick={this.acceptButtonClick}
+            />
             <EuiButtonIcon
               iconType="cross"
               className={styles["refuse-button"]}
