@@ -3,6 +3,8 @@ package com.example.demo.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +16,8 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private String SECRET_KEY = "123asd123";
+    @Value ("${jwt.secret.key}")
+    private String SECRET_KEY;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -44,7 +47,7 @@ public class JwtUtil {
     private String createToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 60))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
     }
 
