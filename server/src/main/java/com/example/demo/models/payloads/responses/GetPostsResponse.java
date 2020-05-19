@@ -1,5 +1,6 @@
 package com.example.demo.models.payloads.responses;
 import com.example.demo.models.payloads.queryResults.PostDetailsQueryResult;
+import com.example.demo.repositories.PostsRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,14 +14,28 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetPostsResponse{
-   private ArrayList<PostDetailsQueryResult>posts;
+   private ArrayList<PostDetails>posts;
    private boolean last;
    private boolean empty;
 
-   public void map(Slice<PostDetailsQueryResult>list){
+
+   @Getter
+   @Setter
+   @AllArgsConstructor
+   @NoArgsConstructor
+   private class PostDetails{
+      PostDetailsQueryResult post;
+      boolean isLiked;
+   }
+
+   public void map(Slice<PostDetailsQueryResult>list,PostsRepository postsRepository,Long principalId){
       posts=new ArrayList<>();
       for (PostDetailsQueryResult element:list) {
-      posts.add(element);
+         PostDetails postDetails=new PostDetails();
+         postDetails.post=new PostDetailsQueryResult();
+         postDetails.post=element;
+         postDetails.isLiked=postsRepository.isLiked(principalId,element.getPostId());
+      posts.add(postDetails);
       }
       this.last=list.isLast();
       this.empty=list.isEmpty();

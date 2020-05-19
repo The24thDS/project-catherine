@@ -17,6 +17,8 @@ import ForgotPasswordForm from "../ForgotPasswordForm";
 import "../forms.sass";
 import ServerRequest from "../../../utils/ServerRequest";
 import { setLoggedIn, setUserInfo } from "../../../redux/user/user.actions";
+import { setFriendsInfo } from "../../../redux/friends/friends.actions";
+import { getUserDetails, getUserFriends } from "../../../utils/user";
 
 class LoginForm extends React.Component {
   static propTypes = {
@@ -104,13 +106,10 @@ class LoginForm extends React.Component {
     const req = new ServerRequest(
       "/auth/login",
       "POST",
-      {
-        "Content-Type": "application/json",
-      },
+      undefined,
       this.state.formInputs
-    );
+    ).useJsonBody();
     const response = await req.send();
-
     const data = await response.json();
 
     if (data.success === true) {
@@ -120,18 +119,20 @@ class LoginForm extends React.Component {
       } else {
         window.sessionStorage.setItem("token", token);
       }
-      const req = new ServerRequest("/user/details");
-      req.useAuthorization();
-      const response = await req.send();
-      if (response.status === 200) {
-        const userDetails = (await response.json()).user;
+      const userDetails = await getUserDetails();
+      if (userDetails !== false) {
         LogRocket.identify(userDetails.id, {
           email: userDetails.email,
           name: `
                   ${userDetails.firstName} ${userDetails.lastName}`,
         });
+        const userFriends = (await getUserFriends()).reduce(
+          (acc, value) => ({ [value.id]: { ...value }, ...acc }),
+          {}
+        );
         this.props.setUserInfo(userDetails);
         this.props.setLoggedIn(true);
+        this.props.setFriendsInfo(userFriends);
         this.props.history.push("/feed");
       }
     } else {
@@ -235,6 +236,7 @@ class LoginForm extends React.Component {
 const mapDispatchToProps = (dispatch) => ({
   setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
   setUserInfo: (userDetails) => dispatch(setUserInfo(userDetails)),
+  setFriendsInfo: (friendsArray) => dispatch(setFriendsInfo(friendsArray)),
 });
 
 export default connect(null, mapDispatchToProps)(LoginForm);

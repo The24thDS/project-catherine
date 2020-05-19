@@ -12,5 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CustomUserDetailsResponse extends ApiResponse {
     CustomUserDetails user;
+    boolean online;
 
 }

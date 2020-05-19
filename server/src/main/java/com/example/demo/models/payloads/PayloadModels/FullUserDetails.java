@@ -17,6 +17,4 @@ public class FullUserDetails implements Serializable {
     private Long id;
     private String profilePicture;
 
-
-
     }
