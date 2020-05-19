@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { EuiHorizontalRule, EuiIcon } from "@elastic/eui";
+import {
+  EuiHorizontalRule,
+  EuiIcon,
+  EuiButtonIcon,
+  EuiButton,
+} from "@elastic/eui";
 import moment from "moment";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -10,6 +15,7 @@ import Post from "./Post";
 import Comment from "./Comment";
 import ServerRequest from "../../utils/ServerRequest";
 import { selectUserInfo } from "../../redux/user/user.selectors";
+import Modal from "../Modal";
 
 import styles from "./PostContainer.module.sass";
 
@@ -23,6 +29,7 @@ const PostContainer = (props) => {
     isLastCommentsPage: false,
     isLikedByCurrentUser: props.postInfo.isLiked,
     likesNumber: props.postInfo.likes,
+    deleteModal: false,
   });
 
   const fetchComments = async () => {
@@ -172,59 +179,122 @@ const PostContainer = (props) => {
     }
   };
 
+  const deletePost = async () => {
+    const req = new ServerRequest("/posts/" + props.postInfo.postId, "DELETE");
+    req.useAuthorization().useJsonBody();
+    const response = await req.send();
+    if (response.status === 200) {
+      props.removePostById(props.postInfo.postId);
+      return true;
+    }
+  };
+
   return (
-    <section className={styles.postContainer}>
-      <Post
-        author={props.author}
-        postData={{
-          content: props.postInfo.content,
-          date: props.postInfo.date,
-          imageNames: props.postInfo.imageNames,
-        }}
-      />
-      <EuiHorizontalRule margin="xxl" />
-      <div className={styles.postActions}>
-        <div
-          title="Like"
-          className={
-            styles.button +
-            " " +
-            (state.isLikedByCurrentUser ? styles.active : null)
-          }
-          onClick={likeClickHandler}
-        >
-          <EuiIcon
-            type="https://upload.wikimedia.org/wikipedia/commons/8/87/Symbol_thumbs_up.svg"
-            size="l"
-            style={{
-              transform: "rotateY(180deg)",
+    <>
+      <section className={styles.postContainer}>
+        {props.author.id === props.currentUser.id ? (
+          <EuiButtonIcon
+            iconType="trash"
+            color="danger"
+            className={styles["delete-button"]}
+            onClick={() => {
+              setState({ ...state, deleteModal: true });
             }}
           />
-          <div className={styles.counter}>{state.likesNumber}</div>
+        ) : null}
+        <Post
+          author={props.author}
+          postData={{
+            content: props.postInfo.content,
+            date: props.postInfo.date,
+            imageNames: props.postInfo.imageNames,
+          }}
+        />
+        <EuiHorizontalRule margin="xxl" />
+        <div className={styles.postActions}>
+          <div
+            title="Like"
+            className={
+              styles.button +
+              " " +
+              (state.isLikedByCurrentUser ? styles.active : null)
+            }
+            onClick={likeClickHandler}
+          >
+            <EuiIcon
+              type="https://upload.wikimedia.org/wikipedia/commons/8/87/Symbol_thumbs_up.svg"
+              size="l"
+              style={{
+                transform: "rotateY(180deg)",
+              }}
+            />
+            <div className={styles.counter}>{state.likesNumber}</div>
+          </div>
+          <div
+            title="Comment"
+            className={
+              styles.button +
+              " " +
+              (state.areCommentsOpen ? styles.active : null)
+            }
+            onClick={commentClickHandler}
+          >
+            <EuiIcon type="editorComment" size="l" />
+            <div className={styles.counter}>{state.commentsNumber}</div>
+          </div>
+          <div title="Share" className={styles.button + " " + styles.disabled}>
+            <div className={styles.counter}>0</div>
+          </div>
         </div>
-        <div
-          title="Comment"
-          className={
-            styles.button + " " + (state.areCommentsOpen ? styles.active : null)
-          }
-          onClick={commentClickHandler}
-        >
-          <EuiIcon type="editorComment" size="l" />
-          <div className={styles.counter}>{state.commentsNumber}</div>
-        </div>
-        <div title="Share" className={styles.button + " " + styles.disabled}>
-          <div className={styles.counter}>0</div>
-        </div>
-      </div>
-      <AddComment
-        isCommentLoading={state.isCommentPosting}
-        className={styles.add_comment}
-        addCommentHandler={addCommentHandler}
-      />
-      {state.areCommentsOpen ? <EuiHorizontalRule margin="s" /> : null}
-      {commentsContainer}
-      {showSeeMoreButton()}
-    </section>
+        <AddComment
+          isCommentLoading={state.isCommentPosting}
+          className={styles.add_comment}
+          addCommentHandler={addCommentHandler}
+        />
+        {state.areCommentsOpen ? <EuiHorizontalRule margin="s" /> : null}
+        {commentsContainer}
+        {showSeeMoreButton()}
+      </section>
+      {state.deleteModal ? (
+        <Modal>
+          <div style={{ background: "white", padding: "15px" }}>
+            <h1>Are you sure you want to delete this post?</h1>
+            <span
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-around",
+                marginTop: "15px",
+              }}
+            >
+              <EuiButton
+                color="danger"
+                onClick={(ev) => {
+                  ev.persist();
+                  ev.target.textContent = "Deleting...";
+                  deletePost().then((done) => {
+                    if (done) {
+                      setState({ ...state, deleteModal: false });
+                    }
+                  });
+                }}
+              >
+                Yes
+              </EuiButton>{" "}
+              <EuiButton
+                color="primary"
+                fill
+                onClick={() => {
+                  setState({ ...state, deleteModal: false });
+                }}
+              >
+                No
+              </EuiButton>
+            </span>
+          </div>
+        </Modal>
+      ) : null}
+    </>
   );
 };
 
@@ -244,6 +314,7 @@ PostContainer.propTypes = {
     lastName: PropTypes.string.isRequired,
     profilePicture: PropTypes.string.isRequired,
   }).isRequired,
+  removePostById: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({

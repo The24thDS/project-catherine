@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import ServerRequest from "../../utils/ServerRequest";
 
 import "./activation.sass";
-import BlackLogo from "../../assets/logo-black.svg";
+import Spinner from "../../components/Spinner/Spinner";
 
 function Activation(props) {
   document.title = "Project Catherine | Activation";
@@ -38,20 +38,17 @@ function Activation(props) {
 
   return (
     <div className="activation-page">
-      <h1>
-        {activated === false
-          ? "Activating your account"
-          : activated === true
-          ? "Account activated! You'll be redirected to Login."
-          : "Account activation failed!"}
-      </h1>
-      <img
-        src={BlackLogo}
-        className="heartBeat"
-        style={
-          activated !== "failed" ? { animationIterationCount: "infinite" } : {}
+      <h1>{}</h1>
+      <Spinner
+        text={
+          activated === false
+            ? "Activating your account"
+            : activated === true
+            ? "Account activated! You'll be redirected to Login."
+            : "Account activation failed!"
         }
-        alt="Sheep Loader"
+        infinite={activated === false}
+        textSize="36px"
       />
       {activated === "redirect" ? (
         <Redirect

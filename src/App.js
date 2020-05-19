@@ -7,8 +7,8 @@ import LogRocket from "logrocket";
 
 import "./App.sass";
 
-import { setLoggedIn, setUserInfo } from "./redux/user/user.actions";
-import { selectLoggedIn } from "./redux/user/user.selectors";
+import { setLoggedIn, setUserInfo, logOut } from "./redux/user/user.actions";
+import { selectLoggedIn, selectUserID } from "./redux/user/user.selectors";
 import { setFriendsInfo } from "./redux/friends/friends.actions";
 import LandingPage from "./pages/landing";
 import Activation from "./pages/activation";
@@ -22,7 +22,9 @@ import ProfilePage from "./pages/profile";
 class App extends React.Component {
   static propTypes = {
     loggedIn: PropTypes.bool.isRequired,
+    logOut: PropTypes.func.isRequired,
     setLoggedIn: PropTypes.func.isRequired,
+    setFriendsInfo: PropTypes.func.isRequired,
   };
 
   componentDidMount() {
@@ -52,10 +54,13 @@ class App extends React.Component {
             }
           });
         } else {
+          this.props.logOut();
           window.localStorage.removeItem("token");
           window.sessionStorage.removeItem("token");
         }
       });
+    } else {
+      this.props.logOut();
     }
   }
 
@@ -133,6 +138,7 @@ const mapDispatchToProps = (dispatch) => ({
   setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
   setUserInfo: (userDetails) => dispatch(setUserInfo(userDetails)),
   setFriendsInfo: (friendsArray) => dispatch(setFriendsInfo(friendsArray)),
+  logOut: () => dispatch(logOut()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

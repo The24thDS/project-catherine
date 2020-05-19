@@ -72,11 +72,11 @@ class NavBar extends Component {
       },
       style: { cursor: "pointer" },
     },
-    {
-      name: "Settings",
-      icon: settingsIcon,
-      style: { cursor: "pointer" },
-    },
+    // {
+    //   name: "Settings",
+    //   icon: settingsIcon,
+    //   style: { cursor: "pointer" },
+    // },
     {
       name: "Logout",
       icon: logoutIcon,

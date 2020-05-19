@@ -1,13 +1,15 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
-import { EuiAvatar, EuiButton } from "@elastic/eui";
+import { EuiAvatar, EuiButton, EuiFilePicker } from "@elastic/eui";
 
 import PostContainer from "../../components/PostContainer";
 import ServerRequest from "../../utils/ServerRequest";
 import { selectUserInfo } from "../../redux/user/user.selectors.js";
-import AddPost from "../../components/AddPost/AddPost";
+import { setUserInfo } from "../../redux/user/user.actions";
+import AddPost from "../../components/AddPost";
 import PictureURL from "../../utils/PictureURL";
+import Spinner from "../../components/Spinner";
 
 import styles from "./ProfilePage.module.sass";
 
@@ -24,46 +26,107 @@ class ProfilePage extends Component {
         props.currentUser.lastName;
     }
     this.state = {
+      loadingPosts: false,
       isMyProfile: userInfo !== undefined ? true : false,
       arePostsLoaded: false,
       postsData: [],
       isLastPostsPage: false,
       postsPage: 0,
       userInfo,
+      friendButtonText: "",
     };
   }
-  // deletePost = async (postID) => {
-  //   if (this.props.userID === this.props.reduxUserID) {
-  //     const req = new ServerRequest("/posts/" + postID, "DELETE");
-  //     req.useAuthorization().useJsonBody();
-  //     const response = await req.send();
-  //     if (response.status === 200) {
-  //       this.setState((prevState) => ({
-  //         p: prevState.p.filter((post) => post.postId !== postID),
-  //       }));
-  //     }
-  //   }
-  // };
+
+  removePostById = (postId) => {
+    this.setState((prevState) => ({
+      postsData: prevState.postsData.filter((el) => el.post.postId !== postId),
+    }));
+  };
+
+  updatePFP = async (files) => {
+    if (files.length !== 0) {
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        formData.append("photos", file);
+      }
+
+      let req = new ServerRequest(
+        "/photos",
+        "POST",
+        undefined,
+        formData
+      ).useAuthorization();
+      let response = await req.send();
+      let data = await response.json();
+      if (response.status === 200) {
+        const photo = data.photos[0];
+        req = new ServerRequest("/user/update", "POST", undefined, {
+          profilePicture: photo,
+        })
+          .useAuthorization()
+          .useJsonBody();
+        response = await req.send();
+        if (response.status === 200) {
+          this.setState((prevState) => ({
+            userInfo: { ...prevState.userInfo, profilePicture: photo },
+          }));
+          this.props.setUserInfo({
+            ...this.state.userInfo,
+            profilePicture: photo,
+          });
+        }
+      }
+    }
+  };
+
+  sendFriendRequest = async () => {
+    const req = new ServerRequest(
+      "/user/sendFriendRequest/" + this.state.userInfo.id,
+      "POST"
+    ).useAuthorization();
+    const response = await req.send();
+    if (response.status === 200) {
+      this.setState({
+        friendButtonText: "Sent",
+      });
+    } else {
+      this.setState({
+        friendButtonText: "Failed",
+      });
+    }
+  };
 
   fetchPosts = async () => {
-    const request = new ServerRequest(
-      "/posts/user/" + this.state.userInfo.id + "?page=" + this.state.postsPage
-    ).useAuthorization();
-    const response = await request.send();
-    if (response.status === 200) {
+    if (this.state.userInfo.email !== undefined) {
+      this.setState({
+        loadingPosts: true,
+      });
+      const request = new ServerRequest(
+        "/posts/user/" +
+          this.state.userInfo.id +
+          "?page=" +
+          this.state.postsPage
+      ).useAuthorization();
+      const response = await request.send();
       const data = await response.json();
+      if (data.posts === null) {
+        data.posts = [];
+      }
       this.setState((prevState) => ({
         postsData: [...prevState.postsData, ...data.posts],
         arePostsLoaded: true,
         isLastPostsPage: data.last,
+        loadingPosts: false,
       }));
-    } else {
-      return false;
     }
   };
 
   scrollListener = () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+    if (
+      window.innerHeight + window.scrollY >= document.body.offsetHeight &&
+      this.state.userInfo !== undefined
+    ) {
       if (!this.state.isLastPostsPage) {
         this.setState(
           (prevState) => ({
@@ -96,15 +159,17 @@ class ProfilePage extends Component {
         })
         .then((data) => {
           if (data !== false) {
-            this.setState({
-              userInfo: data.user,
-            });
+            this.setState(
+              {
+                userInfo: data.user,
+              },
+              this.fetchPosts
+            );
             document.title =
               "Project Catherine | " +
               data.user.firstName +
               " " +
               data.user.lastName;
-            this.fetchPosts();
           }
         });
     }
@@ -128,15 +193,17 @@ class ProfilePage extends Component {
         })
         .then((data) => {
           if (data !== false) {
-            this.setState({
-              userInfo: data.user,
-            });
+            this.setState(
+              {
+                userInfo: data.user,
+              },
+              this.fetchPosts
+            );
             document.title =
               "Project Catherine | " +
               data.user.firstName +
               " " +
               data.user.lastName;
-            this.fetchPosts();
           }
         });
     }
@@ -147,15 +214,24 @@ class ProfilePage extends Component {
   }
 
   render() {
-    const { userInfo, isMyProfile, postsData } = this.state;
+    const {
+      userInfo,
+      isMyProfile,
+      postsData,
+      loadingPosts,
+      arePostsLoaded,
+      isLastPostsPage,
+      friendButtonText,
+    } = this.state;
 
     if (userInfo !== undefined) {
       const friendButton =
         userInfo.email !== undefined ? (
-          <EuiButton color="danger">Remove friend</EuiButton>
+          "Can't remove a friend yet"
         ) : (
-          <EuiButton color="secondary" fill>
-            Send friend request
+          // <EuiButton color="danger">Remove friend</EuiButton>
+          <EuiButton color="secondary" fill onClick={this.sendFriendRequest}>
+            {friendButtonText.length ? friendButtonText : "Send friend request"}
           </EuiButton>
         );
       const name = userInfo.firstName + " " + userInfo.lastName;
@@ -168,15 +244,25 @@ class ProfilePage extends Component {
             flexDirection: "column",
             alignItems: "center",
             paddingTop: "120px",
-            paddingBottom: "50px",
+            paddingBottom: "100px",
           }}
         >
           <div className={styles["user-hero"]}>
             <div className={styles["user-info"]}>
-              <EuiAvatar
-                name={name}
-                imageUrl={new PictureURL(userInfo.profilePicture).url}
-                className={styles.pfp}
+              <label htmlFor="avatarUpload">
+                <EuiAvatar
+                  name={name}
+                  imageUrl={new PictureURL(userInfo.profilePicture).url}
+                  className={
+                    styles.pfp + " " + (isMyProfile ? styles["my-pfp"] : null)
+                  }
+                />
+              </label>
+              <EuiFilePicker
+                id="avatarUpload"
+                className={styles["file-picker"]}
+                accept=".png, .jpg, .jpeg"
+                onChange={this.updatePFP}
               />
               <h1>{name}</h1>
               {userInfo.email ? (
@@ -199,13 +285,43 @@ class ProfilePage extends Component {
             </div>
           </div>
           {isMyProfile ? <AddPost /> : null}
-          {postsData.map((postInfo) => (
-            <PostContainer
-              key={"pfposts" + postInfo.post.postId}
-              author={userInfo}
-              postInfo={{ ...postInfo.post, isLiked: postInfo.liked }}
+          {postsData.length ? (
+            postsData.map((postInfo) => (
+              <PostContainer
+                key={"pfposts" + postInfo.post.postId}
+                author={userInfo}
+                postInfo={{ ...postInfo.post, isLiked: postInfo.liked }}
+                removePostById={this.removePostById}
+              />
+            ))
+          ) : arePostsLoaded ? (
+            <>
+              <p style={{ color: "gray", marginTop: "30px", fontSize: "22px" }}>
+                It's cold and empty here.
+              </p>
+              <p style={{ color: "gray", fontSize: "22px" }}>
+                This user has no posts.
+              </p>
+            </>
+          ) : null}
+          {loadingPosts ? (
+            <Spinner
+              style={{ marginTop: "30px" }}
+              text="Loading posts"
+              infinite={true}
+              imageSize="80px"
             />
-          ))}
+          ) : null}
+          {isLastPostsPage && postsData.length ? (
+            <p style={{ color: "gray", fontSize: "22px", marginTop: "75px" }}>
+              That was all. Go do something productive now.
+            </p>
+          ) : null}
+          {userInfo.email === undefined && (
+            <p style={{ color: "gray", marginTop: "30px", fontSize: "22px" }}>
+              You must be friends with this user to see any posts.
+            </p>
+          )}
         </div>
       );
     } else {
@@ -216,4 +332,7 @@ class ProfilePage extends Component {
 const mapStateToProps = createStructuredSelector({
   currentUser: selectUserInfo,
 });
-export default connect(mapStateToProps, null)(ProfilePage);
+const mapDispatchToProps = (dispatch) => ({
+  setUserInfo: (userInfo) => dispatch(setUserInfo(userInfo)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);
