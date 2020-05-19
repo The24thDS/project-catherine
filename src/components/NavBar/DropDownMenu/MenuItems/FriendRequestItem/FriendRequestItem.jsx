@@ -8,7 +8,6 @@ import { setFriendsInfo } from "../../../../../redux/friends/friends.actions";
 import { getUserFriends } from "../../../../../utils/user";
 
 import styles from "./FriendRequestItem.module.sass";
-import ServerRequest from "../../../../../utils/ServerRequest";
 
 class FriendRequestItem extends Component {
   state = {
