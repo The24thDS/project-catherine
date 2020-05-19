@@ -7,8 +7,8 @@ import LogRocket from "logrocket";
 
 import "./App.sass";
 
+import { selectLoggedIn } from "./redux/user/user.selectors";
 import { setLoggedIn, setUserInfo, logOut } from "./redux/user/user.actions";
-import { selectLoggedIn, selectUserID } from "./redux/user/user.selectors";
 import { setFriendsInfo } from "./redux/friends/friends.actions";
 import LandingPage from "./pages/landing";
 import Activation from "./pages/activation";

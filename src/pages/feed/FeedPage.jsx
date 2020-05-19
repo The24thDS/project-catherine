@@ -1,9 +1,12 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
 
 import AddPost from "../../components/AddPost/AddPost";
 import PostContainer from "../../components/PostContainer";
 import ServerRequest from "../../utils/ServerRequest";
 import Spinner from "../../components/Spinner/Spinner";
+import { selectFriendsRaw } from "../../redux/friends/friends.selectors";
 
 class FeedPage extends Component {
   constructor(props) {
@@ -55,12 +58,24 @@ class FeedPage extends Component {
   componentDidMount() {
     this.fetchPosts().then((data) => {
       this.setState({
-        posts: data.posts,
+        posts: data.posts || [],
         isPostsLastPage: data.last,
         arePostsLoaded: true,
       });
     });
     window.addEventListener("scroll", this.scrollListener);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.friends.length !== this.props.friends.length) {
+      this.fetchPosts().then((data) => {
+        this.setState({
+          posts: data.posts || [],
+          isPostsLastPage: data.last,
+          arePostsLoaded: true,
+        });
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -94,7 +109,7 @@ class FeedPage extends Component {
               It's cold and empty here.
             </p>
             <p style={{ color: "gray", fontSize: "22px" }}>
-              We can't find any posts to display here.
+              We can't find any posts to display.
             </p>
             <p style={{ color: "gray", fontSize: "22px" }}>
               You need some friends in your life.
@@ -109,7 +124,7 @@ class FeedPage extends Component {
             imageSize="80px"
           />
         ) : null}
-        {this.state.isPostsLastPage ? (
+        {this.state.isPostsLastPage && this.state.posts.length > 0 ? (
           <p style={{ color: "gray", fontSize: "22px", marginTop: "75px" }}>
             That was all. Go do something productive now.
           </p>
@@ -119,4 +134,8 @@ class FeedPage extends Component {
   }
 }
 
-export default FeedPage;
+const mapStateToProps = createStructuredSelector({
+  friends: selectFriendsRaw,
+});
+
+export default connect(mapStateToProps)(FeedPage);

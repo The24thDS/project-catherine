@@ -7,11 +7,13 @@ import PostContainer from "../../components/PostContainer";
 import ServerRequest from "../../utils/ServerRequest";
 import { selectUserInfo } from "../../redux/user/user.selectors.js";
 import { setUserInfo } from "../../redux/user/user.actions";
+import { removeFriend } from "../../redux/friends/friends.actions";
 import AddPost from "../../components/AddPost";
 import PictureURL from "../../utils/PictureURL";
 import Spinner from "../../components/Spinner";
 
 import styles from "./ProfilePage.module.sass";
+import { selectFriendsRaw } from "../../redux/friends/friends.selectors";
 
 class ProfilePage extends Component {
   constructor(props) {
@@ -81,6 +83,9 @@ class ProfilePage extends Component {
   };
 
   sendFriendRequest = async () => {
+    this.setState({
+      friendButtonText: "Sending...",
+    });
     const req = new ServerRequest(
       "/user/sendFriendRequest/" + this.state.userInfo.id,
       "POST"
@@ -90,6 +95,33 @@ class ProfilePage extends Component {
       this.setState({
         friendButtonText: "Sent",
       });
+    } else {
+      this.setState({
+        friendButtonText: "Failed",
+      });
+    }
+  };
+
+  removeFriend = async () => {
+    this.setState({
+      friendButtonText: "Removing...",
+    });
+    const req = new ServerRequest(
+      "/user/friends/" + this.state.userInfo.id,
+      "DELETE"
+    ).useAuthorization();
+    const response = await req.send();
+    if (response.status === 200) {
+      this.setState((prevState) => ({
+        friendButtonText: "Friend removed :(",
+        userInfo: {
+          ...prevState.userInfo,
+          email: undefined,
+          birthDate: undefined,
+        },
+        postsData: [],
+      }));
+      this.props.removeFriend(this.state.userInfo.id);
     } else {
       this.setState({
         friendButtonText: "Failed",
@@ -140,7 +172,7 @@ class ProfilePage extends Component {
 
   componentDidMount() {
     window.addEventListener("scroll", this.scrollListener);
-    if (this.state.userInfo !== undefined) {
+    if (this.state.isMyProfile) {
       this.fetchPosts();
     } else {
       const req = new ServerRequest(
@@ -175,8 +207,11 @@ class ProfilePage extends Component {
     }
   }
 
-  componentDidUpdate() {
-    if (this.state.userInfo === undefined) {
+  componentDidUpdate(prevProps) {
+    if (
+      this.state.userInfo === undefined ||
+      prevProps.friends.length !== this.props.friends.length
+    ) {
       const req = new ServerRequest(
         "/user/details?user=" + this.props.match.params.userID
       )
@@ -227,9 +262,10 @@ class ProfilePage extends Component {
     if (userInfo !== undefined) {
       const friendButton =
         userInfo.email !== undefined ? (
-          "Can't remove a friend yet"
+          <EuiButton color="danger" onClick={this.removeFriend}>
+            {friendButtonText.length ? friendButtonText : "Remove friend"}
+          </EuiButton>
         ) : (
-          // <EuiButton color="danger">Remove friend</EuiButton>
           <EuiButton color="secondary" fill onClick={this.sendFriendRequest}>
             {friendButtonText.length ? friendButtonText : "Send friend request"}
           </EuiButton>
@@ -294,7 +330,7 @@ class ProfilePage extends Component {
                 removePostById={this.removePostById}
               />
             ))
-          ) : arePostsLoaded ? (
+          ) : arePostsLoaded && userInfo.email !== undefined ? (
             <>
               <p style={{ color: "gray", marginTop: "30px", fontSize: "22px" }}>
                 It's cold and empty here.
@@ -331,8 +367,10 @@ class ProfilePage extends Component {
 }
 const mapStateToProps = createStructuredSelector({
   currentUser: selectUserInfo,
+  friends: selectFriendsRaw,
 });
 const mapDispatchToProps = (dispatch) => ({
   setUserInfo: (userInfo) => dispatch(setUserInfo(userInfo)),
+  removeFriend: (id) => dispatch(removeFriend(id)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);
