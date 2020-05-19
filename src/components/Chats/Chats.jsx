@@ -73,6 +73,39 @@ class Chats extends Component {
     }
   };
 
+  closeWindow = (email) => {
+    const windows = this.state.chatWindows;
+    delete windows[email];
+    this.setState({
+      chatWindows: windows,
+    });
+  };
+
+  componentDidUpdate(prevProps) {
+    /* Stackoverflow magic */
+    function comparer(otherArray) {
+      return function (current) {
+        return (
+          otherArray.filter(function (other) {
+            return other.id === current.id;
+          }).length === 0
+        );
+      };
+    }
+    const difference = prevProps.friends
+      .filter(comparer(this.props.friends))
+      .map((el) => el.email);
+    if (difference.length) {
+      const chatWindows = this.state.chatWindows;
+      difference.forEach((email) => {
+        delete chatWindows[email];
+      });
+      this.setState({
+        chatWindows: chatWindows,
+      });
+    }
+  }
+
   render() {
     const { onFriendItemClick } = this;
     return (
@@ -81,6 +114,7 @@ class Chats extends Component {
           <ChatWindow
             key={chatWindow.id}
             sendMessage={this.sendMessage}
+            closeWindow={this.closeWindow}
             {...chatWindow}
           />
         ))}

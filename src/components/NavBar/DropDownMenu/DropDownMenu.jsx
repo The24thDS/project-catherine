@@ -6,7 +6,7 @@ import styles from "./DropDownMenu.module.sass";
 
 class DropDownMenu extends Component {
   static propTypes = {
-    MenuItemComponent: PropTypes.func.isRequired,
+    MenuItemComponent: PropTypes.any.isRequired,
     menuItemsData: PropTypes.array.isRequired,
     menuButtonIcon: PropTypes.string.isRequired,
     menuTitle: PropTypes.string.isRequired,
@@ -17,9 +17,16 @@ class DropDownMenu extends Component {
   };
 
   toggleIsPopoverOpen = () => {
-    this.setState((prevState) => ({
-      isPopoverOpen: !prevState.isPopoverOpen,
-    }));
+    this.setState(
+      (prevState) => ({
+        isPopoverOpen: !prevState.isPopoverOpen,
+      }),
+      () => {
+        if (!this.state.isPopoverOpen && this.props.onPopoverClose) {
+          this.props.onPopoverClose();
+        }
+      }
+    );
   };
 
   render() {
@@ -43,11 +50,18 @@ class DropDownMenu extends Component {
     );
 
     const items = menuItemsData.map((itemData, i) => (
-      <MenuItemComponent {...itemData} key={`${menuTitle} ${i}`} /> // TODO: we need a proper key here
+      <MenuItemComponent
+        {...itemData}
+        onClick={() => {
+          this.toggleIsPopoverOpen();
+          itemData.onClick();
+        }}
+        key={`${menuTitle} ${i}`}
+      />
     ));
 
     return (
-      <div>
+      <div className={this.props.className} onClick={this.props.onClick}>
         <EuiPopover
           className={styles.button}
           button={MenuButton}

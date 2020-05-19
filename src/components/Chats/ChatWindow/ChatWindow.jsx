@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { EuiAvatar } from "@elastic/eui";
+import { EuiAvatar, EuiIcon } from "@elastic/eui";
 import moment from "moment";
 
 import styles from "./ChatWindow.module.sass";
@@ -8,23 +8,26 @@ function ChatWindow(props) {
   const [isOpen, setIsOpen] = useState(true);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [grabAttention, setGrabAttention] = useState(false);
 
   const sendMessage = () => {
-    setMessages([
-      ...messages,
-      {
-        you: true,
-        content: message,
-        date: moment().format("YYYY-MM-DD HH:mm"),
-      },
-    ]);
-    setMessage("");
-    props.sendMessage({ message, toUser: props.email });
+    if (message.trim() !== "") {
+      setMessages([
+        ...messages,
+        {
+          you: true,
+          content: message.trim(),
+          date: moment().format("YYYY-MM-DD HH:mm"),
+        },
+      ]);
+      setMessage("");
+      props.sendMessage({ message, toUser: props.email });
+    }
   };
 
   useEffect(() => {
     if (props.receivedMessage) {
-      setMessages((m) => [
+      setMessages((messages) => [
         ...messages,
         {
           you: false,
@@ -32,11 +35,19 @@ function ChatWindow(props) {
           date: moment(props.receivedMessage.moment).format("YYYY-MM-DD HH:mm"),
         },
       ]);
+      setGrabAttention(true);
     }
   }, [props.receivedMessage]);
 
   return (
-    <div className={styles["chat-window"]}>
+    <div
+      className={
+        styles["chat-window"] +
+        " " +
+        (grabAttention ? styles["attention-grabber"] : null)
+      }
+      onClick={() => setGrabAttention(false)}
+    >
       <header onClick={() => setIsOpen(!isOpen)}>
         <EuiAvatar
           name={`${props.firstName} ${props.lastName}`}
@@ -51,7 +62,14 @@ function ChatWindow(props) {
             props.online ? styles.online : styles.offline
           }`}
         ></span>
+        <EuiIcon
+          className={styles["close-window"]}
+          type="cross"
+          color="danger"
+          onClick={() => props.closeWindow(props.email)}
+        />
       </header>
+
       <div
         className={styles["messages-container"]}
         style={{ height: isOpen ? "200px" : "0px" }}
@@ -86,7 +104,11 @@ function ChatWindow(props) {
             setMessage(ev.target.value);
           }}
         />
-        <input type="button" value=">" onClick={sendMessage} />
+        <EuiIcon
+          className={styles.send}
+          type="arrowRight"
+          onClick={sendMessage}
+        />
       </div>
     </div>
   );

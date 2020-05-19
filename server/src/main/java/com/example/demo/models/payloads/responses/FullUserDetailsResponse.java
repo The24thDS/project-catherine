@@ -10,4 +10,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FullUserDetailsResponse extends ApiResponse{
     FullUserDetails User;
+    boolean online;
 }

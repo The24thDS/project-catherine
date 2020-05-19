@@ -90,7 +90,7 @@ public class PostsController {
         GetPostsResponse response=new GetPostsResponse();
         Slice<PostDetailsQueryResult> list=postsRepository.customFindPostsByUser(userId,PageRequest.of(pageNumber,25,Sort.by("date").descending()));
         if (!list.isEmpty()) {
-            response.map(list);
+            response.map(list,postsRepository,userId);
             httpStatus=HttpStatus.OK;
         }else{
             response.setEmpty(list.isEmpty());response.setLast(list.isLast());
