@@ -37,7 +37,6 @@ function AddPost(props) {
     let photos = null;
 
     if (files.length !== 0) {
-      console.log("upload files then content");
       const formData = new FormData();
       for (let i = 0; i < files.length; i++) {
         const file = files[i];

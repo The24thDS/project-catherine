@@ -1,3 +1,3 @@
-import DropDownMenu from "./DropDownMenu.js";
+import DropDownMenu from "./DropDownMenu.jsx";
 
 export default DropDownMenu;

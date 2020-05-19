@@ -1,6 +1,5 @@
 .postContainer
     display: flex
-    align-self: center
     flex-direction: column
     background-color: white
     width: 96vw
@@ -8,26 +7,54 @@
     margin-top: 30px
     align-items: center
     position: relative
-.add_comment_container
-    padding: 20px 0px 20px 0px
-.add_comment
-    max-width: 500px
-    width: 60vw
-.buttton_container
+    padding: 15px 10px
+.delete-button
+    position: absolute
+    right: 10px
+    top: 10px
+.postActions
+    --button-size: 40px
     display: flex
-    max-width: 190px
-    width: 50vw
+    width: 25%
     justify-content: space-evenly
     align-self: flex-end
-.buttons
-    border-radius: 50%
-    max-width: 50px
-    max-height: 50px
-    width: 10vw
-    height: 10vw
-    border: 1px solid #707070
-    box-shadow: 
-    font-size: 70%
+    margin-top: calc( -40px - calc( var(--button-size) / 2 ))
+    margin-bottom: 10px
+    position: relative
+    .button
+        display: flex
+        justify-content: center
+        align-items: center
+        position: relative
+        width: var(--button-size)
+        height: var(--button-size)
+        background: hsla(120, 30, 70, 1)
+        box-shadow: inset 0 1px 2px hsla(120, 50, 90, 1), 0 1px 2px hsla(0, 0, 0, 0.5)
+        transition: all 0.5s
+        border-radius: 50%
+        cursor: pointer
+        .counter
+            position: absolute
+            top: -8px
+            right: -5px
+            padding: 1px
+            background: white
+            border-radius: 2px
+            border: 1px solid #707070
+            font-size: 14px
+            min-width: 15px
+            text-align: center
+        &.disabled
+            opacity: 0.5
+            pointer-events: none
+        &.active
+            background: hsla(120, 50, 70, 1)
+            box-shadow: inset 0 1px 2px hsla(0, 0, 0, 0.5), 0 1px 2px hsla(120, 50, 90, 1)
+            transition: all 0.5s
+
+.commentsContainer
+    width: 90%
+    margin-bottom: 20px
 .seeMoreButton
     border: 1px solid #D9D9D9
     position: relative
