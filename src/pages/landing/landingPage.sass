@@ -1,0 +1,67 @@
+.landing
+  align-self: center
+  &>section
+    background-color: var(--secondary-color)
+    margin: 0
+
+section.landing--information
+  max-width: 58vw
+  margin-right: 100px
+  padding: 40px
+  justify-content: space-evenly
+  flex-grow: 4 !important
+  h1
+    font-size: 2rem
+    margin: 0
+    text-align: center
+  .logo
+    height: 120px
+    margin: 0
+  article
+    text-align: justify
+    font-size: 1.3rem
+    margin: 0 110px
+
+@media only screen and (max-width: 1600px)
+  section.landing--information
+    flex-grow: 1 !important
+    margin-right: 50px
+    padding: 20px
+    .logo
+      height: 80px
+    article
+      margin: 0 25px
+      font-size: 1.2rem
+      line-height: 1.2rem
+
+@media only screen and (orientation: portrait)
+  .landing
+    background-color: var(--secondary-color)
+    &>section
+      min-width: 100vw
+      min-height: 50vh
+  section.landing--information
+    h1
+      font-weight: bold
+      text-transform: capitalize
+    .logo
+      margin: 20px 0
+    article
+      display: none
+
+section.landing--forms
+  min-width: 25vw
+  min-width: 300px
+
+.forms-nav
+  display: grid
+  grid-template-columns: 1fr 1fr
+  height: 100px
+  font-family: "Muli", sans-serif
+  font-size: 30px
+  background-color: var(--highlight-color)
+  .forms-nav-button--active
+    background-color: var(--secondary-color)
+    border-top: 10px solid var(--primary-color)
+    cursor: default
+    pointer-events: none

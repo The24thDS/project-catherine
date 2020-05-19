@@ -1,0 +1,32 @@
+.notification-item
+    display: flex
+    background-color: white
+    width: 90vw
+    max-width: 350px
+    align-items: center
+    padding: 10px 0
+    & + .notification-item
+        border-top: 1px solid hsla(120, 20, 50, 1)
+    &.new
+        font-weight: 800
+
+
+.profile-picture
+    height: auto
+    width: 50px
+    height: 50px
+    margin-right: 10px
+    object-fit: cover
+    box-shadow: inset 0 1px 2px 1px hsla(0, 0, 0, .1)
+    border-radius: 50%
+
+.notification-details
+    display: flex
+    flex-wrap: wrap
+    justify-content: space-between
+    padding: 5px
+    h2
+        font-weight: 600
+    time
+        color: gray
+        font-size: 14px

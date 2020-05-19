@@ -1,35 +1,127 @@
 import React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import PropTypes from "prop-types";
+import LogRocket from "logrocket";
 
-import { setCurrentUser } from "./redux/user/user.actions";
-import { selectCurrentUser } from "./redux/user/user.selectors";
-
-import logo from "./logo.svg";
 import "./App.sass";
 
+import { selectLoggedIn } from "./redux/user/user.selectors";
+import { setLoggedIn, setUserInfo, logOut } from "./redux/user/user.actions";
+import { setFriendsInfo } from "./redux/friends/friends.actions";
+import LandingPage from "./pages/landing";
+import Activation from "./pages/activation";
+import PrivateRoute from "./components/PrivateRoute";
+import FeedPage from "./pages/feed/FeedPage";
+import NavBar from "./components/NavBar";
+import Chats from "./components/Chats";
+import { getUserDetails, checkToken, getUserFriends } from "./utils/user";
+
+import ProfilePage from "./pages/profile";
 class App extends React.Component {
+  static propTypes = {
+    loggedIn: PropTypes.bool.isRequired,
+    logOut: PropTypes.func.isRequired,
+    setLoggedIn: PropTypes.func.isRequired,
+    setFriendsInfo: PropTypes.func.isRequired,
+  };
+
   componentDidMount() {
-    // just an example
-    const { setCurrentUser } = this.props;
-    // this user will be available in this.props.currentUser
-    setCurrentUser({ name: "Catherine", id: 5 });
+    const token =
+      window.localStorage.getItem("token") ||
+      window.sessionStorage.getItem("token");
+    if (token !== null) {
+      checkToken(token).then((valid) => {
+        if (valid) {
+          getUserDetails().then(async (userDetails) => {
+            if (userDetails !== false) {
+              LogRocket.identify(userDetails.id, {
+                email: userDetails.email,
+                name: `
+                  ${userDetails.firstName} ${userDetails.lastName}`,
+              });
+              const userFriends = (await getUserFriends()).reduce(
+                (acc, value) => ({ [value.id]: { ...value }, ...acc }),
+                {}
+              );
+              this.props.setUserInfo(userDetails);
+              this.props.setLoggedIn(true);
+              this.props.setFriendsInfo(userFriends);
+            } else {
+              window.localStorage.removeItem("token");
+              window.sessionStorage.removeItem("token");
+            }
+          });
+        } else {
+          this.props.logOut();
+          window.localStorage.removeItem("token");
+          window.sessionStorage.removeItem("token");
+        }
+      });
+    } else {
+      this.props.logOut();
+    }
   }
 
   render() {
     return (
       <div className="App">
+        {this.props.loggedIn ? <NavBar /> : null}
         <Switch>
-          <Route exact path="/">
-            <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
-              <p>Project Catherine</p>
-            </header>
-          </Route>
+          <Route
+            exact
+            path="/"
+            component={(props) =>
+              this.props.loggedIn ? (
+                <Redirect to="/feed" />
+              ) : (
+                <LandingPage {...props} />
+              )
+            }
+          />
+          <Route
+            exact
+            path="/activation/:token"
+            component={(props) =>
+              this.props.loggedIn ? (
+                <Redirect to="/feed" />
+              ) : (
+                <Activation {...props} />
+              )
+            }
+          />
+          <PrivateRoute
+            exact
+            path="/feed"
+            isAuthenticated={this.props.loggedIn}
+          >
+            <FeedPage />
+          </PrivateRoute>
+          <PrivateRoute
+            exact
+            path="/user/:userID"
+            isAuthenticated={this.props.loggedIn}
+            component={(props) => (
+              <ProfilePage key={props.location.key} {...props} />
+            )}
+          ></PrivateRoute>
           {/* this route will render if all of the above routes don't */}
-          <Route>404 - Not Found</Route>
+          <Route>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "50vh",
+                width: "100%",
+              }}
+            >
+              404 - Not Found
+            </div>
+          </Route>
         </Switch>
+        {this.props.loggedIn ? <Chats /> : null}
       </div>
     );
   }
@@ -38,12 +130,15 @@ class App extends React.Component {
 // this function will select from the store and map the results to props
 // propName: selectorName
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  loggedIn: selectLoggedIn,
 });
 
 // this function will map boundActionCreators to props
-const mapDispatchToProps = dispatch => ({
-  setCurrentUser: user => dispatch(setCurrentUser(user))
+const mapDispatchToProps = (dispatch) => ({
+  setLoggedIn: (loggedIn) => dispatch(setLoggedIn(loggedIn)),
+  setUserInfo: (userDetails) => dispatch(setUserInfo(userDetails)),
+  setFriendsInfo: (friendsArray) => dispatch(setFriendsInfo(friendsArray)),
+  logOut: () => dispatch(logOut()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

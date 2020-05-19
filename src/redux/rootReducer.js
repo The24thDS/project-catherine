@@ -1,14 +1,22 @@
 import { combineReducers } from "redux";
 import { persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import storageSession from "redux-persist/lib/storage/session";
 
 import userReducer from "./user/user.reducer";
+import friendsReducer from "./friends/friends.reducer";
 
 const persistConfig = {
   key: "root",
-  storage
+  storage: storageSession,
 };
 
-const reducer = combineReducers({ user: userReducer });
+const reducer = combineReducers({ user: userReducer, friends: friendsReducer });
 
-export default persistReducer(persistConfig, reducer);
+const root = (currentState, action) => {
+  if (action.type === "LOG_OUT") {
+    currentState = undefined;
+  }
+  return reducer(currentState, action);
+};
+
+export default persistReducer(persistConfig, root);
