@@ -120,7 +120,7 @@ class Chats extends Component {
         ))}
         <ChatList {...{ onFriendItemClick }} friends={this.props.friends} />
         <SockJsClient
-          url="https://localhost:8443/ws"
+          url={process.env.REACT_APP_WS_URL}
           topics={["/user/queue/chat", "/user/queue/online"]}
           headers={{ ...new ServerRequest().useAuthorization().headers }}
           onMessage={this.receivedMessage}

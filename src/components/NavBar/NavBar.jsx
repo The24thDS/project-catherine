@@ -212,7 +212,7 @@ class NavBar extends Component {
           </div>
         </div>
         <SockJsClient
-          url="https://localhost:8443/ws"
+          url={process.env.REACT_APP_WS_URL}
           topics={["/user/queue/notification"]}
           headers={{ ...new ServerRequest().useAuthorization().headers }}
           onMessage={this.receivedMessage}
