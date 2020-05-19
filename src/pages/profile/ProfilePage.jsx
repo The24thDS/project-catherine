@@ -294,12 +294,14 @@ class ProfilePage extends Component {
                   }
                 />
               </label>
-              <EuiFilePicker
-                id="avatarUpload"
-                className={styles["file-picker"]}
-                accept=".png, .jpg, .jpeg"
-                onChange={this.updatePFP}
-              />
+              {isMyProfile ? (
+                <EuiFilePicker
+                  id="avatarUpload"
+                  className={styles["file-picker"]}
+                  accept=".png, .jpg, .jpeg"
+                  onChange={this.updatePFP}
+                />
+              ) : null}
               <h1>{name}</h1>
               {userInfo.email ? (
                 <>
