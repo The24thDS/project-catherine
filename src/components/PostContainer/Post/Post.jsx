@@ -43,7 +43,7 @@ const Post = (props) => {
       </header>
       <EuiHorizontalRule margin="s" />
       <article className={styles["post-content"]}>
-        {postData.content !== null
+        {props.postData.content !== null
           ? props.postData.content
               .split("\n")
               .map((el, idx) => <p key={"p" + idx}>{el}</p>)
