@@ -31,6 +31,7 @@ import logoutIcon from "../../assets/logout.svg";
 import profileIcon from "../../assets/profile.svg";
 
 import styles from "./NavBar.module.sass";
+import PictureURL from "../../utils/PictureURL.js";
 
 class NavBar extends Component {
   state = {
