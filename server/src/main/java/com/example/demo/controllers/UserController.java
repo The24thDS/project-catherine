@@ -8,9 +8,13 @@ import com.example.demo.models.payloads.requests.UserUpdateRequest;
 import com.example.demo.models.payloads.responses.*;
 import com.example.demo.models.payloads.PayloadModels.FullUserDetails;
 import com.example.demo.repositories.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +38,10 @@ public class UserController {
     PasswordEncoder passwordEncoder;
     @Autowired
     SimpUserRegistry simpUserRegistry;
+
+    @Autowired
+    SimpMessagingTemplate simpMessagingTemplate;
+
     //updates user's details
     @RequestMapping("/update")
     public ResponseEntity<?> updateUserDetails(@Valid @RequestBody UserUpdateRequest userUpdateRequest,
@@ -56,6 +64,9 @@ public class UserController {
 
                 if (!user.get().getBirthDate().equals(userUpdateRequest.getBirthDate())&&userUpdateRequest.getBirthDate()!=null)
                     user.get().setBirthDate(userUpdateRequest.getBirthDate());
+                if(userUpdateRequest.getProfilePicture()!=null&&userUpdateRequest.getProfilePicture().length()>50) {
+                    user.get().setProfilePicture(userUpdateRequest.getProfilePicture());
+                }
                 if(userUpdateRequest.getPassword()!=null && userUpdateRequest.getPassword2()!=null) {
                     if (!(passwordEncoder.matches(userUpdateRequest.getPassword(), user.get().getPassword()))) {
                         if (passwordEncoder.matches(userUpdateRequest.getPassword2(), user.get().getPassword())) {
@@ -84,17 +95,20 @@ public class UserController {
             if (id != null) {
                 Optional<User> requestedUser = userRepository.findById(id, 0);
                 if (requestedUser.isPresent()) {
+                    SimpUser simpUser= simpUserRegistry.getUser(requestedUser.get().getEmail());
+                    boolean online= simpUser != null;
                     if (userRepository.isFriendsWith(principal.get().getId(), requestedUser.get().getId())) {
                         User user = requestedUser.get();
                         FullUserDetails fullUserDetails=new FullUserDetails(user.getEmail(), user.getFirstName(), user.getLastName(),
                                 formatter.format(user.getBirthDate()), user.getId(), user.getProfilePicture());
-                        fullUserDetailsResponse=new FullUserDetailsResponse(fullUserDetails);
+
+                        fullUserDetailsResponse=new FullUserDetailsResponse(fullUserDetails,online);
                         fullUserDetailsResponse.setMessage("Friend Details");
                         fullUserDetailsResponse.setSuccess(true);
                     } else {
                         User user = requestedUser.get();
                         CustomUserDetails customUserDetails=new CustomUserDetails(user.getId(),user.getFirstName(),user.getLastName(),user.getProfilePicture());
-                        customUserDetailsResponse = new CustomUserDetailsResponse(customUserDetails);
+                        customUserDetailsResponse = new CustomUserDetailsResponse(customUserDetails,online);
                         customUserDetailsResponse.setMessage("User Details");
                         customUserDetailsResponse.setSuccess(true);
 
@@ -102,8 +116,10 @@ public class UserController {
                 } else return new ResponseEntity<ApiResponse>(new ApiResponse("User does not exist", false),HttpStatus.OK);
             } else {
                 User user = principal.get();
+                SimpUser simpUser= simpUserRegistry.getUser(user.getEmail());
+                boolean online= simpUser != null;
                 fullUserDetailsResponse = new FullUserDetailsResponse(new FullUserDetails(user.getEmail(), user.getFirstName(), user.getLastName(),
-                        formatter.format(user.getBirthDate()), user.getId(), user.getProfilePicture()));
+                        formatter.format(user.getBirthDate()), user.getId(), user.getProfilePicture()),online);
                 fullUserDetailsResponse.setSuccess(true);
                 fullUserDetailsResponse.setMessage("Authenticated User details");
 
@@ -138,12 +154,70 @@ public class UserController {
             if(!recieverUser.get().getFriends().contains(senderUser.get())) {
                 recieverUser.get().getFriendRequests().add(senderUser.get());
                 userRepository.save(recieverUser.get());
+                SimpUser simpUser= simpUserRegistry.getUser(recieverUser.get().getEmail());
+                if(simpUser!=null)
+                    simpMessagingTemplate.convertAndSendToUser(simpUser.getName(),"/queue/notification", new FriendNotificationMessage(currentUser.getId(), "SENT"));
                 return new ResponseEntity<>(new ApiResponse("Friend Request Sent", true), HttpStatus.OK);
             } else return new ResponseEntity<>(new ApiResponse("User is already In your friends list", false), HttpStatus.OK);
         } else return new ResponseEntity<>(new ApiResponse("Couldn't find user with given id", false), HttpStatus.OK);
 
     }
 
+    @PostMapping("/refuseFriendRequest/{id}")
+    ResponseEntity<?> refuseFriendRequest(@PathVariable("id") Long id) {
+        ApiResponse apiResponse = new ApiResponse();
+        UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),1);
+        Optional<User> friendRequestUser = userRepository.findById(id);
+        if (principal.isPresent() && friendRequestUser.isPresent()) {
+            if (principal.get().getFriendRequests().contains(friendRequestUser.get())) {
+                //remove from the pending list
+                principal.get().getFriendRequests().remove(friendRequestUser.get());
+                userRepository.save(principal.get());
+                apiResponse.setMessage("Friend request refused");
+                apiResponse.setSuccess(true);
+            }else {
+                apiResponse.setMessage("There is no such friend request to be refused");
+                apiResponse.setSuccess(false);
+            }
+        } else {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Error. Requested user doesn't exist");
+
+        }
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+
+
+    @DeleteMapping("/friends/{id}")
+    ResponseEntity<?> deleteRequest(@PathVariable("id") Long id) {
+        ApiResponse apiResponse = new ApiResponse();
+        UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> principal = userRepository.findByEmail(currentUser.getUsername(),1);
+        Optional<User> friendToDelete= userRepository.findById(id);
+        if (principal.isPresent() && friendToDelete.isPresent()) {
+            if (principal.get().getFriends().contains(friendToDelete.get())) {
+                //remove
+                principal.get().getFriends().remove(friendToDelete.get());
+                friendToDelete.get().getFriends().remove(principal.get());
+                userRepository.save(principal.get());
+                userRepository.save(friendToDelete.get());
+
+                apiResponse.setMessage("Friend has been deleted from your friend list");
+                apiResponse.setSuccess(true);
+            }else {
+                //Id in the path variable is not present in the pending list
+                apiResponse.setMessage("There is no such friend to be deleted");
+                apiResponse.setSuccess(false);
+            }
+            } else {
+                apiResponse.setSuccess(false);
+                apiResponse.setMessage("Error. Requested user doesn't exist");
+
+            }
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
 
     @PostMapping("/acceptFriendRequest/{id}")
     ResponseEntity<?> acceptFriendRequest(@PathVariable("id") Long id) {
@@ -164,18 +238,22 @@ public class UserController {
 
                 apiResponse.setMessage("Friend has been added to your friend list");
                 apiResponse.setSuccess(true);
+                SimpUser simpUser= simpUserRegistry.getUser(friendRequestUser.get().getEmail());
+                if(simpUser!=null)
+                    simpMessagingTemplate.convertAndSendToUser(simpUser.getName(),"/queue/notification", new FriendNotificationMessage(currentUser.getId(), "ACCEPTED"));
             }else {
                 //Id in the path variable is not present in the pending list
                 apiResponse.setMessage("There is no such friend request to be accepted");
                 apiResponse.setSuccess(false);
             }
-            } else {
-                apiResponse.setSuccess(false);
-                apiResponse.setMessage("Error. Requested user doesn't exist");
+        } else {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Error. Requested user doesn't exist");
 
-            }
-            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
+
 
     @GetMapping("/friendRequests")
     ResponseEntity<?>getPending(){
@@ -223,6 +301,7 @@ public class UserController {
     }
 
 
+
     @RequestMapping(value = "/search",method =RequestMethod.POST)
     ResponseEntity<?>search(@RequestBody SearchRequest searchRequest){
         UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -246,13 +325,15 @@ public class UserController {
 
     }
 
-
-
-
-
-
-
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    private static class FriendNotificationMessage{
+        Long id;
+        String type;
     }
+
+}
 
 
 
