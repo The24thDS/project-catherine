@@ -43,9 +43,11 @@ const Post = (props) => {
       </header>
       <EuiHorizontalRule margin="s" />
       <article className={styles["post-content"]}>
-        {props.postData.content.split("\n").map((el, idx) => (
-          <p key={"p" + idx}>{el}</p>
-        ))}
+        {props.postData.content !== null
+          ? props.postData.content
+              .split("\n")
+              .map((el, idx) => <p key={"p" + idx}>{el}</p>)
+          : null}
         {images.length ? <ImageGrid images={images} /> : null}
       </article>
     </>
