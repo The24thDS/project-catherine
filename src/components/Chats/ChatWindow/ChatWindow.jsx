@@ -73,6 +73,7 @@ function ChatWindow(props) {
       <div
         className={styles["messages-container"]}
         style={{ height: isOpen ? "200px" : "0px" }}
+        data-private
       >
         {messages.map((message, id) => {
           if (message.you) {
@@ -103,6 +104,7 @@ function ChatWindow(props) {
           onChange={(ev) => {
             setMessage(ev.target.value);
           }}
+          data-private
         />
         <EuiIcon
           className={styles.send}
