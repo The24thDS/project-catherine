@@ -123,12 +123,6 @@ class NavBar extends Component {
       name: "Logout",
       icon: logoutIcon,
       onClick: this.logout,
-      style: { cursor: "pointer" },
-    },
-    {
-      name: "Logout",
-      icon: logoutIcon,
-      onClick: this.logout,
     },
   ];
   render() {

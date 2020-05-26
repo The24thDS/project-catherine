@@ -98,9 +98,18 @@ class ProfilePage extends Component {
     ).useAuthorization();
     const response = await req.send();
     if (response.status === 200) {
-      this.setState({
-        friendButtonText: "Sent",
-      });
+      this.setState(
+        {
+          friendButtonText: "Sent",
+        },
+        () => {
+          window.setTimeout(() => {
+            this.setState({
+              friendButtonText: "",
+            });
+          }, 1000);
+        }
+      );
     } else {
       this.setState({
         friendButtonText: "Failed",
@@ -118,15 +127,24 @@ class ProfilePage extends Component {
     ).useAuthorization();
     const response = await req.send();
     if (response.status === 200) {
-      this.setState((prevState) => ({
-        friendButtonText: "Friend removed :(",
-        userInfo: {
-          ...prevState.userInfo,
-          email: undefined,
-          birthDate: undefined,
-        },
-        postsData: [],
-      }));
+      this.setState(
+        (prevState) => ({
+          friendButtonText: "Friend removed :(",
+          userInfo: {
+            ...prevState.userInfo,
+            email: undefined,
+            birthDate: undefined,
+          },
+          postsData: [],
+        }),
+        () => {
+          window.setTimeout(() => {
+            this.setState({
+              friendButtonText: "",
+            });
+          }, 1000);
+        }
+      );
       this.props.removeFriend(this.state.userInfo.id);
     } else {
       this.setState({
@@ -330,7 +348,21 @@ class ProfilePage extends Component {
                   </p>
                 </>
               ) : null}
-              {isMyProfile ? null : friendButton}
+              {isMyProfile ? null : userInfo.email !== undefined ? (
+                <EuiButton color="danger" onClick={this.removeFriend}>
+                  {friendButtonText.length ? friendButtonText : "Remove friend"}
+                </EuiButton>
+              ) : (
+                <EuiButton
+                  color="secondary"
+                  fill
+                  onClick={this.sendFriendRequest}
+                >
+                  {friendButtonText.length
+                    ? friendButtonText
+                    : "Send friend request"}
+                </EuiButton>
+              )}
             </div>
           </div>
           {isMyProfile ? <AddPost insertPost={this.insertPost} /> : null}
