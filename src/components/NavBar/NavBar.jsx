@@ -198,9 +198,12 @@ class NavBar extends Component {
             <EuiIcon
               className={styles.profilePicture}
               type={this.props.userPFP}
+              data-private
             />
             <div className={styles.userInfo}>
-              <p className={styles.userName}>{this.props.userName}</p>
+              <p className={styles.userName} data-private>
+                {this.props.userName}
+              </p>
               <span className={styles.status}>Custom status</span>
             </div>
             <DropdownMenu

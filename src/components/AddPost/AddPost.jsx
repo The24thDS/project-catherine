@@ -1,6 +1,8 @@
 import React, { useState, useRef } from "react";
 import { connect } from "react-redux";
-import { EuiAvatar, EuiFilePicker } from "@elastic/eui";
+import { EuiAvatar, EuiFilePicker, EuiPopover } from "@elastic/eui";
+import Picker from "react-emojipicker";
+import { emojify } from "react-emojione";
 import { createStructuredSelector } from "reselect";
 
 import { selectUserProfilePicture } from "../../redux/user/user.selectors";
@@ -16,7 +18,12 @@ function AddPost(props) {
     isLoading: false,
     content: "Post",
   });
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const inputRef = useRef(null);
+
+  const onEmojiClick = (emojiObject) => {
+    setContent(content + emojiObject.shortname);
+  };
 
   const onFilePickerChange = (files) => {
     setFiles(files);
@@ -93,6 +100,7 @@ function AddPost(props) {
           className={styles["profile-picture"]}
           imageUrl={props.userPFP}
           name="user"
+          data-private
         />
         <textarea
           name="add-post-content"
@@ -102,8 +110,34 @@ function AddPost(props) {
           onChange={(ev) => {
             setContent(ev.target.value);
           }}
-          value={content}
+          value={emojify(content, { output: "unicode" })}
+          data-private="lipsum"
         ></textarea>
+        <EuiPopover
+          button={
+            <span
+              className={
+                styles["emoji-button"] +
+                " " +
+                (isEmojiPickerOpen ? styles["emoji-active"] : null)
+              }
+              onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+            >
+              😊
+            </span>
+          }
+          isOpen={isEmojiPickerOpen}
+          closePopover={() => setIsEmojiPickerOpen(false)}
+          anchorPosition="downRight"
+          panelPaddingSize="none"
+          repositionOnScroll={true}
+          hasArrow={true}
+          zIndex={1}
+          panelClassName={styles["emoji-picker"]}
+          display="block"
+        >
+          <Picker onEmojiSelected={onEmojiClick} />
+        </EuiPopover>
       </div>
       <div className={styles.actions}>
         <EuiFilePicker

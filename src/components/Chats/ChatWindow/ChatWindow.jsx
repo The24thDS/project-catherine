@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { EuiAvatar, EuiIcon } from "@elastic/eui";
+import { EuiAvatar, EuiIcon, EuiPopover } from "@elastic/eui";
 import moment from "moment";
+import Picker from "react-emojipicker";
+import TextareaAutosize from "react-autosize-textarea";
+import { emojify } from "react-emojione";
 
 import styles from "./ChatWindow.module.sass";
 
@@ -9,9 +12,10 @@ function ChatWindow(props) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [grabAttention, setGrabAttention] = useState(false);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 
   const sendMessage = () => {
-    if (message.trim() !== "") {
+    if (message.trim().split("/n").join(" ") !== "") {
       setMessages([
         ...messages,
         {
@@ -20,9 +24,13 @@ function ChatWindow(props) {
           date: moment().format("YYYY-MM-DD HH:mm"),
         },
       ]);
-      setMessage("");
       props.sendMessage({ message, toUser: props.email });
+      setMessage("");
     }
+  };
+
+  const onEmojiClick = (emojiObject) => {
+    setMessage(message + emojiObject.shortname);
   };
 
   useEffect(() => {
@@ -53,8 +61,9 @@ function ChatWindow(props) {
           name={`${props.firstName} ${props.lastName}`}
           imageUrl={props.profilePicture}
           className={styles["friend-avatar"]}
+          data-private
         />
-        <span className={styles["friend-name"]}>
+        <span className={styles["friend-name"]} data-private>
           {props.firstName} {props.lastName}
         </span>
         <span
@@ -73,20 +82,27 @@ function ChatWindow(props) {
       <div
         className={styles["messages-container"]}
         style={{ height: isOpen ? "200px" : "0px" }}
-        data-private
       >
         {messages.map((message, id) => {
           if (message.you) {
             return (
-              <div key={"message" + id} className={styles["my-message"]}>
-                {message.content}
+              <div
+                key={"message" + id}
+                className={styles["my-message"]}
+                data-private
+              >
+                {emojify(message.content)}
                 <time className={styles.date}>{message.date}</time>
               </div>
             );
           } else {
             return (
-              <div key={"message" + id} className={styles["friend-message"]}>
-                {message.content}
+              <div
+                key={"message" + id}
+                className={styles["friend-message"]}
+                data-private
+              >
+                {emojify(message.content)}
                 <time className={styles.date}>{message.date}</time>
               </div>
             );
@@ -97,20 +113,43 @@ function ChatWindow(props) {
         className={styles["input-container"]}
         style={{ height: isOpen ? "auto" : "0px" }}
       >
-        <input
-          type="text"
-          value={message}
-          onKeyDown={(ev) => (ev.key === "Enter" ? sendMessage() : null)}
+        <TextareaAutosize
+          value={emojify(message, { output: "unicode" })}
+          onKeyDown={(ev) => {
+            if (ev.key === "Enter") {
+              ev.preventDefault();
+              sendMessage();
+            }
+          }}
           onChange={(ev) => {
             setMessage(ev.target.value);
           }}
-          data-private
+          className={styles.input}
+          data-private="lipsum"
         />
-        <EuiIcon
-          className={styles.send}
-          type="arrowRight"
-          onClick={sendMessage}
-        />
+        <EuiPopover
+          button={
+            <span
+              className={
+                styles["emoji-button"] +
+                " " +
+                (isEmojiPickerOpen ? styles["emoji-active"] : null)
+              }
+              onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+            >
+              😊
+            </span>
+          }
+          isOpen={isEmojiPickerOpen}
+          closePopover={() => setIsEmojiPickerOpen(false)}
+          anchorPosition="upCenter"
+          panelPaddingSize="none"
+          repositionOnScroll={true}
+          zIndex={4}
+          panelClassName={styles["emoji-picker"]}
+        >
+          <Picker onEmojiSelected={onEmojiClick} />
+        </EuiPopover>
       </div>
     </div>
   );

@@ -2,6 +2,8 @@
     width: 98%
     display: flex
     justify-content: space-evenly
+    position: relative
+    align-items: flex-start
 .profile_picture
     --pfp-size: 40px
     width: var(--pfp-size)
@@ -9,3 +11,47 @@
     margin-right: 10px
 .comment_text_field
     border-radius: 5px
+    resize: none !important
+    padding-right: 28px
+    &:focus
+        background-image: linear-gradient(to top, var(--primary-color), var(--primary-color) 2px, transparent 2px, transparent 100%)
+
+.emoji-button
+    position: relative
+    margin-left: -28px
+    display: block
+    margin-top: 12px
+    -webkit-filter: grayscale(100%)
+    filter: grayscale(100%)
+    transition: filter 0.5s
+    cursor: pointer
+    z-index: 0
+    &:hover, &.emoji-active
+        -webkit-filter: grayscale(0%)
+        filter: grayscale(0%)
+        transition: filter 0.5s
+.emoji-picker
+    margin-left: -16.6px
+    margin-top: 7px
+    background-color: transparent
+    border: none
+    box-shadow: none
+    > div > div > div // this is the emoji picker container
+        margin-top: 0
+        div:first-child // this is the categories container
+            position: fixed
+            display: flex
+            flex-direction: column
+            justify-content: space-evenly
+        div:last-child // this is the emoji container
+            width: 85%
+            margin-left: 15%
+            img // this is an emoji
+                width: 20px !important
+                height: 20px !important
+
+.comment-posting-spinner
+    position: absolute
+    top: 12px
+    right: 30px
+    border-color: var(--primary-color) #D3DAE6 #D3DAE6 #D3DAE6

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { EuiAvatar, EuiHorizontalRule } from "@elastic/eui";
 import moment from "moment";
 import { useHistory } from "react-router-dom";
+import { emojify } from "react-emojione";
 
 import PictureURL from "../../../utils/PictureURL";
 
@@ -30,9 +31,10 @@ const Post = (props) => {
           imageUrl={authorPFP}
           className={styles["author-pfp"]}
           onClick={() => history.push("/user/" + props.author.id)}
+          data-private
         />
         <div className={styles["post-info"]}>
-          <span>{authorName}</span>
+          <span data-private>{authorName}</span>
           <time
             title={localDate.format("YYYY-MM-DD HH:mm")}
             dateTime={localDate.format("YYYY-MM-DD HH:mm")}
@@ -44,11 +46,13 @@ const Post = (props) => {
       <EuiHorizontalRule margin="s" />
       <article className={styles["post-content"]}>
         {props.postData.content !== null
-          ? props.postData.content
-              .split("\n")
-              .map((el, idx) => <p key={"p" + idx}>{el}</p>)
+          ? props.postData.content.split("\n").map((el, idx) => (
+              <p data-private key={"p" + idx}>
+                {emojify(el)}
+              </p>
+            ))
           : null}
-        {images.length ? <ImageGrid images={images} /> : null}
+        {images.length ? <ImageGrid data-private images={images} /> : null}
       </article>
     </>
   );

@@ -83,11 +83,12 @@ const PostContainer = (props) => {
     if (state.commentsNumber > 0) {
       if (state.areCommentsOpen !== true && state.commentsData.length === 0) {
         fetchComments();
+      } else {
+        setState({
+          ...state,
+          areCommentsOpen: !state.areCommentsOpen,
+        });
       }
-      setState({
-        ...state,
-        areCommentsOpen: !state.areCommentsOpen,
-      });
     }
   };
 
@@ -103,36 +104,32 @@ const PostContainer = (props) => {
         "POST",
         undefined,
         { text }
-      );
-      req.useAuthorization().useJsonBody();
+      )
+        .useAuthorization()
+        .useJsonBody();
       const response = await req.send();
       if (response.status === 200) {
+        const UTCnow = moment.utc().format("YYYY-MM-DD HH:mm:ss");
         setState({
           ...state,
           commentsNumber: state.commentsNumber + 1,
           isCommentPosting: false,
-        });
-        if (state.areCommentsOpen) {
-          const UTCnow = moment.utc().format("YYYY-MM-DD HH:mm:ss");
-          setState({
-            ...state,
-            commentsData: [
-              {
-                user: {
-                  profilePicture: props.currentUser.profilePicture,
-                  firstName: props.currentUser.firstName,
-                  lastName: props.currentUser.lastName,
-                  id: props.currentUser.id,
-                },
-                comment: {
-                  date: UTCnow,
-                  text,
-                },
+          commentsData: [
+            {
+              user: {
+                profilePicture: props.currentUser.profilePicture,
+                firstName: props.currentUser.firstName,
+                lastName: props.currentUser.lastName,
+                id: props.currentUser.id,
               },
-              ...state.commentsData,
-            ],
-          });
-        }
+              comment: {
+                date: UTCnow,
+                text,
+              },
+            },
+            ...state.commentsData,
+          ],
+        });
         return true;
       }
     }
@@ -248,7 +245,6 @@ const PostContainer = (props) => {
         </div>
         <AddComment
           isCommentLoading={state.isCommentPosting}
-          className={styles.add_comment}
           addCommentHandler={addCommentHandler}
         />
         {state.areCommentsOpen ? <EuiHorizontalRule margin="s" /> : null}

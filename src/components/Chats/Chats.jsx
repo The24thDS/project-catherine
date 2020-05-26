@@ -21,7 +21,11 @@ class Chats extends Component {
     this.setState((prevState) => ({
       chatWindows: {
         ...prevState.chatWindows,
-        [friendInfo.email]: { ...friendInfo, receivedMessage: null },
+        [friendInfo.email]: {
+          ...friendInfo,
+          receivedMessage: null,
+          order: Object.keys(prevState.chatWindows).length,
+        },
       },
     }));
   };
@@ -110,14 +114,16 @@ class Chats extends Component {
     const { onFriendItemClick } = this;
     return (
       <div className={styles["chats-container"]}>
-        {Object.values(this.state.chatWindows).map((chatWindow) => (
-          <ChatWindow
-            key={chatWindow.id}
-            sendMessage={this.sendMessage}
-            closeWindow={this.closeWindow}
-            {...chatWindow}
-          />
-        ))}
+        {Object.values(this.state.chatWindows)
+          .sort((a, b) => b.order - a.order)
+          .map((chatWindow) => (
+            <ChatWindow
+              key={chatWindow.id}
+              sendMessage={this.sendMessage}
+              closeWindow={this.closeWindow}
+              {...chatWindow}
+            />
+          ))}
         <ChatList {...{ onFriendItemClick }} friends={this.props.friends} />
         <SockJsClient
           url={process.env.REACT_APP_WS_URL}

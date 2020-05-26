@@ -36,11 +36,7 @@ class App extends React.Component {
         if (valid) {
           getUserDetails().then(async (userDetails) => {
             if (userDetails !== false) {
-              LogRocket.identify(userDetails.id, {
-                email: userDetails.email,
-                name: `
-                  ${userDetails.firstName} ${userDetails.lastName}`,
-              });
+              LogRocket.identify("" + userDetails.id);
               const userFriends = (await getUserFriends()).reduce(
                 (acc, value) => ({ [value.id]: { ...value }, ...acc }),
                 {}
@@ -122,6 +118,11 @@ class App extends React.Component {
           </Route>
         </Switch>
         {this.props.loggedIn ? <Chats /> : null}
+        {this.props.loggedIn ? (
+          <div className="build-version">
+            Project Catherine v0.9.2-beta <br /> build afhgsa6safgas
+          </div>
+        ) : null}
       </div>
     );
   }

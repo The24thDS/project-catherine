@@ -292,6 +292,7 @@ class ProfilePage extends Component {
                   className={
                     styles.pfp + " " + (isMyProfile ? styles["my-pfp"] : null)
                   }
+                  data-private
                 />
               </label>
               {isMyProfile ? (
@@ -302,13 +303,15 @@ class ProfilePage extends Component {
                   onChange={this.updatePFP}
                 />
               ) : null}
-              <h1>{name}</h1>
+              <h1 data-private>{name}</h1>
               {userInfo.email ? (
                 <>
                   <p>
                     <b>email</b>
                   </p>
-                  <p style={{ marginBottom: "10px" }}>{userInfo.email}</p>
+                  <p data-private style={{ marginBottom: "10px" }}>
+                    {userInfo.email}
+                  </p>
                 </>
               ) : null}
               {userInfo.birthDate ? (
@@ -316,7 +319,9 @@ class ProfilePage extends Component {
                   <p>
                     <b>birthdate</b>
                   </p>
-                  <p style={{ marginBottom: "10px" }}>{userInfo.birthDate}</p>
+                  <p data-private style={{ marginBottom: "10px" }}>
+                    {userInfo.birthDate}
+                  </p>
                 </>
               ) : null}
               {isMyProfile ? null : friendButton}

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import styles from "./AddComment.module.sass";
-import { EuiFieldText, EuiAvatar } from "@elastic/eui";
+import { EuiAvatar, EuiPopover, EuiLoadingSpinner } from "@elastic/eui";
+import Picker from "react-emojipicker";
+import TextareaAutosize from "react-autosize-textarea";
+import { emojify } from "react-emojione";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 
@@ -11,6 +14,11 @@ import {
 
 const AddComment = (props) => {
   const [value, setValue] = useState("");
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+
+  const onEmojiClick = (emojiObject) => {
+    setValue(value + emojiObject.shortname);
+  };
 
   return (
     <div className={styles.container}>
@@ -18,20 +26,51 @@ const AddComment = (props) => {
         className={styles.profile_picture}
         imageUrl={props.currentUserPFP}
         name={props.currentUserName}
+        data-private
       />
-      <EuiFieldText
-        value={value}
-        isLoading={props.isCommentLoading}
-        onKeyDown={async (e) => {
-          if (await props.addCommentHandler(e)) {
-            setValue("");
+      <TextareaAutosize
+        value={emojify(value, { output: "unicode" })}
+        onKeyDown={(ev) => {
+          if (ev.key === "Enter") {
+            ev.preventDefault();
+            props.addCommentHandler(ev).then((d) => {
+              setValue("");
+            });
           }
         }}
-        className={styles.comment_text_field}
-        placeholder="Add a comment"
-        fullWidth={true}
+        className={
+          styles.comment_text_field + " euiFieldText euiFieldText--fullWidth"
+        }
         onChange={(ev) => setValue(ev.target.value)}
+        data-private="lipsum"
       />
+      {props.isCommentLoading ? (
+        <EuiLoadingSpinner className={styles["comment-posting-spinner"]} />
+      ) : null}
+      <EuiPopover
+        button={
+          <span
+            className={
+              styles["emoji-button"] +
+              " " +
+              (isEmojiPickerOpen ? styles["emoji-active"] : null)
+            }
+            onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+          >
+            😊
+          </span>
+        }
+        isOpen={isEmojiPickerOpen}
+        closePopover={() => setIsEmojiPickerOpen(false)}
+        anchorPosition="upCenter"
+        panelPaddingSize="none"
+        repositionOnScroll={true}
+        hasArrow={true}
+        zIndex={1}
+        panelClassName={styles["emoji-picker"]}
+      >
+        <Picker onEmojiSelected={onEmojiClick} />
+      </EuiPopover>
     </div>
   );
 };
