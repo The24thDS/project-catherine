@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { EuiAvatar, EuiHorizontalRule } from "@elastic/eui";
+import { EuiAvatar, EuiHorizontalRule, EuiToolTip } from "@elastic/eui";
 import moment from "moment";
 import { useHistory } from "react-router-dom";
 import { emojify } from "react-emojione";
@@ -15,7 +15,7 @@ const Post = (props) => {
   const authorPFP = new PictureURL(props.author.profilePicture).url;
 
   const localDate = moment.utc(props.postData.date).local();
-  const formatedDate = localDate.fromNow();
+  const formatedDate = localDate.calendar();
 
   const images = props.postData.imageNames.map(
     (imageName) => new PictureURL(imageName).url
@@ -35,12 +35,14 @@ const Post = (props) => {
         />
         <div className={styles["post-info"]}>
           <span data-private>{authorName}</span>
-          <time
-            title={localDate.format("YYYY-MM-DD HH:mm")}
-            dateTime={localDate.format("YYYY-MM-DD HH:mm")}
+          <EuiToolTip
+            position="top"
+            content={localDate.format("dddd, MMMM D, YYYY h:mm A")}
           >
-            {formatedDate}
-          </time>
+            <time dateTime={localDate.format("YYYY-MM-DD HH:mm")}>
+              {formatedDate}
+            </time>
+          </EuiToolTip>
         </div>
       </header>
       <EuiHorizontalRule margin="s" />
