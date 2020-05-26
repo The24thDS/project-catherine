@@ -40,3 +40,8 @@ export const selectUserFullName = createSelector(
   [selectUserFirstName, selectUserLastName],
   (firstName, lastName) => `${firstName} ${lastName}`
 );
+
+export const selectUserFormattedInfo = createSelector(
+  [selectUserInfo, selectUserProfilePicture],
+  (userInfo, userPFP) => ({ ...userInfo, profilePicture: userPFP })
+);

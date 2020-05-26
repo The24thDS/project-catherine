@@ -119,8 +119,9 @@ class App extends React.Component {
         </Switch>
         {this.props.loggedIn ? <Chats /> : null}
         {this.props.loggedIn ? (
-          <div className="build-version">
-            Project Catherine v0.9.2-beta <br /> build afhgsa6safgas
+          <div className="build-version" style={{ pointerEvents: "none" }}>
+            Project Catherine v0.9.2-beta <br /> <em>Express Yourself</em>{" "}
+            update
           </div>
         ) : null}
       </div>

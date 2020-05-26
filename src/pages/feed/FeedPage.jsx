@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
+import moment from "moment";
 
 import AddPost from "../../components/AddPost/AddPost";
 import PostContainer from "../../components/PostContainer";
 import ServerRequest from "../../utils/ServerRequest";
 import Spinner from "../../components/Spinner/Spinner";
 import { selectFriendsRaw } from "../../redux/friends/friends.selectors";
+import { selectUserInfo } from "../../redux/user/user.selectors";
 
 class FeedPage extends Component {
   constructor(props) {
@@ -16,37 +18,71 @@ class FeedPage extends Component {
       arePostsLoaded: false,
       loadingPosts: false,
       posts: [],
-      postsPage: 0,
-      isPostsLastPage: false,
+      friendsPostsPage: 0,
+      isFriendsPostsLastPage: false,
+      myPostsPage: 0,
+      isMyPostsLastPage: false,
     };
   }
 
   fetchPosts = async () => {
     this.setState({ loadingPosts: true });
-    const req = new ServerRequest(
-      "/posts?page=" + this.state.postsPage
+    let req = new ServerRequest(
+      "/posts?page=" + this.state.friendsPostsPage
     ).useAuthorization();
-    const response = await req.send();
-    const data = await response.json();
+    let response = await req.send();
+    const friendsPosts = await response.json();
+    req = new ServerRequest(
+      "/posts/user/" +
+        this.props.currentUser.id +
+        "?page=" +
+        this.state.myPostsPage
+    ).useAuthorization();
+    response = await req.send();
+    const myPosts = await response.json();
     this.setState({ loadingPosts: false });
-    return data;
+    return { friendsPosts, myPosts };
+  };
+
+  formatPosts = (data) => {
+    if (data.friendsPosts.posts === null) {
+      data.friendsPosts.posts = [];
+    }
+    if (data.myPosts.posts === null) {
+      data.myPosts.posts = [];
+    }
+    data.myPosts.posts = data.myPosts.posts.map((postData) => ({
+      user: { ...this.props.currentUser },
+      ...postData,
+    }));
+    const posts = data.friendsPosts.posts.concat(data.myPosts.posts);
+    const sortedPosts = posts.sort((a, b) =>
+      moment(b.post.date).diff(moment(a.post.date))
+    );
+    return sortedPosts;
+  };
+
+  removePostById = (postId) => {
+    this.setState((prevState) => ({
+      posts: prevState.posts.filter((el) => el.post.postId !== postId),
+    }));
   };
 
   scrollListener = () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-      if (!this.state.isPostsLastPage) {
+      if (!this.state.isFriendsPostsLastPage || !this.state.isMyPostsLastPage) {
         this.setState(
           (prevState) => ({
-            postsPage: prevState.postsPage + 1,
+            friendsPostsPage: prevState.friendsPostsPage + 1,
+            myPostsPage: prevState.myPostsPage + 1,
           }),
           () => {
             this.fetchPosts().then((data) => {
-              if (data.posts === null) {
-                data.posts = [];
-              }
+              const posts = this.formatPosts(data);
               this.setState((prevState) => ({
-                posts: [...prevState.posts, ...data.posts],
-                isPostsLastPage: data.last,
+                posts: [...prevState.posts, posts],
+                isFriendsPostsLastPage: data.friendsPosts.last,
+                isMyPostsLastPage: data.myPosts.last,
               }));
             });
           }
@@ -57,9 +93,12 @@ class FeedPage extends Component {
 
   componentDidMount() {
     this.fetchPosts().then((data) => {
+      const posts = this.formatPosts(data);
+
       this.setState({
-        posts: data.posts || [],
-        isPostsLastPage: data.last,
+        posts: posts || [],
+        isFriendsPostsLastPage: data.friendsPosts.last,
+        isMyPostsLastPage: data.myPosts.last,
         arePostsLoaded: true,
       });
     });
@@ -101,6 +140,7 @@ class FeedPage extends Component {
               key={"post" + el.post.postId}
               postInfo={{ ...el.post, isLiked: el.liked }}
               author={el.user}
+              removePostById={this.removePostById}
             />
           ))
         ) : this.state.arePostsLoaded ? (
@@ -124,7 +164,9 @@ class FeedPage extends Component {
             imageSize="80px"
           />
         ) : null}
-        {this.state.isPostsLastPage && this.state.posts.length > 0 ? (
+        {this.state.isFriendsPostsLastPage &&
+        this.state.isMyPostsLastPage &&
+        this.state.posts.length > 0 ? (
           <p style={{ color: "gray", fontSize: "22px", marginTop: "75px" }}>
             That was all. Go do something productive now.
           </p>
@@ -136,6 +178,7 @@ class FeedPage extends Component {
 
 const mapStateToProps = createStructuredSelector({
   friends: selectFriendsRaw,
+  currentUser: selectUserInfo,
 });
 
 export default connect(mapStateToProps)(FeedPage);
