@@ -4,6 +4,7 @@ import moment from "moment";
 import Picker from "react-emojipicker";
 import TextareaAutosize from "react-autosize-textarea";
 import { emojify } from "react-emojione";
+import AutoScroll from "@brianmcallister/react-auto-scroll";
 
 import styles from "./ChatWindow.module.sass";
 
@@ -79,9 +80,14 @@ function ChatWindow(props) {
         />
       </header>
 
-      <div
+      {/* <div
         className={styles["messages-container"]}
         style={{ height: isOpen ? "200px" : "0px" }}
+      > */}
+      <AutoScroll
+        showOption={false}
+        className={styles["messages-container"]}
+        height={isOpen ? 200 : 0}
       >
         {messages.map((message, id) => {
           if (message.you) {
@@ -108,7 +114,8 @@ function ChatWindow(props) {
             );
           }
         })}
-      </div>
+      </AutoScroll>
+      {/* </div> */}
       <div
         className={styles["input-container"]}
         style={{ height: isOpen ? "auto" : "0px" }}
@@ -136,6 +143,8 @@ function ChatWindow(props) {
                 (isEmojiPickerOpen ? styles["emoji-active"] : null)
               }
               onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+              role="img"
+              aria-label="emoji picker"
             >
               😊
             </span>
