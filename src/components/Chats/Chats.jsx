@@ -9,6 +9,10 @@ import ChatWindow from "./ChatWindow/";
 import ServerRequest from "../../utils/ServerRequest";
 import { setFriendStatus } from "../../redux/friends/friends.actions";
 import { selectFriendsFormatted } from "../../redux/friends/friends.selectors";
+import {
+  addChatMessage,
+  deleteChat,
+} from "../../redux/messages/mesagges.actions";
 
 import styles from "./Chats.module.sass";
 
@@ -37,19 +41,29 @@ class Chats extends Component {
   receivedMessage = (msg, topic) => {
     if (topic === "/user/queue/chat") {
       let hasChatWindow = true;
+      let user = null;
+      const msgObj = {
+        you: false,
+        content: msg.message,
+        date: moment().format("YYYY-MM-DD HH:mm"),
+      };
       if (this.state[msg.sender] === undefined) {
         hasChatWindow = false;
+        user = this.props.friends.find((f) => f.email === msg.sender);
+        this.props.addChatMessage({ id: user.id, message: msgObj });
+      } else {
+        this.props.addChatMessage({
+          id: this.state.chatWindows[msg.sender].id,
+          message: msgObj,
+        });
       }
       this.setState((prevState) => ({
         chatWindows: {
           ...prevState.chatWindows,
           [msg.sender]: {
-            ...(hasChatWindow
-              ? prevState.chatWindows[msg.sender]
-              : this.props.friends.find((f) => f.email === msg.sender)),
+            ...(hasChatWindow ? prevState.chatWindows[msg.sender] : user),
             receivedMessage: {
               moment: moment().valueOf(),
-              content: msg.message,
             },
           },
         },
@@ -98,11 +112,12 @@ class Chats extends Component {
     }
     const difference = prevProps.friends
       .filter(comparer(this.props.friends))
-      .map((el) => el.email);
+      .map((el) => ({ email: el.email, id: el.id }));
     if (difference.length) {
       const chatWindows = this.state.chatWindows;
-      difference.forEach((email) => {
-        delete chatWindows[email];
+      difference.forEach((el) => {
+        delete chatWindows[el.email];
+        this.props.deleteChat(el.id);
       });
       this.setState({
         chatWindows: chatWindows,
@@ -145,6 +160,8 @@ const mapStateToProps = createStructuredSelector({
 
 const mapDispatchToProps = (dispatch) => ({
   setFriendStatus: (friend) => dispatch(setFriendStatus(friend)),
+  addChatMessage: (data) => dispatch(addChatMessage(data)),
+  deleteChat: (chatID) => dispatch(deleteChat(chatID)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Chats);
