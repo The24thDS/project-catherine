@@ -45,6 +45,12 @@ class ProfilePage extends Component {
     }));
   };
 
+  insertPost = (postObj) => {
+    this.setState((prevState) => ({
+      postsData: [postObj, ...prevState.postsData],
+    }));
+  };
+
   updatePFP = async (files) => {
     if (files.length !== 0) {
       const formData = new FormData();
@@ -327,7 +333,7 @@ class ProfilePage extends Component {
               {isMyProfile ? null : friendButton}
             </div>
           </div>
-          {isMyProfile ? <AddPost /> : null}
+          {isMyProfile ? <AddPost insertPost={this.insertPost} /> : null}
           {postsData.length ? (
             postsData.map((postInfo) => (
               <PostContainer

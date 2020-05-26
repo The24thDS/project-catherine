@@ -68,6 +68,12 @@ class FeedPage extends Component {
     }));
   };
 
+  insertPost = (postObj) => {
+    this.setState((prevState) => ({
+      posts: [postObj, ...prevState.posts],
+    }));
+  };
+
   scrollListener = () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
       if (!this.state.isFriendsPostsLastPage || !this.state.isMyPostsLastPage) {
@@ -133,7 +139,7 @@ class FeedPage extends Component {
           paddingBottom: "100px",
         }}
       >
-        <AddPost />
+        <AddPost insertPost={this.insertPost} />
         {this.state.posts.length ? (
           this.state.posts.map((el) => (
             <PostContainer

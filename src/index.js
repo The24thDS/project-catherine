@@ -30,6 +30,7 @@ LogRocket.init("iisf1p/project-catherine", {
       return response;
     },
   },
+  release: "v0.9.2-beta : 'Express Yourself' update",
 });
 setupLogRocketReact(LogRocket);
 const getLogRocketSessionURL = () => {
