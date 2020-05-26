@@ -268,11 +268,7 @@ const PostContainer = (props) => {
                 onClick={(ev) => {
                   ev.persist();
                   ev.target.textContent = "Deleting...";
-                  deletePost().then((done) => {
-                    if (done) {
-                      setState({ ...state, deleteModal: false });
-                    }
-                  });
+                  deletePost();
                 }}
               >
                 Yes
