@@ -102,7 +102,7 @@ class FeedPage extends Component {
       const posts = this.formatPosts(data);
 
       this.setState({
-        posts: posts || [],
+        posts: posts,
         isFriendsPostsLastPage: data.friendsPosts.last,
         isMyPostsLastPage: data.myPosts.last,
         arePostsLoaded: true,
@@ -114,9 +114,12 @@ class FeedPage extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps.friends.length !== this.props.friends.length) {
       this.fetchPosts().then((data) => {
+        const posts = this.formatPosts(data);
+
         this.setState({
-          posts: data.posts || [],
-          isPostsLastPage: data.last,
+          posts: posts,
+          isFriendsPostsLastPage: data.friendsPosts.last,
+          isMyPostsLastPage: data.myPosts.last,
           arePostsLoaded: true,
         });
       });
