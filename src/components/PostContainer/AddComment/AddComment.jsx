@@ -56,6 +56,8 @@ const AddComment = (props) => {
               (isEmojiPickerOpen ? styles["emoji-active"] : null)
             }
             onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+            role="img"
+            aria-label="emoji picker"
           >
             😊
           </span>
