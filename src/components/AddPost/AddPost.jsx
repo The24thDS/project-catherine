@@ -1,13 +1,16 @@
 import React, { useState, useRef } from "react";
 import { connect } from "react-redux";
-import { EuiAvatar, EuiFilePicker } from "@elastic/eui";
+import { EuiAvatar, EuiFilePicker, EuiPopover, EuiButton } from "@elastic/eui";
+import Picker from "react-emojipicker";
+import { emojify } from "react-emojione";
 import { createStructuredSelector } from "reselect";
+import moment from "moment";
 
-import { selectUserProfilePicture } from "../../redux/user/user.selectors";
+import PictureURL from "../../utils/PictureURL";
+import { selectUserInfo } from "../../redux/user/user.selectors";
 import ServerRequest from "../../utils/ServerRequest";
 
 import styles from "./AddPost.module.sass";
-import { EuiButton } from "@elastic/eui";
 
 function AddPost(props) {
   const [files, setFiles] = useState([]);
@@ -16,7 +19,12 @@ function AddPost(props) {
     isLoading: false,
     content: "Post",
   });
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const inputRef = useRef(null);
+
+  const onEmojiClick = (emojiObject) => {
+    setContent(content + emojiObject.shortname);
+  };
 
   const onFilePickerChange = (files) => {
     setFiles(files);
@@ -68,6 +76,22 @@ function AddPost(props) {
     const response = await req.send();
 
     if (response.status === 200) {
+      const postObj = {
+        liked: false,
+        post: {
+          postId: (await response.json()).id,
+          content: content !== "" ? content : null,
+          date: moment().format("YYYY-MM-DD HH:mm:ss"),
+          imageNames: photos !== null ? photos : [],
+          likes: 0,
+          comments: 0,
+        },
+        user: {
+          ...props.currentUser,
+        },
+      };
+      console.log(postObj);
+      props.insertPost(postObj);
       setContent("");
       setFiles([]);
       setPostState({
@@ -91,8 +115,9 @@ function AddPost(props) {
       <div className={styles["content-area"]}>
         <EuiAvatar
           className={styles["profile-picture"]}
-          imageUrl={props.userPFP}
+          imageUrl={new PictureURL(props.currentUser.profilePicture).url}
           name="user"
+          data-private
         />
         <textarea
           name="add-post-content"
@@ -102,8 +127,36 @@ function AddPost(props) {
           onChange={(ev) => {
             setContent(ev.target.value);
           }}
-          value={content}
+          value={emojify(content, { output: "unicode" })}
+          data-private="lipsum"
         ></textarea>
+        <EuiPopover
+          button={
+            <span
+              className={
+                styles["emoji-button"] +
+                " " +
+                (isEmojiPickerOpen ? styles["emoji-active"] : null)
+              }
+              onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+              role="img"
+              aria-label="emoji picker"
+            >
+              😊
+            </span>
+          }
+          isOpen={isEmojiPickerOpen}
+          closePopover={() => setIsEmojiPickerOpen(false)}
+          anchorPosition="downRight"
+          panelPaddingSize="none"
+          repositionOnScroll={true}
+          hasArrow={true}
+          zIndex={1}
+          panelClassName={styles["emoji-picker"]}
+          display="block"
+        >
+          <Picker onEmojiSelected={onEmojiClick} />
+        </EuiPopover>
       </div>
       <div className={styles.actions}>
         <EuiFilePicker
@@ -130,7 +183,7 @@ function AddPost(props) {
 }
 
 const mapStateToProps = createStructuredSelector({
-  userPFP: selectUserProfilePicture,
+  currentUser: selectUserInfo,
 });
 
 export default connect(mapStateToProps, null)(AddPost);

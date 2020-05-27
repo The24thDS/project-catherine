@@ -11,6 +11,7 @@
 .content-area
   margin: 10px
   position: relative
+  display: flex
 
   .textarea
     padding: 10px
@@ -41,3 +42,38 @@
   border-top: 1px solid gray
   .image-picker
     max-width: 200px
+
+.emoji-button
+  display: block
+  position: relative
+  top: 15px
+  margin-left: -40px
+  font-size: 20px
+  -webkit-filter: grayscale(100%)
+  filter: grayscale(100%)
+  transition: filter 0.5s
+  cursor: pointer
+  z-index: 0
+  &:hover, &.emoji-active
+      -webkit-filter: grayscale(0%)
+      filter: grayscale(0%)
+      transition: filter 0.5s
+.emoji-picker
+  margin-left: -26px
+  margin-top: 15px
+  background-color: transparent
+  border: none
+  box-shadow: none
+  > div > div > div // this is the emoji picker container
+      margin-top: 0
+      div:first-child // this is the categories container
+          position: fixed
+          display: flex
+          flex-direction: column
+          justify-content: space-evenly
+      div:last-child // this is the emoji container
+          width: 85%
+          margin-left: 15%
+          img // this is an emoji
+              width: 20px !important
+              height: 20px !important

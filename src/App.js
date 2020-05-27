@@ -19,12 +19,22 @@ import Chats from "./components/Chats";
 import { getUserDetails, checkToken, getUserFriends } from "./utils/user";
 
 import ProfilePage from "./pages/profile";
+import Modal from "./components/Modal";
+import NewFeaturesWindow from "./components/NewFeaturesWindow";
+
 class App extends React.Component {
   static propTypes = {
     loggedIn: PropTypes.bool.isRequired,
     logOut: PropTypes.func.isRequired,
     setLoggedIn: PropTypes.func.isRequired,
     setFriendsInfo: PropTypes.func.isRequired,
+  };
+
+  state = {
+    updateWindowClosed:
+      window.localStorage.getItem("closed-express-yourself") === "true"
+        ? true
+        : false,
   };
 
   componentDidMount() {
@@ -36,11 +46,7 @@ class App extends React.Component {
         if (valid) {
           getUserDetails().then(async (userDetails) => {
             if (userDetails !== false) {
-              LogRocket.identify(userDetails.id, {
-                email: userDetails.email,
-                name: `
-                  ${userDetails.firstName} ${userDetails.lastName}`,
-              });
+              LogRocket.identify("" + userDetails.id);
               const userFriends = (await getUserFriends()).reduce(
                 (acc, value) => ({ [value.id]: { ...value }, ...acc }),
                 {}
@@ -122,6 +128,27 @@ class App extends React.Component {
           </Route>
         </Switch>
         {this.props.loggedIn ? <Chats /> : null}
+        {this.props.loggedIn ? (
+          <div
+            className="build-version"
+            style={{ pointerEvents: "none", zIndex: "0" }}
+          >
+            Project Catherine v0.9.2-beta <br /> <em>Express Yourself</em>{" "}
+            update
+          </div>
+        ) : null}
+        {this.state.updateWindowClosed !== true && this.props.loggedIn ? (
+          <Modal>
+            <NewFeaturesWindow
+              closeWindow={() => {
+                window.localStorage.setItem("closed-express-yourself", "true");
+                this.setState({
+                  updateWindowClosed: true,
+                });
+              }}
+            />
+          </Modal>
+        ) : null}
       </div>
     );
   }
