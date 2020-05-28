@@ -131,9 +131,19 @@ class App extends React.Component {
         {this.props.loggedIn ? (
           <div
             className="build-version"
-            style={{ pointerEvents: "none", zIndex: "0" }}
+            style={{ cursor: "default", zIndex: "0" }}
           >
-            Project Catherine v0.9.2-beta <br /> <em>Express Yourself</em>{" "}
+            Project Catherine v0.9.2-beta <br />{" "}
+            <em
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                this.setState({
+                  updateWindowClosed: false,
+                });
+              }}
+            >
+              Express Yourself
+            </em>{" "}
             update
           </div>
         ) : null}
