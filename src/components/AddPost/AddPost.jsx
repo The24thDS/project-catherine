@@ -81,7 +81,7 @@ function AddPost(props) {
         post: {
           postId: (await response.json()).id,
           content: content !== "" ? content : null,
-          date: moment().format("YYYY-MM-DD HH:mm:ss"),
+          date: moment.utc().format("YYYY-MM-DD HH:mm:ss"),
           imageNames: photos !== null ? photos : [],
           likes: 0,
           comments: 0,
