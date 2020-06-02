@@ -32,8 +32,9 @@ function ChatList(props) {
                 name={`${friend.firstName} ${friend.lastName}`}
                 imageUrl={friend.profilePicture}
                 className={styles["friend-avatar"]}
+                data-private
               />
-              <span className={styles["friend-name"]}>
+              <span className={styles["friend-name"]} data-private>
                 {friend.firstName} {friend.lastName}
               </span>
               <span

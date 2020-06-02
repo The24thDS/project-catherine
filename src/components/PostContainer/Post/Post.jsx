@@ -1,8 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { EuiAvatar, EuiHorizontalRule } from "@elastic/eui";
+import { EuiAvatar, EuiHorizontalRule, EuiToolTip } from "@elastic/eui";
 import moment from "moment";
 import { useHistory } from "react-router-dom";
+import { emojify } from "react-emojione";
 
 import PictureURL from "../../../utils/PictureURL";
 
@@ -14,7 +15,7 @@ const Post = (props) => {
   const authorPFP = new PictureURL(props.author.profilePicture).url;
 
   const localDate = moment.utc(props.postData.date).local();
-  const formatedDate = localDate.fromNow();
+  const formatedDate = localDate.calendar();
 
   const images = props.postData.imageNames.map(
     (imageName) => new PictureURL(imageName).url
@@ -30,25 +31,30 @@ const Post = (props) => {
           imageUrl={authorPFP}
           className={styles["author-pfp"]}
           onClick={() => history.push("/user/" + props.author.id)}
+          data-private
         />
         <div className={styles["post-info"]}>
-          <span>{authorName}</span>
-          <time
-            title={localDate.format("YYYY-MM-DD HH:mm")}
-            dateTime={localDate.format("YYYY-MM-DD HH:mm")}
+          <span data-private>{authorName}</span>
+          <EuiToolTip
+            position="top"
+            content={localDate.format("dddd, MMMM D, YYYY h:mm A")}
           >
-            {formatedDate}
-          </time>
+            <time dateTime={localDate.format("YYYY-MM-DD HH:mm")}>
+              {formatedDate}
+            </time>
+          </EuiToolTip>
         </div>
       </header>
       <EuiHorizontalRule margin="s" />
       <article className={styles["post-content"]}>
         {props.postData.content !== null
-          ? props.postData.content
-              .split("\n")
-              .map((el, idx) => <p key={"p" + idx}>{el}</p>)
+          ? props.postData.content.split("\n").map((el, idx) => (
+              <p data-private key={"p" + idx}>
+                {emojify(el)}
+              </p>
+            ))
           : null}
-        {images.length ? <ImageGrid images={images} /> : null}
+        {images.length ? <ImageGrid data-private images={images} /> : null}
       </article>
     </>
   );

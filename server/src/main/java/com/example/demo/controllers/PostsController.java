@@ -22,6 +22,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.servlet.ServletContext;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -46,7 +51,13 @@ public class PostsController {
     //can post both post content (text), and image.None is compulsory, but must contain at least 1 of them.
     @PostMapping()
     ResponseEntity<?> post(@RequestBody PostRequest postRequest)  {
-        ApiResponse apiResponse = new ApiResponse();
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        class Response extends ApiResponse{
+            public long id;
+        }
+        Response apiResponse = new Response();
         //check request to contain either of the 2
         if (postRequest.getContent() != null || postRequest.getPhotos() != null) {
             UserDetailsPrincipal currentUser = (UserDetailsPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -64,11 +75,13 @@ public class PostsController {
                         post.getImageNames().add(element);
                     }
                 }
+                post=postsRepository.save(post);
                 user.get().getPosts().add(post);
                 userRepository.save(user.get());
 
                 apiResponse.setMessage("Post added successfully");
                 apiResponse.setSuccess(true);
+                apiResponse.id=post.getId();
             }
             //handle that case when, for some reason, user couldn't be loaded from db. (poor chance to happen)
             else {

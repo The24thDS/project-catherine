@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 
 import styles from "./ImageGrid.module.sass";
 
-function ImageGrid(props) {
+function ImageGrid({ images, ...rest }) {
   const rowNum = () => {
-    let value = Math.sqrt(props.images.length);
+    let value = Math.sqrt(images.length);
     const truncValue = Math.trunc(value);
     if (value % truncValue !== 0) {
       value = truncValue + 1;
@@ -14,8 +14,12 @@ function ImageGrid(props) {
   };
 
   return (
-    <div className={styles.images} style={{ "--rowNum": "" + rowNum() }}>
-      {props.images.map((photo, index) => {
+    <div
+      className={styles.images}
+      style={{ "--rowNum": "" + rowNum() }}
+      {...rest}
+    >
+      {images.map((photo, index) => {
         return (
           <img
             key={index}

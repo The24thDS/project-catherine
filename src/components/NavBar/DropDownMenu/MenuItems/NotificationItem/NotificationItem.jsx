@@ -7,7 +7,6 @@ import PictureURL from "../../../../../utils/PictureURL";
 import styles from "./NotificationItem.module.sass";
 
 const NotificationItem = (props) => {
-  console.log(props);
   return (
     <div
       className={`${styles["notification-item"]} ${
