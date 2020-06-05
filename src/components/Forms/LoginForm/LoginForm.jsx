@@ -121,11 +121,7 @@ class LoginForm extends React.Component {
       }
       const userDetails = await getUserDetails();
       if (userDetails !== false) {
-        LogRocket.identify(userDetails.id, {
-          email: userDetails.email,
-          name: `
-                  ${userDetails.firstName} ${userDetails.lastName}`,
-        });
+        LogRocket.identify("" + userDetails.id);
         const userFriends = (await getUserFriends()).reduce(
           (acc, value) => ({ [value.id]: { ...value }, ...acc }),
           {}
